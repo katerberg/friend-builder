@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:friend_builder/contactsPage.dart';
+import 'package:friend_builder/contactPermissionsAlert.dart';
 
 void main() {
   runApp(MyApp());
@@ -70,21 +70,18 @@ class _MyHomePageState extends State<MyHomePage> {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => ContactsPage()));
     } else {
-      //If permissions have been denied show standard cupertino alert dialog
-      showDialog(
-          context: context,
-          builder: (BuildContext context) => CupertinoAlertDialog(
-                title: Text('Permissions error'),
-                content: Text('Please enable contacts access '
-                    'permission in system settings'),
-                actions: <Widget>[
-                  CupertinoDialogAction(
-                    child: Text('OK'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  )
-                ],
-              ));
+      _showPermissionsFailureDialog();
     }
+  }
+
+  Future<void> _showPermissionsFailureDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new ContactPermissionsAlert(context);
+      },
+    );
   }
 
   //Check contacts permission
