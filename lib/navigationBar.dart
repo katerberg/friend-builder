@@ -8,6 +8,24 @@ class NavigationBar extends StatefulWidget {
 class _NavigationBarState extends State<NavigationBar> {
   int _tabIndex = 1;
 
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+
+  static const List<Widget> _tabs = <Widget>[
+    Text(
+      'Index 0: User',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 1: Log',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 2: Friends',
+      style: optionStyle,
+    ),
+  ];
+
   void _changeTab(int tabIndex) async {
     setState(() {
       _tabIndex = tabIndex;
@@ -37,18 +55,7 @@ class _NavigationBarState extends State<NavigationBar> {
         onTap: _changeTab,
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You are on tab:',
-            ),
-            Text(
-              '$_tabIndex',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+        child: _tabs.elementAt(_tabIndex),
       ),
     );
   }
