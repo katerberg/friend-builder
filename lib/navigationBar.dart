@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/contactsPage.dart';
 
 class NavigationBar extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class _NavigationBarState extends State<NavigationBar> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  static const List<Widget> _tabs = <Widget>[
+  List<Widget> _tabs = <Widget>[
     Text(
       'Index 0: User',
       style: optionStyle,
@@ -20,10 +21,7 @@ class _NavigationBarState extends State<NavigationBar> {
       'Index 1: Log',
       style: optionStyle,
     ),
-    Text(
-      'Index 2: Friends',
-      style: optionStyle,
-    ),
+    new ContactsPage(),
   ];
 
   void _changeTab(int tabIndex) async {
