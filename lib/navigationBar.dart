@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:friend_builder/contactsPage.dart';
+import 'package:friend_builder/pages/contactsPage.dart';
+import 'package:friend_builder/pages/logPage.dart';
 
 class NavigationBar extends StatefulWidget {
   @override
@@ -17,10 +18,7 @@ class _NavigationBarState extends State<NavigationBar> {
       'Index 0: User',
       style: optionStyle,
     ),
-    Text(
-      'Index 1: Log',
-      style: optionStyle,
-    ),
+    new LogPage(),
     new ContactsPage(),
   ];
 
