@@ -8,11 +8,7 @@ class LogPage extends StatefulWidget {
 }
 
 class _LogPageState extends State<LogPage> {
-  String _contactSearch;
-
-  Future<void> _handleContactSearch(String searchParam) async {
-    _contactSearch = searchParam;
-  }
+  String _friend;
 
   Future<List<String>> _getSuggestions(String pattern) async {
     ContactPermission contactPermission =
@@ -29,47 +25,61 @@ class _LogPageState extends State<LogPage> {
     }));
   }
 
+  void _setFriend(String friend) {
+    setState(() {
+      _friend = friend;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> itemsToShow = [];
+
+    itemsToShow.add(TypeAheadField(
+      textFieldConfiguration: TextFieldConfiguration(
+          autofocus: _friend == null,
+          autocorrect: false,
+          cursorColor: Theme.of(context).cursorColor,
+          style: DefaultTextStyle.of(context)
+              .style
+              .copyWith(fontStyle: FontStyle.italic),
+          decoration: InputDecoration(border: OutlineInputBorder())),
+      suggestionsCallback: (pattern) async {
+        return await _getSuggestions(pattern);
+      },
+      itemBuilder: (context, suggestion) {
+        return ListTile(
+          leading: Icon(Icons.person_add),
+          title: Text(suggestion),
+        );
+      },
+      onSuggestionSelected: (friend) {
+        _setFriend(friend);
+      },
+    ));
+
+    if (_friend != null) {
+      itemsToShow.add(new Text(_friend));
+    } else {
+      itemsToShow.insert(
+        0,
+        new Text(
+          'Who are you hanging out with?',
+          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
+
     return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TypeAheadField(
-              textFieldConfiguration: TextFieldConfiguration(
-                  autofocus: true,
-                  autocorrect: false,
-                  cursorColor: Theme.of(context).cursorColor,
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(fontStyle: FontStyle.italic),
-                  decoration: InputDecoration(border: OutlineInputBorder())),
-              suggestionsCallback: (pattern) async {
-                return await _getSuggestions(pattern);
-              },
-              itemBuilder: (context, suggestion) {
-                return ListTile(
-                  leading: Icon(Icons.person_add),
-                  title: Text(suggestion),
-                  // subtitle: Text('\$${suggestion['price']}'),
-                );
-              },
-              onSuggestionSelected: (suggestion) {},
-            ),
-            // TextField(
-            //   autocorrect: false,
-            //   enableSuggestions: false,
-            //   cursorColor: Theme.of(context).cursorColor,
-            //   onChanged: _handleContactSearch,
-            //   decoration: InputDecoration(
-            //     icon: Icon(Icons.person),
-            //     filled: false,
-            //     labelText: 'Friend name',
-            //   ),
-            // ),
-          ],
+      body: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: _friend != null
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
+            children: itemsToShow,
+          ),
         ),
       ),
     );
