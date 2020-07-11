@@ -35,6 +35,13 @@ class _LogPageState extends State<LogPage> {
     _setFriend(null);
   }
 
+  String _getInputLabelText() {
+    if (_selectedFriend == null) {
+      return 'Who are you hanging out with?';
+    }
+    return 'Anyone else?';
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> itemsToShow = [];
@@ -44,10 +51,9 @@ class _LogPageState extends State<LogPage> {
           autofocus: _selectedFriend == null,
           autocorrect: false,
           cursorColor: Theme.of(context).cursorColor,
-          style: DefaultTextStyle.of(context)
-              .style
-              .copyWith(fontStyle: FontStyle.italic),
-          decoration: InputDecoration(border: OutlineInputBorder())),
+          decoration: InputDecoration(
+            labelText: _getInputLabelText(),
+          )),
       suggestionsCallback: (pattern) async {
         return await _getSuggestions(pattern);
       },
@@ -57,6 +63,12 @@ class _LogPageState extends State<LogPage> {
           title: Text(suggestion.displayName),
         );
       },
+      noItemsFoundBuilder: (context) => Padding(
+          padding: EdgeInsets.fromLTRB(8, 32, 8, 32),
+          child: Text(
+            'No contact found',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          )),
       onSuggestionSelected: _setFriend,
     ));
 
@@ -79,14 +91,6 @@ class _LogPageState extends State<LogPage> {
         _selectedFriend.displayName,
         style: _headerStyle,
       ));
-    } else {
-      itemsToShow.insert(
-        0,
-        Text(
-          'Who are you hanging out with?',
-          style: _headerStyle,
-        ),
-      );
     }
 
     return Scaffold(
