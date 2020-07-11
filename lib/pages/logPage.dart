@@ -60,15 +60,14 @@ class _LogPageState extends State<LogPage> {
 
     itemsToShow.add(TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
-          autofocus: _selectedFriends.isEmpty,
-          autocorrect: false,
-          cursorColor: Theme.of(context).cursorColor,
-          decoration: InputDecoration(
-            labelText: _getInputLabelText(),
-          )),
-      suggestionsCallback: (pattern) async {
-        return await _getSuggestions(pattern);
-      },
+        autofocus: _selectedFriends.isEmpty,
+        autocorrect: false,
+        cursorColor: Theme.of(context).cursorColor,
+        decoration: InputDecoration(
+          labelText: _getInputLabelText(),
+        ),
+      ),
+      suggestionsCallback: (pattern) async => await _getSuggestions(pattern),
       itemBuilder: (context, suggestion) {
         return ListTile(
           leading: Icon(Icons.person_add),
