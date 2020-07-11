@@ -8,26 +8,26 @@ class LogPage extends StatefulWidget {
 }
 
 class _LogPageState extends State<LogPage> {
-  String _friend;
+  Contact _selectedFriend;
 
-  Future<List<String>> _getSuggestions(String pattern) async {
+  static const TextStyle _headerStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+
+  Future<List<Contact>> _getSuggestions(String pattern) async {
     ContactPermission contactPermission =
         await new ContactPermissionService().getContacts();
     if (!contactPermission.missingPermission) {
       return Future.value(contactPermission.contacts
           .where((element) =>
               element.displayName.toLowerCase().contains(pattern.toLowerCase()))
-          .map((e) => e.displayName)
           .toList());
     }
-    return Future.value(List.generate(3, (index) {
-      return pattern + 'no';
-    }));
+    return Future.value([]);
   }
 
-  void _setFriend(String friend) {
+  void _setFriend(Contact friend) {
     setState(() {
-      _friend = friend;
+      _selectedFriend = friend;
     });
   }
 
@@ -37,7 +37,7 @@ class _LogPageState extends State<LogPage> {
 
     itemsToShow.add(TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
-          autofocus: _friend == null,
+          autofocus: _selectedFriend == null,
           autocorrect: false,
           cursorColor: Theme.of(context).cursorColor,
           style: DefaultTextStyle.of(context)
@@ -50,22 +50,25 @@ class _LogPageState extends State<LogPage> {
       itemBuilder: (context, suggestion) {
         return ListTile(
           leading: Icon(Icons.person_add),
-          title: Text(suggestion),
+          title: Text(suggestion.displayName),
         );
       },
-      onSuggestionSelected: (friend) {
+      onSuggestionSelected: (Contact friend) {
         _setFriend(friend);
       },
     ));
 
-    if (_friend != null) {
-      itemsToShow.add(new Text(_friend));
+    if (_selectedFriend != null) {
+      itemsToShow.add(new Text(
+        _selectedFriend.displayName,
+        style: _headerStyle,
+      ));
     } else {
       itemsToShow.insert(
         0,
         new Text(
           'Who are you hanging out with?',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          style: _headerStyle,
         ),
       );
     }
@@ -75,7 +78,7 @@ class _LogPageState extends State<LogPage> {
         child: Container(
           padding: const EdgeInsets.all(32),
           child: Column(
-            mainAxisAlignment: _friend != null
+            mainAxisAlignment: _selectedFriend != null
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.center,
             children: itemsToShow,
