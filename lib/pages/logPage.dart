@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/logPageComponents/noItemsFound.dart';
 
 class LogPage extends StatefulWidget {
   @override
@@ -63,12 +64,7 @@ class _LogPageState extends State<LogPage> {
           title: Text(suggestion.displayName),
         );
       },
-      noItemsFoundBuilder: (context) => Padding(
-          padding: EdgeInsets.fromLTRB(8, 32, 8, 32),
-          child: Text(
-            'No contact found',
-            style: TextStyle(fontStyle: FontStyle.italic),
-          )),
+      noItemsFoundBuilder: (context) => NoItemsFound(),
       onSuggestionSelected: _setFriend,
     ));
 
