@@ -19,7 +19,7 @@ class SelectedFriendChip extends StatelessWidget {
         child: Text(this.selectedFriend.initials()),
       ),
       label: Text(this.selectedFriend.displayName),
-      onPressed: this.onPressed,
+      onPressed: () => this.onPressed(this.selectedFriend),
     );
   }
 }

@@ -10,10 +10,13 @@ class LogPage extends StatefulWidget {
 }
 
 class _LogPageState extends State<LogPage> {
-  Contact _selectedFriend;
+  List<Contact> _selectedFriends;
 
-  static const TextStyle _headerStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  @override
+  void initState() {
+    super.initState();
+    _selectedFriends = [];
+  }
 
   Future<List<Contact>> _getSuggestions(String pattern) async {
     ContactPermission contactPermission =
@@ -21,7 +24,10 @@ class _LogPageState extends State<LogPage> {
     if (!contactPermission.missingPermission) {
       return Future.value(contactPermission.contacts
           .where((element) =>
-              element.displayName.toLowerCase().contains(pattern.toLowerCase()))
+              element.displayName
+                  .toLowerCase()
+                  .contains(pattern.toLowerCase()) &&
+              !_selectedFriends.contains(element))
           .toList());
     }
     return Future.value([]);
@@ -29,16 +35,20 @@ class _LogPageState extends State<LogPage> {
 
   void _setFriend(Contact friend) {
     setState(() {
-      _selectedFriend = friend;
+      _selectedFriends = [..._selectedFriends, friend];
     });
   }
 
-  void _resetFriend() {
-    _setFriend(null);
+  void _resetFriend(Contact friendToRemove) {
+    setState(() {
+      _selectedFriends = _selectedFriends
+          .where((element) => element.identifier != friendToRemove.identifier)
+          .toList();
+    });
   }
 
   String _getInputLabelText() {
-    if (_selectedFriend == null) {
+    if (_selectedFriends.isEmpty) {
       return 'Who are you hanging out with?';
     }
     return 'Anyone else?';
@@ -50,7 +60,7 @@ class _LogPageState extends State<LogPage> {
 
     itemsToShow.add(TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
-          autofocus: _selectedFriend == null,
+          autofocus: _selectedFriends.isEmpty,
           autocorrect: false,
           cursorColor: Theme.of(context).cursorColor,
           decoration: InputDecoration(
@@ -69,20 +79,16 @@ class _LogPageState extends State<LogPage> {
       onSuggestionSelected: _setFriend,
     ));
 
-    if (_selectedFriend != null) {
+    if (_selectedFriends.isNotEmpty) {
       itemsToShow.add(Wrap(
         spacing: 8.0,
         runSpacing: 4.0,
-        children: <Widget>[
-          SelectedFriendChip(
-            onPressed: _resetFriend,
-            selectedFriend: _selectedFriend,
-          ),
-        ],
-      ));
-      itemsToShow.add(Text(
-        _selectedFriend.displayName,
-        style: _headerStyle,
+        children: _selectedFriends
+            .map((Contact friend) => SelectedFriendChip(
+                  onPressed: _resetFriend,
+                  selectedFriend: friend,
+                ))
+            .toList(),
       ));
     }
 
@@ -91,9 +97,9 @@ class _LogPageState extends State<LogPage> {
         child: Container(
           padding: const EdgeInsets.all(32),
           child: Column(
-            mainAxisAlignment: _selectedFriend != null
-                ? MainAxisAlignment.start
-                : MainAxisAlignment.center,
+            mainAxisAlignment: _selectedFriends.isEmpty
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
             children: itemsToShow,
           ),
         ),
