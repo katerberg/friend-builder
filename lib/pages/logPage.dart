@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/logPageComponents/noItemsFound.dart';
+import 'package:friend_builder/logPageComponents/selectedFriendChip.dart';
 
 class LogPage extends StatefulWidget {
   @override
@@ -73,13 +74,9 @@ class _LogPageState extends State<LogPage> {
         spacing: 8.0,
         runSpacing: 4.0,
         children: <Widget>[
-          InputChip(
-            avatar: CircleAvatar(
-              backgroundColor: Colors.grey.shade800,
-              child: Text(_selectedFriend.initials()),
-            ),
-            label: Text(_selectedFriend.displayName),
+          SelectedFriendChip(
             onPressed: _resetFriend,
+            selectedFriend: _selectedFriend,
           ),
         ],
       ));
