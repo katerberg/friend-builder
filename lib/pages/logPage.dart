@@ -15,7 +15,7 @@ class _LogPageState extends State<LogPage> {
 
   Future<List<Contact>> _getSuggestions(String pattern) async {
     ContactPermission contactPermission =
-        await new ContactPermissionService().getContacts();
+        await ContactPermissionService().getContacts();
     if (!contactPermission.missingPermission) {
       return Future.value(contactPermission.contacts
           .where((element) =>
@@ -29,6 +29,10 @@ class _LogPageState extends State<LogPage> {
     setState(() {
       _selectedFriend = friend;
     });
+  }
+
+  void _resetFriend() {
+    _setFriend(null);
   }
 
   @override
@@ -53,20 +57,32 @@ class _LogPageState extends State<LogPage> {
           title: Text(suggestion.displayName),
         );
       },
-      onSuggestionSelected: (Contact friend) {
-        _setFriend(friend);
-      },
+      onSuggestionSelected: _setFriend,
     ));
 
     if (_selectedFriend != null) {
-      itemsToShow.add(new Text(
+      itemsToShow.add(Wrap(
+        spacing: 8.0,
+        runSpacing: 4.0,
+        children: <Widget>[
+          InputChip(
+            avatar: CircleAvatar(
+              backgroundColor: Colors.grey.shade800,
+              child: Text(_selectedFriend.initials()),
+            ),
+            label: Text(_selectedFriend.displayName),
+            onPressed: _resetFriend,
+          ),
+        ],
+      ));
+      itemsToShow.add(Text(
         _selectedFriend.displayName,
         style: _headerStyle,
       ));
     } else {
       itemsToShow.insert(
         0,
-        new Text(
+        Text(
           'Who are you hanging out with?',
           style: _headerStyle,
         ),
