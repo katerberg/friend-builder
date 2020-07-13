@@ -19,24 +19,36 @@ class _HangoutFormState extends State<HangoutForm> {
         children: <Widget>[
           TextFormField(
             decoration: const InputDecoration(
-              hintText: 'Enter your email',
+              hintText: 'Where?',
             ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'Please enter some text';
-              }
-              return null;
-            },
+          ),
+          DropdownButtonFormField(
+            decoration: InputDecoration(labelText: 'How many folks'),
+            items: <String>['One on One', 'Small Group', 'Party']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String newValue) => {},
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: RaisedButton(
-              onPressed: () {
-                if (_formKey.currentState.validate()) {
-                  // Process data.
-                }
-              },
-              child: Text('Submit'),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                RaisedButton(
+                  color: Theme.of(context).primaryColor,
+                  textColor: Theme.of(context).cardColor,
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      // Process data.
+                    }
+                  },
+                  child: Text('Submit'),
+                ),
+              ],
             ),
           ),
         ],

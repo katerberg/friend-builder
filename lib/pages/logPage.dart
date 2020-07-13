@@ -103,16 +103,21 @@ class _LogPageState extends State<LogPage> {
     }
 
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: _selectedFriends.isEmpty
-                ? MainAxisAlignment.center
-                : MainAxisAlignment.start,
-            children: itemsToShow,
+      body: GestureDetector(
+        child: SafeArea(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: _selectedFriends.isEmpty
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
+              children: itemsToShow,
+            ),
           ),
         ),
+        onTap: () {
+          FocusScope.of(context).requestFocus(new FocusNode());
+        },
       ),
     );
   }

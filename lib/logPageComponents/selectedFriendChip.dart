@@ -15,7 +15,7 @@ class SelectedFriendChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return InputChip(
       avatar: CircleAvatar(
-        backgroundColor: Colors.grey.shade800,
+        backgroundColor: Theme.of(context).primaryColorDark,
         child: Text(this.selectedFriend.initials()),
       ),
       label: Text(this.selectedFriend.displayName),
