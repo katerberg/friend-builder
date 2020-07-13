@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/logPageComponents/hangoutForm.dart';
 import 'package:friend_builder/logPageComponents/noItemsFound.dart';
 import 'package:friend_builder/logPageComponents/selectedFriendChip.dart';
 
@@ -80,8 +81,8 @@ class _LogPageState extends State<LogPage> {
 
     if (_selectedFriends.isNotEmpty) {
       itemsToShow.add(Wrap(
-        spacing: 8.0,
-        runSpacing: 4.0,
+        spacing: 8,
+        runSpacing: 4,
         children: _selectedFriends
             .map((Contact friend) => SelectedFriendChip(
                   onPressed: _resetFriend,
@@ -89,12 +90,22 @@ class _LogPageState extends State<LogPage> {
                 ))
             .toList(),
       ));
+      itemsToShow.add(Row(children: [
+        Expanded(
+          child: Card(
+            child: Padding(
+              child: HangoutForm(),
+              padding: EdgeInsets.all(16),
+            ),
+          ),
+        ),
+      ]));
     }
 
     return Scaffold(
       body: SafeArea(
         child: Container(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: _selectedFriends.isEmpty
                 ? MainAxisAlignment.center
