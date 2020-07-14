@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+class _HangoutData {
+  String where;
+  String howMany = 'One on One';
+  String medium = 'Face to Face';
+}
+
 class HangoutForm extends StatefulWidget {
   HangoutForm({Key key}) : super(key: key);
 
@@ -9,6 +15,7 @@ class HangoutForm extends StatefulWidget {
 
 class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
+  _HangoutData _data = new _HangoutData();
 
   @override
   Widget build(BuildContext context) {
@@ -17,13 +24,27 @@ class _HangoutFormState extends State<HangoutForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          TextFormField(
-            decoration: const InputDecoration(
-              hintText: 'Where?',
-            ),
-          ),
           DropdownButtonFormField(
-            decoration: InputDecoration(labelText: 'How many folks'),
+            decoration: InputDecoration(labelText: 'How did you see them?'),
+            items: <String>['Face to Face', 'Chat', 'Phone', 'Video']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String _) => {},
+            onSaved: (String newValue) => {this._data.medium = newValue},
+          ),
+          TextFormField(
+              decoration: const InputDecoration(
+                hintText: 'Where?',
+              ),
+              onSaved: (String value) {
+                this._data.where = value;
+              }),
+          DropdownButtonFormField(
+            decoration: InputDecoration(labelText: 'How many people?'),
             items: <String>['One on One', 'Small Group', 'Party']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
@@ -31,7 +52,22 @@ class _HangoutFormState extends State<HangoutForm> {
                 child: Text(value),
               );
             }).toList(),
-            onChanged: (String newValue) => {},
+            onChanged: (String _) => {},
+            onSaved: (String newValue) => {this._data.howMany = newValue},
+          ),
+          TextFormField(
+            decoration: const InputDecoration(
+              hintText: 'How Long?',
+            ),
+            onSaved: (String value) {
+              this._data.where = value;
+            },
+            validator: (String value) {
+              if (value == null || double.tryParse(value) != null) {
+                return 'How many minutes?';
+              }
+              return null;
+            },
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
