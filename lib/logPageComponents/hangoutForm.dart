@@ -28,7 +28,7 @@ class _HangoutFormState extends State<HangoutForm> {
         children: <Widget>[
           DropdownButtonFormField(
             decoration: InputDecoration(labelText: 'How did you see them?'),
-            items: <String>['Face to Face', 'Chat', 'Phone', 'Video']
+            items: <String>['Face to Face', 'Chat', 'Phone', 'Video', 'Mail']
                 .map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
