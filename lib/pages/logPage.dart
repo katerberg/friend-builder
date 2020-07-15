@@ -107,10 +107,9 @@ class _LogPageState extends State<LogPage> {
         child: SafeArea(
           child: Container(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: _selectedFriends.isEmpty
-                  ? MainAxisAlignment.center
-                  : MainAxisAlignment.start,
+            child: ListView(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
               children: itemsToShow,
             ),
           ),

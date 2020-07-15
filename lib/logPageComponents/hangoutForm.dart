@@ -38,7 +38,7 @@ class _HangoutFormState extends State<HangoutForm> {
           ),
           TextFormField(
               decoration: const InputDecoration(
-                hintText: 'Where?',
+                labelText: 'Where?',
               ),
               onSaved: (String value) {
                 this._data.where = value;
@@ -57,7 +57,7 @@ class _HangoutFormState extends State<HangoutForm> {
           ),
           TextFormField(
             decoration: const InputDecoration(
-              hintText: 'How Long?',
+              labelText: 'How Long?',
             ),
             onSaved: (String value) {
               this._data.where = value;
