@@ -84,21 +84,18 @@ class _HangoutFormState extends State<HangoutForm> {
                   textColor: Theme.of(context).cardColor,
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
-                      print('Form is valid');
+                      _formKey.currentState.save();
                       List<HangoutData> hangouts =
                           await Storage().getHangouts();
                       if (hangouts != null) {
-                        print(hangouts.length);
                         hangouts.add(_data);
                       } else {
-                        print(_data);
                         hangouts = [_data];
                       }
                       Storage().saveHangouts(hangouts);
                       List<HangoutData> hangouts2 =
                           await Storage().getHangouts();
                       print(hangouts2);
-                      // Process data.
                     } else {
                       print('Form is not valid');
                     }
