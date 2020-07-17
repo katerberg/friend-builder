@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/pages/contactsPage.dart';
 import 'package:friend_builder/pages/logPage.dart';
+import 'package:friend_builder/pages/resultsPage.dart';
 
 class NavigationBar extends StatefulWidget {
   @override
@@ -10,16 +11,10 @@ class NavigationBar extends StatefulWidget {
 class _NavigationBarState extends State<NavigationBar> {
   int _tabIndex = 1;
 
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-
   List<Widget> _tabs = <Widget>[
-    Text(
-      'Index 0: User',
-      style: optionStyle,
-    ),
-    new LogPage(),
-    new ContactsPage(),
+    ResultsPage(),
+    LogPage(),
+    ContactsPage(),
   ];
 
   void _changeTab(int tabIndex) async {
