@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
-
-class _HangoutData {
-  String where;
-  String howMany = 'One on One';
-  String medium = 'Face to Face';
-  String when;
-  String howLong;
-}
+import 'package:friend_builder/storage.dart';
 
 class HangoutForm extends StatefulWidget {
   HangoutForm({Key key}) : super(key: key);
@@ -17,7 +10,7 @@ class HangoutForm extends StatefulWidget {
 
 class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
-  _HangoutData _data = new _HangoutData();
+  HangoutData _data = new HangoutData();
 
   @override
   Widget build(BuildContext context) {
@@ -89,9 +82,22 @@ class _HangoutFormState extends State<HangoutForm> {
                 RaisedButton(
                   color: Theme.of(context).primaryColor,
                   textColor: Theme.of(context).cardColor,
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       print('Form is valid');
+                      List<HangoutData> hangouts =
+                          await Storage().getHangouts();
+                      if (hangouts != null) {
+                        print(hangouts.length);
+                        hangouts.add(_data);
+                      } else {
+                        print(_data);
+                        hangouts = [_data];
+                      }
+                      Storage().saveHangouts(hangouts);
+                      List<HangoutData> hangouts2 =
+                          await Storage().getHangouts();
+                      print(hangouts2);
                       // Process data.
                     } else {
                       print('Form is not valid');
