@@ -60,10 +60,10 @@ class _HangoutFormState extends State<HangoutForm> {
             validator: (String value) {
               if (value == null ||
                   value == '' ||
-                  double.tryParse(value) == null) {
-                return 'How many minutes?';
+                  double.tryParse(value) != null) {
+                return null;
               }
-              return null;
+              return 'How many minutes?';
             },
           ),
           TextFormField(
