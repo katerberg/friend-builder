@@ -13,18 +13,19 @@ class HangoutData {
 
   factory HangoutData.fromJson(Map<String, dynamic> parsedJson) {
     return new HangoutData(
-        where: parsedJson['where'] ?? "",
-        howMany: parsedJson['howMany'] ?? "One on One",
-        medium: parsedJson['medium'] ?? "Face to Face",
-        howLong: parsedJson['howLong'] ?? "",
-        when: parsedJson['when'] ?? DateTime.now());
+      where: parsedJson['where'] ?? "",
+      howMany: parsedJson['howMany'] ?? "One on One",
+      medium: parsedJson['medium'] ?? "Face to Face",
+      howLong: parsedJson['howLong'] ?? "",
+      when: DateTime.parse(parsedJson['when']),
+    );
   }
 
   Map<String, dynamic> toJson() {
     return {
       "where": this.where,
       "howMany": this.howMany,
-      "when": this.when,
+      "when": this.when.toIso8601String(),
       "howLong": this.howLong,
       "medium": this.medium
     };

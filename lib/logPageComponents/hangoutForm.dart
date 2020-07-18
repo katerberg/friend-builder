@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/storage.dart';
+import 'package:intl/intl.dart';
 
 class HangoutForm extends StatefulWidget {
   HangoutForm({Key key}) : super(key: key);
@@ -12,7 +13,11 @@ class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
   HangoutData _data = new HangoutData();
   DateTime selectedDate = DateTime.now();
-  TextEditingController dateController = TextEditingController();
+  TextEditingController dateController =
+      TextEditingController(text: _formatDate(DateTime.now()));
+
+  static String _formatDate(DateTime date) =>
+      DateFormat.yMMMMEEEEd().format(date);
 
   Future<void> _selectWhen(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -21,10 +26,11 @@ class _HangoutFormState extends State<HangoutForm> {
         firstDate: DateTime(2018, 8),
         lastDate: DateTime(2101));
     if (picked != null && picked != selectedDate) {
-      // setState(() {
-      //   selectedDate = picked;
-      // });
-      dateController.text = picked.toIso8601String();
+      setState(() {
+        selectedDate = picked;
+      });
+
+      dateController.text = _formatDate(picked);
     }
   }
 
@@ -88,9 +94,9 @@ class _HangoutFormState extends State<HangoutForm> {
             ),
             controller: dateController,
             onTap: () => _selectWhen(context),
-            // onSaved: (String value) {
-            //   this._data.when = value;
-            // },
+            onSaved: (String value) {
+              this._data.when = selectedDate;
+            },
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
