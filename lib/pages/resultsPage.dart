@@ -21,19 +21,28 @@ class _ResultsPageState extends State<ResultsPage> {
     });
   }
 
+  Widget _getResults() {
+    if (_hangouts == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    if (_hangouts.length == 0) {
+      return Center(child: Text('No results yet!'));
+    }
+
+    return ListView(
+      shrinkWrap: true,
+      scrollDirection: Axis.vertical,
+      children: _hangouts.map((h) => Text(h.howMany)).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(24),
-          child: _hangouts == null
-              ? Center(child: CircularProgressIndicator())
-              : ListView(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  children: _hangouts.map((h) => Text(h.howMany)).toList(),
-                ),
+          child: _getResults(),
         ),
       ),
     );

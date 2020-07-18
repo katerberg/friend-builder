@@ -57,6 +57,9 @@ class Storage {
           .map((hangout) => HangoutData.fromJson(hangout))
           .toList();
     } catch (e) {
+      if (e.runtimeType == FileSystemException) {
+        return [];
+      }
       print('error reading data');
       print(e);
       return null;
