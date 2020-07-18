@@ -7,16 +7,14 @@ class HangoutData {
   String howMany = 'One on One';
   String medium = 'Face to Face';
   DateTime when = DateTime.now();
-  String howLong;
 
-  HangoutData({this.where, this.howMany, this.howLong, this.medium, this.when});
+  HangoutData({this.where, this.howMany, this.medium, this.when});
 
   factory HangoutData.fromJson(Map<String, dynamic> parsedJson) {
     return new HangoutData(
       where: parsedJson['where'] ?? "",
       howMany: parsedJson['howMany'] ?? "One on One",
       medium: parsedJson['medium'] ?? "Face to Face",
-      howLong: parsedJson['howLong'] ?? "",
       when: DateTime.parse(parsedJson['when']),
     );
   }
@@ -26,7 +24,6 @@ class HangoutData {
       "where": this.where,
       "howMany": this.howMany,
       "when": this.when.toIso8601String(),
-      "howLong": this.howLong,
       "medium": this.medium
     };
   }

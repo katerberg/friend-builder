@@ -76,22 +76,6 @@ class _HangoutFormState extends State<HangoutForm> {
           ),
           TextFormField(
             decoration: const InputDecoration(
-              labelText: 'How Long?',
-            ),
-            onSaved: (String value) {
-              this._data.howLong = value;
-            },
-            validator: (String value) {
-              if (value == null ||
-                  value == '' ||
-                  double.tryParse(value) != null) {
-                return null;
-              }
-              return 'How many minutes?';
-            },
-          ),
-          TextFormField(
-            decoration: const InputDecoration(
               labelText: 'When?',
             ),
             controller: dateController,
