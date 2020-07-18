@@ -52,6 +52,7 @@ class _HangoutFormState extends State<HangoutForm> {
             }).toList(),
             onChanged: (String _) => {},
             onSaved: (String newValue) => {this._data.medium = newValue},
+            value: 'Face to Face',
           ),
           TextFormField(
               decoration: const InputDecoration(
@@ -71,6 +72,7 @@ class _HangoutFormState extends State<HangoutForm> {
             }).toList(),
             onChanged: (String _) => {},
             onSaved: (String newValue) => {this._data.howMany = newValue},
+            value: 'One on One',
           ),
           TextFormField(
             decoration: const InputDecoration(
