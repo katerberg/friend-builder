@@ -11,6 +11,20 @@ class HangoutForm extends StatefulWidget {
 class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
   HangoutData _data = new HangoutData();
+  DateTime selectedDate = DateTime.now();
+
+  Future<void> _selectWhen(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2018, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +84,10 @@ class _HangoutFormState extends State<HangoutForm> {
             decoration: const InputDecoration(
               labelText: 'When?',
             ),
-            onSaved: (String value) {
-              this._data.when = value;
-            },
+            onTap: () => _selectWhen(context),
+            // onSaved: (String value) {
+            //   this._data.when = value;
+            // },
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),

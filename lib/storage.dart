@@ -6,7 +6,7 @@ class HangoutData {
   String where;
   String howMany = 'One on One';
   String medium = 'Face to Face';
-  String when;
+  DateTime when = DateTime.now();
   String howLong;
 
   HangoutData({this.where, this.howMany, this.howLong, this.medium, this.when});
@@ -17,7 +17,7 @@ class HangoutData {
         howMany: parsedJson['howMany'] ?? "One on One",
         medium: parsedJson['medium'] ?? "Face to Face",
         howLong: parsedJson['howLong'] ?? "",
-        when: parsedJson['when'] ?? "");
+        when: parsedJson['when'] ?? DateTime.now());
   }
 
   Map<String, dynamic> toJson() {
