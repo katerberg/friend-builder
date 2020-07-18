@@ -11,12 +11,6 @@ class NavigationBar extends StatefulWidget {
 class _NavigationBarState extends State<NavigationBar> {
   int _tabIndex = 1;
 
-  List<Widget> _tabs = <Widget>[
-    ResultsPage(),
-    LogPage(),
-    ContactsPage(),
-  ];
-
   void _changeTab(int tabIndex) async {
     setState(() {
       _tabIndex = tabIndex;
@@ -25,6 +19,12 @@ class _NavigationBarState extends State<NavigationBar> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> tabs = <Widget>[
+      ResultsPage(),
+      LogPage(notifyParent: () => _changeTab(0)),
+      ContactsPage(),
+    ];
+
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -46,7 +46,7 @@ class _NavigationBarState extends State<NavigationBar> {
         onTap: _changeTab,
       ),
       body: Center(
-        child: _tabs.elementAt(_tabIndex),
+        child: tabs.elementAt(_tabIndex),
       ),
     );
   }

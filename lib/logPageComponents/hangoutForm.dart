@@ -3,18 +3,23 @@ import 'package:friend_builder/storage.dart';
 import 'package:intl/intl.dart';
 
 class HangoutForm extends StatefulWidget {
-  HangoutForm({Key key}) : super(key: key);
+  final Function() notifyParent;
+  HangoutForm({Key key, @required this.notifyParent}) : super(key: key);
 
   @override
-  _HangoutFormState createState() => _HangoutFormState();
+  _HangoutFormState createState() =>
+      _HangoutFormState(notifyParent: notifyParent);
 }
 
 class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
+  final Function() notifyParent;
   HangoutData _data = new HangoutData();
   DateTime selectedDate = DateTime.now();
   TextEditingController dateController =
       TextEditingController(text: _formatDate(DateTime.now()));
+
+  _HangoutFormState({@required this.notifyParent});
 
   static String _formatDate(DateTime date) =>
       DateFormat.yMMMMEEEEd().format(date);
@@ -106,6 +111,7 @@ class _HangoutFormState extends State<HangoutForm> {
                       List<HangoutData> hangouts2 =
                           await Storage().getHangouts();
                       print(hangouts2);
+                      notifyParent();
                     } else {
                       print('Form is not valid');
                     }

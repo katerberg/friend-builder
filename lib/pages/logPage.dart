@@ -6,12 +6,17 @@ import 'package:friend_builder/logPageComponents/noItemsFound.dart';
 import 'package:friend_builder/logPageComponents/selectedFriendChip.dart';
 
 class LogPage extends StatefulWidget {
+  final Function() notifyParent;
+  LogPage({Key key, @required this.notifyParent}) : super(key: key);
+
   @override
-  _LogPageState createState() => _LogPageState();
+  _LogPageState createState() => _LogPageState(notifyParent: notifyParent);
 }
 
 class _LogPageState extends State<LogPage> {
   List<Contact> _selectedFriends;
+  final Function() notifyParent;
+  _LogPageState({@required this.notifyParent});
 
   @override
   void initState() {
@@ -94,7 +99,9 @@ class _LogPageState extends State<LogPage> {
         Expanded(
           child: Card(
             child: Padding(
-              child: HangoutForm(),
+              child: HangoutForm(
+                notifyParent: notifyParent,
+              ),
               padding: EdgeInsets.all(16),
             ),
           ),
