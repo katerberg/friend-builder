@@ -70,6 +70,9 @@ class _HangoutFormState extends State<HangoutForm> {
             value: 'Face to Face',
           ),
           TextFormField(
+              autocorrect: true,
+              enableSuggestions: true,
+              textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
                 labelText: 'Where?',
               ),

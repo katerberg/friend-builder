@@ -30,7 +30,7 @@ class _LogPageState extends State<LogPage> {
           .where((element) =>
               (element.displayName ?? '')
                   .toLowerCase()
-                  .contains(pattern?.toLowerCase()) &&
+                  .contains(pattern?.toLowerCase() ?? '') &&
               !_selectedFriends.contains(element))
           .toList());
       return val
