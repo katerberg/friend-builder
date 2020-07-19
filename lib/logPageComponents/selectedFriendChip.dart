@@ -16,10 +16,14 @@ class SelectedFriendChip extends StatelessWidget {
     return InputChip(
       avatar: CircleAvatar(
         backgroundColor: Theme.of(context).primaryColorDark,
-        child: Text(this.selectedFriend.initials()),
+        child: Text(
+          this.selectedFriend.initials(),
+          style: TextStyle(fontSize: 14),
+        ),
       ),
+      onDeleted: () => this.onPressed(this.selectedFriend),
+      deleteIconColor: Colors.black54,
       label: Text(this.selectedFriend.displayName),
-      onPressed: () => this.onPressed(this.selectedFriend),
     );
   }
 }
