@@ -15,6 +15,7 @@ class LogPage extends StatefulWidget {
 
 class _LogPageState extends State<LogPage> {
   List<Contact> _selectedFriends;
+  TextEditingController typeaheadController = TextEditingController(text: '');
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _LogPageState extends State<LogPage> {
   }
 
   void _setFriend(Contact friend) {
+    typeaheadController.text = '';
     setState(() {
       _selectedFriends = [..._selectedFriends, friend];
     });
@@ -68,6 +70,7 @@ class _LogPageState extends State<LogPage> {
       textFieldConfiguration: TextFieldConfiguration(
         autofocus: _selectedFriends.isEmpty,
         autocorrect: false,
+        controller: typeaheadController,
         cursorColor: Theme.of(context).cursorColor,
         decoration: InputDecoration(
           labelText: _getInputLabelText(),

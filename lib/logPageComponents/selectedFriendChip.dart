@@ -19,7 +19,7 @@ class SelectedFriendChip extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColorDark,
         child: Text(
           this.selectedFriend.initials(),
-          style: TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 12),
         ),
       ),
       onDeleted: handleDelete,
