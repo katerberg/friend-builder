@@ -69,7 +69,7 @@ class _LogPageState extends State<LogPage> {
 
     itemsToShow.add(TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
-        autofocus: _selectedFriends.isEmpty,
+        autofocus: false,
         autocorrect: false,
         controller: typeaheadController,
         cursorColor: Theme.of(context).cursorColor,

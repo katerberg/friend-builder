@@ -29,7 +29,6 @@ class EncodableContact {
   }
 
   factory EncodableContact.fromJson(Map<String, dynamic> parsedJson) {
-    print('parsing json');
     return new EncodableContact(
       displayName: parsedJson['displayName'] ?? "",
       middleName: parsedJson['middleName'] ?? "",
