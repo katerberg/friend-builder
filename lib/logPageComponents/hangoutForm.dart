@@ -45,7 +45,6 @@ class _HangoutFormState extends State<HangoutForm> {
 
   @override
   Widget build(BuildContext context) {
-    print('building');
     setState(() {
       _data.contacts = widget.selectedFriends
           .map((f) => EncodableContact.fromContact(f))

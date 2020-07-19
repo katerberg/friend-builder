@@ -26,13 +26,15 @@ class _LogPageState extends State<LogPage> {
     ContactPermission contactPermission =
         await ContactPermissionService().getContacts();
     if (!contactPermission.missingPermission) {
-      return Future.value(contactPermission.contacts
+      var val = await Future.value(contactPermission.contacts
           .where((element) =>
-              element.displayName
+              (element.displayName ?? '')
                   .toLowerCase()
-                  .contains(pattern.toLowerCase()) &&
+                  .contains(pattern?.toLowerCase()) &&
               !_selectedFriends.contains(element))
           .toList());
+      return val
+        ..sort((a, b) => a?.displayName?.compareTo(b?.displayName ?? '') ?? 0);
     }
     return Future.value([]);
   }
@@ -75,7 +77,7 @@ class _LogPageState extends State<LogPage> {
       itemBuilder: (context, suggestion) {
         return ListTile(
           leading: Icon(Icons.person_add),
-          title: Text(suggestion.displayName),
+          title: Text(suggestion.displayName ?? ''),
         );
       },
       noItemsFoundBuilder: (context) => NoItemsFound(),

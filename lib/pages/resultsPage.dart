@@ -42,6 +42,9 @@ class _ResultsPageState extends State<ResultsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: (Text('Hangouts')),
+      ),
       body: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(24),
