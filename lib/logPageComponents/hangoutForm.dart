@@ -6,11 +6,11 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:intl/intl.dart';
 
 class HangoutForm extends StatefulWidget {
-  final Function() notifyParent;
+  final Function() onSubmit;
   final List<Contact> selectedFriends;
 
   HangoutForm(
-      {Key key, @required this.notifyParent, @required this.selectedFriends})
+      {Key key, @required this.onSubmit, @required this.selectedFriends})
       : super(key: key);
 
   @override
@@ -120,7 +120,7 @@ class _HangoutFormState extends State<HangoutForm> {
                         hangouts = [_data];
                       }
                       Storage().saveHangouts(hangouts);
-                      widget.notifyParent();
+                      widget.onSubmit();
                     } else {
                       print('Form is not valid');
                     }

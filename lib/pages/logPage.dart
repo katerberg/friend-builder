@@ -6,8 +6,8 @@ import 'package:friend_builder/logPageComponents/noItemsFound.dart';
 import 'package:friend_builder/logPageComponents/selectedFriendChip.dart';
 
 class LogPage extends StatefulWidget {
-  final Function() notifyParent;
-  LogPage({Key key, @required this.notifyParent}) : super(key: key);
+  final Function() onSubmit;
+  LogPage({Key key, @required this.onSubmit}) : super(key: key);
 
   @override
   _LogPageState createState() => _LogPageState();
@@ -103,7 +103,7 @@ class _LogPageState extends State<LogPage> {
           child: Card(
             child: Padding(
               child: HangoutForm(
-                notifyParent: widget.notifyParent,
+                onSubmit: widget.onSubmit,
                 selectedFriends: _selectedFriends,
               ),
               padding: EdgeInsets.all(16),

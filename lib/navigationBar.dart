@@ -21,7 +21,7 @@ class _NavigationBarState extends State<NavigationBar> {
   Widget build(BuildContext context) {
     List<Widget> tabs = <Widget>[
       ResultsPage(),
-      LogPage(notifyParent: () => _changeTab(0)),
+      LogPage(onSubmit: () => _changeTab(0)),
       ContactsPage(),
     ];
 
