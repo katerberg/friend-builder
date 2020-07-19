@@ -13,6 +13,7 @@ class SelectedFriendChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var handleDelete = () => this.onPressed(this.selectedFriend);
     return InputChip(
       avatar: CircleAvatar(
         backgroundColor: Theme.of(context).primaryColorDark,
@@ -21,7 +22,8 @@ class SelectedFriendChip extends StatelessWidget {
           style: TextStyle(fontSize: 14),
         ),
       ),
-      onDeleted: () => this.onPressed(this.selectedFriend),
+      onDeleted: handleDelete,
+      onPressed: handleDelete,
       deleteIconColor: Colors.black54,
       label: Text(this.selectedFriend.displayName),
     );
