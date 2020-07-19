@@ -32,7 +32,8 @@ class _LogPageState extends State<LogPage> {
               (element.displayName ?? '')
                   .toLowerCase()
                   .contains(pattern?.toLowerCase() ?? '') &&
-              !_selectedFriends.contains(element))
+              !_selectedFriends
+                  .any((selected) => selected.identifier == element.identifier))
           .toList());
       return val
         ..sort((a, b) => a?.displayName?.compareTo(b?.displayName ?? '') ?? 0);
