@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/data/encodableContact.dart';
 import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/data/hangout.dart';
 import 'package:intl/intl.dart';
 
 class HangoutForm extends StatefulWidget {
@@ -18,7 +20,7 @@ class HangoutForm extends StatefulWidget {
 class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
 
-  HangoutData _data = new HangoutData();
+  Hangout _data = new Hangout();
   DateTime selectedDate = DateTime.now();
   TextEditingController dateController =
       TextEditingController(text: _formatDate(DateTime.now()));
@@ -45,7 +47,9 @@ class _HangoutFormState extends State<HangoutForm> {
   Widget build(BuildContext context) {
     print('building');
     setState(() {
-      _data.contacts = widget.selectedFriends;
+      _data.contacts = widget.selectedFriends
+          .map((f) => EncodableContact.fromContact(f))
+          .toList();
     });
 
     return Form(
@@ -108,8 +112,7 @@ class _HangoutFormState extends State<HangoutForm> {
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       _formKey.currentState.save();
-                      List<HangoutData> hangouts =
-                          await Storage().getHangouts();
+                      List<Hangout> hangouts = await Storage().getHangouts();
                       if (hangouts != null) {
                         hangouts.add(_data);
                       } else {

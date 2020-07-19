@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/resultsPageComponents/result.dart';
 
 class ResultsPage extends StatefulWidget {
@@ -10,7 +11,7 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
-  List<HangoutData> _hangouts;
+  List<Hangout> _hangouts;
 
   @override
   void initState() {

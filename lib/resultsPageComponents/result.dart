@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/data/hangout.dart';
 
 class Result extends StatelessWidget {
-  final HangoutData hangout;
+  final Hangout hangout;
 
   Result({
-    HangoutData hangout,
+    Hangout hangout,
   }) : this.hangout = hangout;
 
   @override
   Widget build(BuildContext context) {
+    print('inside result');
+    print(hangout.contacts);
     return InputChip(
       avatar: CircleAvatar(
         backgroundColor: Theme.of(context).primaryColorDark,
-        child: Text(this.hangout.howMany[0]),
+        child: hangout.contacts.length > 0
+            ? Text(hangout.contacts[0].initials())
+            : Text(hangout.howMany[0]),
       ),
-      label: Text(this.hangout.medium),
+      label: Text(hangout.medium),
     );
   }
 }

@@ -1,39 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:friend_builder/contacts.dart';
 import 'package:path_provider/path_provider.dart';
-
-class HangoutData {
-  List<Contact> contacts = [];
-  String where;
-  String howMany = 'One on One';
-  String medium = 'Face to Face';
-  DateTime when = DateTime.now();
-
-  HangoutData(
-      {this.contacts, this.where, this.howMany, this.medium, this.when});
-
-  factory HangoutData.fromJson(Map<String, dynamic> parsedJson) {
-    print(parsedJson['contacts']);
-    return new HangoutData(
-      contacts: [],
-      where: parsedJson['where'] ?? "",
-      howMany: parsedJson['howMany'] ?? "One on One",
-      medium: parsedJson['medium'] ?? "Face to Face",
-      when: DateTime.parse(parsedJson['when']),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "contacts": this.contacts.map((c) => c.toMap().toString()).toString(),
-      "where": this.where,
-      "howMany": this.howMany,
-      "when": this.when.toIso8601String(),
-      "medium": this.medium
-    };
-  }
-}
+import 'package:friend_builder/data/hangout.dart';
 
 class Storage {
   Future<String> get _localPath async {
@@ -47,7 +15,7 @@ class Storage {
     return File('$path/hangouts.txt');
   }
 
-  Future<List<HangoutData>> getHangouts() async {
+  Future<List<Hangout>> getHangouts() async {
     try {
       final file = await _localFile;
 
@@ -55,9 +23,7 @@ class Storage {
       String contents = await file.readAsString();
 
       var contentList = jsonDecode(contents) as List;
-      return contentList
-          .map((hangout) => HangoutData.fromJson(hangout))
-          .toList();
+      return contentList.map((hangout) => Hangout.fromJson(hangout)).toList();
     } catch (e) {
       if (e.runtimeType == FileSystemException) {
         return [];
@@ -68,7 +34,7 @@ class Storage {
     }
   }
 
-  Future<File> saveHangouts(List<HangoutData> hangouts) async {
+  Future<File> saveHangouts(List<Hangout> hangouts) async {
     final file = await _localFile;
 
     return file.writeAsString(jsonEncode(hangouts));
