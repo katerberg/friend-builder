@@ -1,17 +1,22 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:friend_builder/contacts.dart';
 import 'package:path_provider/path_provider.dart';
 
 class HangoutData {
+  List<Contact> contacts = [];
   String where;
   String howMany = 'One on One';
   String medium = 'Face to Face';
   DateTime when = DateTime.now();
 
-  HangoutData({this.where, this.howMany, this.medium, this.when});
+  HangoutData(
+      {this.contacts, this.where, this.howMany, this.medium, this.when});
 
   factory HangoutData.fromJson(Map<String, dynamic> parsedJson) {
+    print(parsedJson['contacts']);
     return new HangoutData(
+      contacts: [],
       where: parsedJson['where'] ?? "",
       howMany: parsedJson['howMany'] ?? "One on One",
       medium: parsedJson['medium'] ?? "Face to Face",
@@ -21,6 +26,7 @@ class HangoutData {
 
   Map<String, dynamic> toJson() {
     return {
+      "contacts": this.contacts.map((c) => c.toMap().toString()).toString(),
       "where": this.where,
       "howMany": this.howMany,
       "when": this.when.toIso8601String(),
@@ -47,8 +53,6 @@ class Storage {
 
       // Read the file.
       String contents = await file.readAsString();
-      print('reading');
-      print(contents);
 
       var contentList = jsonDecode(contents) as List;
       return contentList

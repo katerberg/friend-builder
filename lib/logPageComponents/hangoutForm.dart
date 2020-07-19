@@ -43,6 +43,11 @@ class _HangoutFormState extends State<HangoutForm> {
 
   @override
   Widget build(BuildContext context) {
+    print('building');
+    setState(() {
+      _data.contacts = widget.selectedFriends;
+    });
+
     return Form(
       key: _formKey,
       child: Column(
