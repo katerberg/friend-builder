@@ -10,13 +10,11 @@ class LogPage extends StatefulWidget {
   LogPage({Key key, @required this.notifyParent}) : super(key: key);
 
   @override
-  _LogPageState createState() => _LogPageState(notifyParent: notifyParent);
+  _LogPageState createState() => _LogPageState();
 }
 
 class _LogPageState extends State<LogPage> {
   List<Contact> _selectedFriends;
-  final Function() notifyParent;
-  _LogPageState({@required this.notifyParent});
 
   @override
   void initState() {
@@ -100,7 +98,8 @@ class _LogPageState extends State<LogPage> {
           child: Card(
             child: Padding(
               child: HangoutForm(
-                notifyParent: notifyParent,
+                notifyParent: widget.notifyParent,
+                selectedFriends: _selectedFriends,
               ),
               padding: EdgeInsets.all(16),
             ),

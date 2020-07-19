@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:intl/intl.dart';
 
 class HangoutForm extends StatefulWidget {
   final Function() notifyParent;
-  HangoutForm({Key key, @required this.notifyParent}) : super(key: key);
+  final List<Contact> selectedFriends;
+
+  HangoutForm(
+      {Key key, @required this.notifyParent, @required this.selectedFriends})
+      : super(key: key);
 
   @override
-  _HangoutFormState createState() =>
-      _HangoutFormState(notifyParent: notifyParent);
+  _HangoutFormState createState() => _HangoutFormState();
 }
 
 class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
-  final Function() notifyParent;
+
   HangoutData _data = new HangoutData();
   DateTime selectedDate = DateTime.now();
   TextEditingController dateController =
       TextEditingController(text: _formatDate(DateTime.now()));
-
-  _HangoutFormState({@required this.notifyParent});
 
   static String _formatDate(DateTime date) =>
       DateFormat.yMMMMEEEEd().format(date);
@@ -46,6 +48,7 @@ class _HangoutFormState extends State<HangoutForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          ...widget.selectedFriends.map((f) => Text(f.initials())).toList(),
           DropdownButtonFormField(
             decoration: InputDecoration(labelText: 'How did you see them?'),
             items: <String>['Face to Face', 'Chat', 'Phone', 'Video', 'Mail']
@@ -108,10 +111,7 @@ class _HangoutFormState extends State<HangoutForm> {
                         hangouts = [_data];
                       }
                       Storage().saveHangouts(hangouts);
-                      List<HangoutData> hangouts2 =
-                          await Storage().getHangouts();
-                      print(hangouts2);
-                      notifyParent();
+                      widget.notifyParent();
                     } else {
                       print('Form is not valid');
                     }
