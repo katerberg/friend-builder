@@ -35,7 +35,9 @@ class EncodableContact {
       middleName: parsedJson['middleName'] ?? "",
       givenName: parsedJson['givenName'] ?? "",
       familyName: parsedJson['familyName'] ?? "",
-      birthday: DateTime.parse(parsedJson['birthday']),
+      birthday: parsedJson['birthday'] != null
+          ? DateTime.parse(parsedJson['birthday'])
+          : null,
     );
   }
 
@@ -45,7 +47,8 @@ class EncodableContact {
       "middleName": this.middleName,
       "givenName": this.givenName,
       "familyName": this.familyName,
-      "birthday": this.birthday.toIso8601String(),
+      "birthday":
+          this.birthday != null ? this.birthday.toIso8601String() : null,
     };
   }
 }

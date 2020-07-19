@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/resultsPageComponents/resultBubbles.dart';
 
 class Result extends StatelessWidget {
   final Hangout hangout;
@@ -19,14 +20,8 @@ class Result extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Theme.of(context).primaryColorDark,
-                    child: hangout.contacts.length > 0
-                        ? Text(hangout.contacts[0].initials())
-                        : Text(hangout.medium[0]),
-                  ),
                   Container(
-                    padding: EdgeInsets.only(left: 8),
+                    alignment: Alignment.centerRight,
                     child: Text(
                       hangout.formattedDate(),
                       style: TextStyle(
@@ -34,20 +29,13 @@ class Result extends StatelessWidget {
                       ),
                     ),
                   ),
+                  ResultBubbles(contacts: hangout.contacts),
                 ],
               ),
             ),
           ],
         ),
       ),
-    ]
-        // avatar: CircleAvatar(
-        //   backgroundColor: Theme.of(context).primaryColorDark,
-        //   child: hangout.contacts.length > 0
-        //       ? Text(hangout.contacts[0].initials())
-        //       : Text(hangout.howMany[0]),
-        // ),
-        // label: Text(hangout.medium),
-        );
+    ]);
   }
 }
