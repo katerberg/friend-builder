@@ -57,7 +57,6 @@ class _HangoutFormState extends State<HangoutForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ...widget.selectedFriends.map((f) => Text(f.initials())).toList(),
           DropdownButtonFormField(
             decoration: InputDecoration(labelText: 'How did you see them?'),
             items: <String>['Face to Face', 'Chat', 'Phone', 'Video', 'Mail']

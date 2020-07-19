@@ -30,6 +30,7 @@ class _ResultsPageState extends State<ResultsPage> {
     if (_hangouts.length == 0) {
       return Center(child: Text('No results yet!'));
     }
+    _hangouts.sort((h0, h1) => h0.when.isAfter(h1.when) ? -1 : 1);
 
     return ListView(
       shrinkWrap: true,
