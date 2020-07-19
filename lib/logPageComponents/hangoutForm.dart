@@ -33,7 +33,7 @@ class _HangoutFormState extends State<HangoutForm> {
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(2018, 8),
-        lastDate: DateTime(2101));
+        lastDate: DateTime.now());
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
