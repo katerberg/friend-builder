@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/resultsPageComponents/result.dart';
 
 class ResultsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -32,7 +33,7 @@ class _ResultsPageState extends State<ResultsPage> {
     return ListView(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
-      children: _hangouts.map((h) => Text(h.howMany)).toList(),
+      children: _hangouts.map((h) => Result(hangout: h)).toList(),
     );
   }
 
