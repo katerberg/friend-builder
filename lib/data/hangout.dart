@@ -1,4 +1,5 @@
 import 'package:friend_builder/data/encodableContact.dart';
+import 'package:intl/intl.dart';
 
 class Hangout {
   List<EncodableContact> contacts = [];
@@ -9,8 +10,9 @@ class Hangout {
 
   Hangout({this.contacts, this.where, this.howMany, this.medium, this.when});
 
+  String formattedDate() => DateFormat.yMMMMd().format(this.when);
+
   factory Hangout.fromJson(Map<String, dynamic> parsedJson) {
-    print('parsing json');
     return new Hangout(
       contacts: (parsedJson['contacts'] as List)
           .map((c) => EncodableContact.fromJson(c))

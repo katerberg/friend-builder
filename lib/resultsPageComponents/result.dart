@@ -10,16 +10,44 @@ class Result extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('inside result');
-    print(hangout.contacts);
-    return InputChip(
-      avatar: CircleAvatar(
-        backgroundColor: Theme.of(context).primaryColorDark,
-        child: hangout.contacts.length > 0
-            ? Text(hangout.contacts[0].initials())
-            : Text(hangout.howMany[0]),
+    return Row(children: [
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Theme.of(context).primaryColorDark,
+                    child: hangout.contacts.length > 0
+                        ? Text(hangout.contacts[0].initials())
+                        : Text(hangout.medium[0]),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Text(
+                      hangout.formattedDate(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-      label: Text(hangout.medium),
-    );
+    ]
+        // avatar: CircleAvatar(
+        //   backgroundColor: Theme.of(context).primaryColorDark,
+        //   child: hangout.contacts.length > 0
+        //       ? Text(hangout.contacts[0].initials())
+        //       : Text(hangout.howMany[0]),
+        // ),
+        // label: Text(hangout.medium),
+        );
   }
 }
