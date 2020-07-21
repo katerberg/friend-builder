@@ -16,9 +16,22 @@ class _ResultsPageState extends State<ResultsPage> {
   @override
   void initState() {
     super.initState();
-    widget.storage.getHangouts().then((value) {
+    widget.storage.getHangouts().then((hangouts) {
       setState(() {
-        _hangouts = value;
+        _hangouts = hangouts;
+      });
+    });
+  }
+
+  void _onDelete(Hangout hangout) {
+    widget.storage.getHangouts().then((hangouts) {
+      widget.storage
+          .saveHangouts(
+              hangouts..removeWhere((element) => element.id == hangout.id))
+          .then((file) {
+        setState(() {
+          _hangouts = hangouts;
+        });
       });
     });
   }
@@ -35,7 +48,12 @@ class _ResultsPageState extends State<ResultsPage> {
     return ListView(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
-      children: _hangouts.map((h) => Result(hangout: h)).toList(),
+      children: _hangouts
+          .map((h) => Result(
+                hangout: h,
+                onDelete: _onDelete,
+              ))
+          .toList(),
     );
   }
 

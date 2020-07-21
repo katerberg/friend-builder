@@ -27,6 +27,7 @@ dependencies:
   contacts_service: ^0.3.10
   flutter_typeahead: ^1.8.5
   path_provider: ^1.6.11
+  uuid: ^2.2.0
 
 
   # The following adds the Cupertino Icons font to your application.

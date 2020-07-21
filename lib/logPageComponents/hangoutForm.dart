@@ -20,7 +20,7 @@ class HangoutForm extends StatefulWidget {
 class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
 
-  Hangout _data = new Hangout();
+  Hangout _data = Hangout();
   DateTime selectedDate = DateTime.now();
   TextEditingController dateController =
       TextEditingController(text: _formatDate(DateTime.now()));
