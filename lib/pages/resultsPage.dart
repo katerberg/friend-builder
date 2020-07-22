@@ -12,6 +12,7 @@ class ResultsPage extends StatefulWidget {
 
 class _ResultsPageState extends State<ResultsPage> {
   List<Hangout> _hangouts;
+  Hangout _editingHangout;
 
   @override
   void initState() {
@@ -36,6 +37,10 @@ class _ResultsPageState extends State<ResultsPage> {
     });
   }
 
+  void _onEdit(Hangout hangout) {
+    _editingHangout = hangout;
+  }
+
   Widget _getResults() {
     if (_hangouts == null) {
       return Center(child: CircularProgressIndicator());
@@ -52,6 +57,7 @@ class _ResultsPageState extends State<ResultsPage> {
           .map((h) => Result(
                 hangout: h,
                 onDelete: _onDelete,
+                onEdit: _onEdit,
               ))
           .toList(),
     );

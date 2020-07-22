@@ -5,11 +5,14 @@ import 'package:friend_builder/resultsPageComponents/resultBubbles.dart';
 class Result extends StatelessWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
+  final void Function(Hangout) onEdit;
 
   Result({
     Hangout hangout,
     void Function(Hangout) onDelete,
+    void Function(Hangout) onEdit,
   })  : this.hangout = hangout,
+        this.onEdit = onEdit,
         this.onDelete = onDelete;
 
   @override
@@ -35,8 +38,24 @@ class Result extends StatelessWidget {
                       alignment: Alignment.centerRight,
                       child: PopupMenuButton(
                         icon: Icon(Icons.more_vert),
-                        onSelected: (result) => onDelete(hangout),
+                        onSelected: (result) {
+                          switch (result) {
+                            case 'Delete':
+                              onDelete(hangout);
+                              break;
+                            case 'Edit':
+                              onEdit(hangout);
+                              break;
+                          }
+                        },
                         itemBuilder: (context) => <PopupMenuEntry<String>>[
+                          PopupMenuItem<String>(
+                            value: 'Edit',
+                            child: ListTile(
+                              leading: const Icon(Icons.edit),
+                              title: Text('Edit'),
+                            ),
+                          ),
                           PopupMenuItem<String>(
                             value: 'Delete',
                             child: ListTile(
