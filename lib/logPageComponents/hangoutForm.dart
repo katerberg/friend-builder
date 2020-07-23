@@ -115,7 +115,13 @@ class _HangoutFormState extends State<HangoutForm> {
                       _formKey.currentState.save();
                       List<Hangout> hangouts = await Storage().getHangouts();
                       if (hangouts != null) {
-                        hangouts.add(_data);
+                        var index = hangouts
+                            .indexWhere((element) => element.id == _data.id);
+                        if (index == -1) {
+                          hangouts.add(_data);
+                        } else {
+                          hangouts[index] = _data;
+                        }
                       } else {
                         hangouts = [_data];
                       }
@@ -125,7 +131,7 @@ class _HangoutFormState extends State<HangoutForm> {
                       print('Form is not valid');
                     }
                   },
-                  child: Text('Submit'),
+                  child: Text('Save'),
                 ),
               ],
             ),
