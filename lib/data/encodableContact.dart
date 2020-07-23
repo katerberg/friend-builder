@@ -1,6 +1,6 @@
 import 'package:friend_builder/contacts.dart';
 
-class EncodableContact {
+class EncodableContact extends Contact {
   String displayName;
   String middleName;
   String givenName;

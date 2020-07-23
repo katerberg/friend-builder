@@ -102,21 +102,18 @@ class _LogPageState extends State<LogPage> {
       itemsToShow.add(Row(children: [
         Expanded(
           child: Card(
-            child: Padding(
-              child: HangoutForm(
-                onSubmit: widget.onSubmit,
-                selectedFriends: _selectedFriends,
-              ),
-              padding: EdgeInsets.all(16),
+            child: HangoutForm(
+              onSubmit: widget.onSubmit,
+              selectedFriends: _selectedFriends,
             ),
           ),
         ),
       ]));
     }
 
-    return Scaffold(
-      body: GestureDetector(
-        child: SafeArea(
+    return GestureDetector(
+      child: Scaffold(
+        body: SafeArea(
           child: Container(
             padding: const EdgeInsets.all(24),
             child: ListView(
@@ -126,10 +123,10 @@ class _LogPageState extends State<LogPage> {
             ),
           ),
         ),
-        onTap: () {
-          FocusScope.of(context).requestFocus(new FocusNode());
-        },
       ),
+      onTap: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      },
     );
   }
 }

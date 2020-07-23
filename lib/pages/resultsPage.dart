@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/resultsPageComponents/result.dart';
+import 'package:friend_builder/resultsPageComponents/editDialog.dart';
 
 class ResultsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -12,11 +13,14 @@ class ResultsPage extends StatefulWidget {
 
 class _ResultsPageState extends State<ResultsPage> {
   List<Hangout> _hangouts;
-  Hangout _editingHangout;
 
   @override
   void initState() {
     super.initState();
+    _refreshHangouts();
+  }
+
+  void _refreshHangouts() {
     widget.storage.getHangouts().then((hangouts) {
       setState(() {
         _hangouts = hangouts;
@@ -38,7 +42,17 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   void _onEdit(Hangout hangout) {
-    _editingHangout = hangout;
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditDialog(
+          hangout: hangout,
+          selectedFriends: hangout.contacts,
+          onSubmit: _refreshHangouts,
+        ),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   Widget _getResults() {
