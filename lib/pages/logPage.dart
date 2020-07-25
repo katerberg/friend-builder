@@ -3,7 +3,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/logPageComponents/hangoutForm.dart';
 import 'package:friend_builder/logPageComponents/noItemsFound.dart';
-import 'package:friend_builder/logPageComponents/selectedFriendChip.dart';
+import 'package:friend_builder/logPageComponents/suggestionForm.dart';
 import 'package:friend_builder/stringUtils.dart';
 
 class LogPage extends StatefulWidget {
@@ -30,8 +30,11 @@ class _LogPageState extends State<LogPage> {
     if (!contactPermission.missingPermission) {
       var val = await Future.value(contactPermission.contacts
           .where((element) =>
-              pattern.length < 2 ||
-              StringUtils.getComparison(element?.displayName, pattern) > 0.1)
+              !_selectedFriends.any(
+                  (selected) => selected.identifier == element.identifier) &&
+              (pattern.length < 2 ||
+                  StringUtils.getComparison(element?.displayName, pattern) >
+                      0.1))
           .toList());
       return val
         ..sort((a, b) => StringUtils.getComparison(a?.displayName, pattern) <
@@ -66,40 +69,34 @@ class _LogPageState extends State<LogPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> itemsToShow = [];
-
-    itemsToShow.add(TypeAheadField(
-      textFieldConfiguration: TextFieldConfiguration(
-        autofocus: false,
-        autocorrect: false,
-        controller: typeaheadController,
-        cursorColor: Theme.of(context).cursorColor,
-        decoration: InputDecoration(
-          labelText: _getInputLabelText(),
+    List<Widget> itemsToShow = [
+      TypeAheadField(
+        textFieldConfiguration: TextFieldConfiguration(
+          autofocus: false,
+          autocorrect: false,
+          controller: typeaheadController,
+          cursorColor: Theme.of(context).cursorColor,
+          decoration: InputDecoration(
+            labelText: _getInputLabelText(),
+          ),
         ),
-      ),
-      suggestionsCallback: (pattern) async => await _getSuggestions(pattern),
-      itemBuilder: (context, suggestion) {
-        return ListTile(
-          leading: Icon(Icons.person_add),
-          title: Text(suggestion.displayName ?? ''),
-        );
-      },
-      noItemsFoundBuilder: (context) => NoItemsFound(),
-      onSuggestionSelected: _setFriend,
+        suggestionsCallback: (pattern) async => await _getSuggestions(pattern),
+        itemBuilder: (context, suggestion) {
+          return ListTile(
+            leading: Icon(Icons.person_add),
+            title: Text(suggestion.displayName ?? ''),
+          );
+        },
+        noItemsFoundBuilder: (context) => NoItemsFound(),
+        onSuggestionSelected: _setFriend,
+      )
+    ];
+    itemsToShow.add(SuggestionForm(
+      selectedFriends: _selectedFriends,
+      onRemoveFriend: _resetFriend,
     ));
 
     if (_selectedFriends.isNotEmpty) {
-      itemsToShow.add(Wrap(
-        spacing: 8,
-        runSpacing: 4,
-        children: _selectedFriends
-            .map((Contact friend) => SelectedFriendChip(
-                  onPressed: _resetFriend,
-                  selectedFriend: friend,
-                ))
-            .toList(),
-      ));
       itemsToShow.add(Row(children: [
         Expanded(
           child: Card(

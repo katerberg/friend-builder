@@ -7,7 +7,7 @@ class SelectedFriendChip extends StatelessWidget {
 
   SelectedFriendChip({
     Contact selectedFriend,
-    Function onPressed,
+    void Function(Contact friend) onPressed,
   })  : this.selectedFriend = selectedFriend,
         this.onPressed = onPressed;
 
