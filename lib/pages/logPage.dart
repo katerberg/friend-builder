@@ -4,6 +4,7 @@ import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/logPageComponents/hangoutForm.dart';
 import 'package:friend_builder/logPageComponents/noItemsFound.dart';
 import 'package:friend_builder/logPageComponents/selectedFriendChip.dart';
+import 'package:friend_builder/stringUtils.dart';
 
 class LogPage extends StatefulWidget {
   final Function() onSubmit;
@@ -29,14 +30,14 @@ class _LogPageState extends State<LogPage> {
     if (!contactPermission.missingPermission) {
       var val = await Future.value(contactPermission.contacts
           .where((element) =>
-              (element.displayName ?? '')
-                  .toLowerCase()
-                  .contains(pattern?.toLowerCase() ?? '') &&
-              !_selectedFriends
-                  .any((selected) => selected.identifier == element.identifier))
+              pattern.length < 2 ||
+              StringUtils.getComparison(element?.displayName, pattern) > 0.1)
           .toList());
       return val
-        ..sort((a, b) => a?.displayName?.compareTo(b?.displayName ?? '') ?? 0);
+        ..sort((a, b) => StringUtils.getComparison(a?.displayName, pattern) <
+                StringUtils.getComparison(b?.displayName, pattern)
+            ? 1
+            : 0);
     }
     return Future.value([]);
   }

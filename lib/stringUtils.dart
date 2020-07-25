@@ -1,16 +1,19 @@
 class StringUtils {
-  List<String> _getBigrams(String str) {
+  static List<String> _getBigrams(String str) {
     if (str.length < 2) {
       return [];
     }
     List<String> bigrams = [];
     for (var i = 0; i < str.length - 1; i++) {
-      bigrams.add(str.substring(i, i + 1));
+      bigrams.add(str.toLowerCase().substring(i, i + 2));
     }
     return bigrams;
   }
 
-  double getComparison(String first, String second) {
+  static double getComparison(String first, String second) {
+    if (first == null || second == null) {
+      return 0;
+    }
     if (first.length < 2 || second.length < 2) {
       return 0;
     }
@@ -19,8 +22,8 @@ class StringUtils {
 
     int intersection = 0;
 
-    for (var i = 0; i < first.length; i++) {
-      for (var j = 0; j < second.length; j++) {
+    for (var i = 0; i < bigrams1.length; i++) {
+      for (var j = 0; j < bigrams2.length; j++) {
         if (bigrams1[i] == bigrams2[j]) {
           intersection++;
           bigrams2[j] = null;
