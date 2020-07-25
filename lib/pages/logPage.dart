@@ -37,7 +37,7 @@ class _LogPageState extends State<LogPage> {
         ..sort((a, b) => StringUtils.getComparison(a?.displayName, pattern) <
                 StringUtils.getComparison(b?.displayName, pattern)
             ? 1
-            : 0);
+            : -1);
     }
     return Future.value([]);
   }
