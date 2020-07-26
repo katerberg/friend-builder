@@ -4,19 +4,20 @@ import 'package:uuid/uuid.dart';
 
 class Hangout {
   List<EncodableContact> contacts = [];
-  String id = Uuid().v4();
+  final String id;
   String where;
   String howMany = 'One on One';
   String medium = 'Face to Face';
   DateTime when = DateTime.now();
 
   Hangout(
-      {this.id,
+      {String id,
       this.contacts,
       this.where,
       this.howMany,
       this.medium,
-      this.when});
+      this.when})
+      : this.id = id ?? Uuid().v4();
 
   String dateWithYear() => DateFormat.yMMMMd().format(this.when);
   String dateWithoutYear() => DateFormat.MMMMd().format(this.when);

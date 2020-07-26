@@ -5,7 +5,7 @@ import 'package:friend_builder/logPageComponents/selectedFriendChips.dart';
 import 'package:friend_builder/logPageComponents/friendSelector.dart';
 
 class LogPage extends StatefulWidget {
-  final Function() onSubmit;
+  final void Function() onSubmit;
   LogPage({Key key, @required this.onSubmit}) : super(key: key);
 
   @override
