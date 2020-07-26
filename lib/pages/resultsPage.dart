@@ -6,37 +6,27 @@ import 'package:friend_builder/resultsPageComponents/editDialog.dart';
 
 class ResultsPage extends StatefulWidget {
   final Storage storage = Storage();
+  final List<Hangout> hangouts;
+  final void Function() updateHangouts;
+
+  ResultsPage({
+    Key key,
+    @required this.hangouts,
+    @required this.updateHangouts,
+  }) : super(key: key);
 
   @override
   _ResultsPageState createState() => _ResultsPageState();
 }
 
 class _ResultsPageState extends State<ResultsPage> {
-  List<Hangout> _hangouts;
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshHangouts();
-  }
-
-  void _refreshHangouts() {
-    widget.storage.getHangouts().then((hangouts) {
-      setState(() {
-        _hangouts = hangouts;
-      });
-    });
-  }
-
   void _onDelete(Hangout hangout) {
     widget.storage.getHangouts().then((hangouts) {
       widget.storage
           .saveHangouts(
               hangouts..removeWhere((element) => element.id == hangout.id))
           .then((file) {
-        setState(() {
-          _hangouts = hangouts;
-        });
+        widget.updateHangouts();
       });
     });
   }
@@ -48,7 +38,7 @@ class _ResultsPageState extends State<ResultsPage> {
         builder: (context) => EditDialog(
           hangout: hangout,
           selectedFriends: hangout.contacts,
-          onSubmit: _refreshHangouts,
+          onSubmit: widget.updateHangouts,
         ),
         fullscreenDialog: true,
       ),
@@ -56,18 +46,18 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   Widget _getResults() {
-    if (_hangouts == null) {
+    if (widget.hangouts == null) {
       return Center(child: CircularProgressIndicator());
     }
-    if (_hangouts.length == 0) {
+    if (widget.hangouts.length == 0) {
       return Center(child: Text('No results yet!'));
     }
-    _hangouts.sort((h0, h1) => h0.when.isAfter(h1.when) ? -1 : 1);
+    widget.hangouts.sort((h0, h1) => h0.when.isAfter(h1.when) ? -1 : 1);
 
     return ListView(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
-      children: _hangouts
+      children: widget.hangouts
           .map((h) => Result(
                 hangout: h,
                 onDelete: _onDelete,
