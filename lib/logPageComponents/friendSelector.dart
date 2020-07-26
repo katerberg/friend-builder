@@ -40,10 +40,19 @@ class FriendSelector extends StatelessWidget {
                       0.1))
           .toList());
       return val
-        ..sort((a, b) => StringUtils.getComparison(a?.displayName, pattern) <
-                StringUtils.getComparison(b?.displayName, pattern)
-            ? 1
-            : -1);
+        ..sort((a, b) {
+          RegExp regExp = new RegExp(
+            '^' + pattern,
+            caseSensitive: false,
+          );
+          var aMatches = regExp.hasMatch(a?.displayName ?? '');
+          if (aMatches || regExp.hasMatch(b?.displayName ?? '')) {
+            return aMatches ? -1 : 1;
+          }
+          bool isBigger = StringUtils.getComparison(a?.displayName, pattern) <
+              StringUtils.getComparison(b?.displayName, pattern);
+          return isBigger ? 1 : -1;
+        });
     }
     return Future.value([]);
   }
