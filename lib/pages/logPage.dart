@@ -3,7 +3,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/logPageComponents/hangoutForm.dart';
 import 'package:friend_builder/logPageComponents/noItemsFound.dart';
-import 'package:friend_builder/logPageComponents/suggestionForm.dart';
+import 'package:friend_builder/logPageComponents/selectedFriendChips.dart';
 import 'package:friend_builder/stringUtils.dart';
 
 class LogPage extends StatefulWidget {
@@ -91,7 +91,7 @@ class _LogPageState extends State<LogPage> {
         onSuggestionSelected: _setFriend,
       )
     ];
-    itemsToShow.add(SuggestionForm(
+    itemsToShow.add(SelectedFriendChips(
       selectedFriends: _selectedFriends,
       onRemoveFriend: _resetFriend,
     ));
