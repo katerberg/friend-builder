@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/logPageComponents/hangoutForm.dart';
-import 'package:friend_builder/logPageComponents/noItemsFound.dart';
 import 'package:friend_builder/logPageComponents/selectedFriendChips.dart';
-import 'package:friend_builder/stringUtils.dart';
+import 'package:friend_builder/logPageComponents/friendSelector.dart';
 
 class LogPage extends StatefulWidget {
   final Function() onSubmit;
@@ -24,27 +22,6 @@ class _LogPageState extends State<LogPage> {
     _selectedFriends = [];
   }
 
-  Future<List<Contact>> _getSuggestions(String pattern) async {
-    ContactPermission contactPermission =
-        await ContactPermissionService().getContacts();
-    if (!contactPermission.missingPermission) {
-      var val = await Future.value(contactPermission.contacts
-          .where((element) =>
-              !_selectedFriends.any(
-                  (selected) => selected.identifier == element.identifier) &&
-              (pattern.length < 2 ||
-                  StringUtils.getComparison(element?.displayName, pattern) >
-                      0.1))
-          .toList());
-      return val
-        ..sort((a, b) => StringUtils.getComparison(a?.displayName, pattern) <
-                StringUtils.getComparison(b?.displayName, pattern)
-            ? 1
-            : -1);
-    }
-    return Future.value([]);
-  }
-
   void _setFriend(Contact friend) {
     typeaheadController.text = '';
     setState(() {
@@ -60,41 +37,15 @@ class _LogPageState extends State<LogPage> {
     });
   }
 
-  String _getInputLabelText() {
-    if (_selectedFriends.isEmpty) {
-      return 'Who are you hanging out with?';
-    }
-    return 'Anyone else?';
-  }
-
   @override
   Widget build(BuildContext context) {
     List<Widget> itemsToShow = [
-      TypeAheadField(
-        textFieldConfiguration: TextFieldConfiguration(
-          autofocus: false,
-          autocorrect: false,
-          controller: typeaheadController,
-          cursorColor: Theme.of(context).cursorColor,
-          decoration: InputDecoration(
-            labelText: _getInputLabelText(),
-          ),
-        ),
-        suggestionsCallback: (pattern) async => await _getSuggestions(pattern),
-        itemBuilder: (context, suggestion) {
-          return ListTile(
-            leading: Icon(Icons.person_add),
-            title: Text(suggestion.displayName ?? ''),
-          );
-        },
-        noItemsFoundBuilder: (context) => NoItemsFound(),
-        onSuggestionSelected: _setFriend,
+      FriendSelector(selectedFriends: _selectedFriends, addFriend: _setFriend),
+      SelectedFriendChips(
+        selectedFriends: _selectedFriends,
+        onRemoveFriend: _resetFriend,
       )
     ];
-    itemsToShow.add(SelectedFriendChips(
-      selectedFriends: _selectedFriends,
-      onRemoveFriend: _resetFriend,
-    ));
 
     if (_selectedFriends.isNotEmpty) {
       itemsToShow.add(Row(children: [
