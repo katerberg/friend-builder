@@ -7,15 +7,22 @@ class ResultBubbles extends StatelessWidget {
 
   ResultBubbles({this.contacts});
 
+  Widget _getPadded(Widget widget) {
+    return Container(
+      padding: EdgeInsets.only(left: 8),
+      child: widget,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var bubbles = [
-      ...contacts.take(3).map((c) => ResultBubble(text: c.initials())).toList(),
+    List<Widget> bubbles = [
+      ...contacts.take(3).map((c) => _getPadded(c.getAvatar(context))).toList(),
     ];
 
     if (contacts.length > 3) {
       if (contacts.length == 4) {
-        bubbles.add(ResultBubble(text: contacts[3].initials()));
+        bubbles.add(_getPadded(contacts[3].getAvatar(context)));
       } else {
         bubbles.add(ResultBubble(text: '+' + (contacts.length - 3).toString()));
       }

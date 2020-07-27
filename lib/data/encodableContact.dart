@@ -1,18 +1,23 @@
 import 'package:friend_builder/contacts.dart';
+import 'package:flutter/material.dart';
+import 'dart:typed_data';
 
 class EncodableContact extends Contact {
   String displayName;
   String middleName;
   String givenName;
   String familyName;
+  Uint8List avatar;
   DateTime birthday;
 
-  EncodableContact(
-      {this.displayName,
-      this.middleName,
-      this.givenName,
-      this.familyName,
-      this.birthday});
+  EncodableContact({
+    this.displayName,
+    this.middleName,
+    this.givenName,
+    this.familyName,
+    this.birthday,
+    this.avatar,
+  });
 
   EncodableContact.fromContact(Contact contact) {
     this.displayName = contact.displayName;
@@ -20,6 +25,21 @@ class EncodableContact extends Contact {
     this.givenName = contact.givenName;
     this.familyName = contact.familyName;
     this.birthday = contact.birthday;
+    this.avatar = contact.avatar;
+  }
+
+  CircleAvatar getAvatar(context, [double fontSize]) {
+    return (avatar != null && avatar.isNotEmpty)
+        ? CircleAvatar(
+            backgroundImage: MemoryImage(avatar),
+          )
+        : CircleAvatar(
+            child: Text(
+              initials(),
+              style: TextStyle(fontSize: fontSize ?? 14),
+            ),
+            backgroundColor: Theme.of(context).accentColor,
+          );
   }
 
   String initials() {
@@ -34,6 +54,9 @@ class EncodableContact extends Contact {
       middleName: parsedJson['middleName'] ?? "",
       givenName: parsedJson['givenName'] ?? "",
       familyName: parsedJson['familyName'] ?? "",
+      avatar: parsedJson['avatar'] == null
+          ? null
+          : new Uint8List.fromList(parsedJson['avatar'].cast<int>()),
       birthday: parsedJson['birthday'] != null
           ? DateTime.parse(parsedJson['birthday'])
           : null,
@@ -42,6 +65,7 @@ class EncodableContact extends Contact {
 
   Map<String, dynamic> toJson() {
     return {
+      "avatar": this.avatar,
       "displayName": this.displayName,
       "middleName": this.middleName,
       "givenName": this.givenName,
