@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:friend_builder/data/encodableContact.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ContactsPage extends StatefulWidget {
@@ -69,14 +70,7 @@ class _ContactsPageState extends State<ContactsPage> {
           return ListTile(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 2, horizontal: 18),
-            leading: (contact.avatar != null && contact.avatar.isNotEmpty)
-                ? CircleAvatar(
-                    backgroundImage: MemoryImage(contact.avatar),
-                  )
-                : CircleAvatar(
-                    child: Text(contact.initials()),
-                    backgroundColor: Theme.of(context).accentColor,
-                  ),
+            leading: EncodableContact.fromContact(contact).getAvatar(context),
             title: Text(contact.displayName ?? ''),
             //This can be further expanded to showing contacts detail
             // onPressed().
