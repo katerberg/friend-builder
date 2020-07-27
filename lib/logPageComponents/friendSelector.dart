@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/logPageComponents/noItemsFound.dart';
+import 'package:friend_builder/data/encodableContact.dart';
 import 'package:friend_builder/stringUtils.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
@@ -70,9 +71,9 @@ class FriendSelector extends StatelessWidget {
         ),
       ),
       suggestionsCallback: (pattern) async => await _getSuggestions(pattern),
-      itemBuilder: (context, suggestion) {
+      itemBuilder: (context, Contact suggestion) {
         return ListTile(
-          leading: Icon(Icons.person_add),
+          leading: EncodableContact.fromContact(suggestion).getAvatar(context),
           title: Text(suggestion.displayName ?? ''),
         );
       },
