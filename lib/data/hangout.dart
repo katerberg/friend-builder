@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 class Hangout {
   List<EncodableContact> contacts = [];
   final String id;
-  String where;
+  String where = '';
   String howMany = 'One on One';
   String medium = 'Face to Face';
   DateTime when = DateTime.now();
