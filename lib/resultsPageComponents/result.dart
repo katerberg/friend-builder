@@ -15,68 +15,80 @@ class Result extends StatelessWidget {
         this.onEdit = onEdit,
         this.onDelete = onDelete;
 
+  void _handleResultTap() {
+    print(hangout.contacts.length);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: _handleResultTap,
+      child: Container(
+        padding: EdgeInsets.only(left: 16),
+        child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    hangout.dateWithoutYear(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Text(
+                          hangout.dateWithoutYear(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        ResultBubbles(
+                            contacts: hangout.contacts
+                              ..sort((a, b) =>
+                                  a?.displayName
+                                      ?.compareTo(b?.displayName ?? '') ??
+                                  0)),
+                        Expanded(
+                          child: Container(
+                            alignment: Alignment.centerRight,
+                            child: PopupMenuButton(
+                              icon: Icon(Icons.more_vert),
+                              onSelected: (result) {
+                                switch (result) {
+                                  case 'Delete':
+                                    onDelete(hangout);
+                                    break;
+                                  case 'Edit':
+                                    onEdit(hangout);
+                                    break;
+                                }
+                              },
+                              itemBuilder: (context) =>
+                                  <PopupMenuEntry<String>>[
+                                PopupMenuItem<String>(
+                                  value: 'Edit',
+                                  child: ListTile(
+                                    leading: const Icon(Icons.edit),
+                                    title: Text('Edit'),
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                  value: 'Delete',
+                                  child: ListTile(
+                                    leading: const Icon(Icons.delete),
+                                    title: Text('Delete'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                  ResultBubbles(
-                      contacts: hangout.contacts
-                        ..sort((a, b) =>
-                            a?.displayName?.compareTo(b?.displayName ?? '') ??
-                            0)),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      child: PopupMenuButton(
-                        icon: Icon(Icons.more_vert),
-                        onSelected: (result) {
-                          switch (result) {
-                            case 'Delete':
-                              onDelete(hangout);
-                              break;
-                            case 'Edit':
-                              onEdit(hangout);
-                              break;
-                          }
-                        },
-                        itemBuilder: (context) => <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            value: 'Edit',
-                            child: ListTile(
-                              leading: const Icon(Icons.edit),
-                              title: Text('Edit'),
-                            ),
-                          ),
-                          PopupMenuItem<String>(
-                            value: 'Delete',
-                            child: ListTile(
-                              leading: const Icon(Icons.delete),
-                              title: Text('Delete'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),
           ],
         ),
       ),
-    ]);
+    );
   }
 }

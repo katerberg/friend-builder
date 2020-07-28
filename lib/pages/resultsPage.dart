@@ -84,10 +84,7 @@ class _ResultsPageState extends State<ResultsPage> {
         title: (Text('Hangouts')),
       ),
       body: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: _getResults(),
-        ),
+        child: _getResults(),
       ),
     );
   }
