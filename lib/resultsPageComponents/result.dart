@@ -2,21 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/resultsPageComponents/resultBubbles.dart';
 
-class Result extends StatelessWidget {
+class Result extends StatefulWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
 
   Result({
-    Hangout hangout,
-    void Function(Hangout) onDelete,
-    void Function(Hangout) onEdit,
-  })  : this.hangout = hangout,
-        this.onEdit = onEdit,
-        this.onDelete = onDelete;
+    Key key,
+    @required this.hangout,
+    @required this.onDelete,
+    @required this.onEdit,
+  }) : super(key: key);
+
+  @override
+  _ResultState createState() => _ResultState();
+}
+
+class _ResultState extends State<Result> {
+  bool isOpen = false;
 
   void _handleResultTap() {
-    print(hangout.contacts.length);
+    print(widget.hangout.contacts.length);
+    setState(() {
+      isOpen = !isOpen;
+    });
   }
 
   @override
@@ -36,11 +45,11 @@ class Result extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          hangout.dateWithoutYear(),
+                          widget.hangout.dateWithoutYear(),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         ResultBubbles(
-                            contacts: hangout.contacts
+                            contacts: widget.hangout.contacts
                               ..sort((a, b) =>
                                   a?.displayName
                                       ?.compareTo(b?.displayName ?? '') ??
@@ -53,10 +62,10 @@ class Result extends StatelessWidget {
                               onSelected: (result) {
                                 switch (result) {
                                   case 'Delete':
-                                    onDelete(hangout);
+                                    widget.onDelete(widget.hangout);
                                     break;
                                   case 'Edit':
-                                    onEdit(hangout);
+                                    widget.onEdit(widget.hangout);
                                     break;
                                 }
                               },
