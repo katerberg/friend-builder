@@ -32,7 +32,11 @@ class Result extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  ResultBubbles(contacts: hangout.contacts),
+                  ResultBubbles(
+                      contacts: hangout.contacts
+                        ..sort((a, b) =>
+                            a?.displayName?.compareTo(b?.displayName ?? '') ??
+                            0)),
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
