@@ -18,8 +18,27 @@ class OpenResult extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    IconData mediumIcon;
+    switch (hangout.medium) {
+      case 'Face to Face':
+        mediumIcon = Icons.tag_faces;
+        break;
+      case 'Mail':
+        mediumIcon = Icons.email;
+        break;
+      case 'Video':
+        mediumIcon = Icons.videocam;
+        break;
+      case 'Chat':
+        mediumIcon = Icons.chat;
+        break;
+      case 'Phone':
+      default:
+        mediumIcon = Icons.phone_in_talk;
+    }
+
     return Container(
-      margin: EdgeInsets.fromLTRB(8, 8, 8, 8),
+      margin: EdgeInsets.all(8),
       padding: EdgeInsets.all(8),
       color: Color(0xffefefef),
       child: Row(
@@ -57,8 +76,7 @@ class OpenResult extends StatelessWidget {
                 ),
                 ResultExpansionItem(
                     iconItem: Icons.group, text: hangout.howMany),
-                ResultExpansionItem(
-                    iconItem: Icons.phone_in_talk, text: hangout.medium),
+                ResultExpansionItem(iconItem: mediumIcon, text: hangout.medium),
                 hangout.where != ''
                     ? ResultExpansionItem(
                         iconItem: Icons.location_on, text: hangout.where)
