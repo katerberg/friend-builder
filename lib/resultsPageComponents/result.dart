@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/resultsPageComponents/resultBubbles.dart';
+import 'package:friend_builder/resultsPageComponents/openResult.dart';
+import 'package:friend_builder/resultsPageComponents/closedResult.dart';
 
 class Result extends StatefulWidget {
   final Hangout hangout;
@@ -22,7 +23,6 @@ class _ResultState extends State<Result> {
   bool isOpen = false;
 
   void _handleResultTap() {
-    print(widget.hangout.contacts.length);
     setState(() {
       isOpen = !isOpen;
     });
@@ -32,72 +32,17 @@ class _ResultState extends State<Result> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: _handleResultTap,
-      child: Container(
-        padding: EdgeInsets.only(left: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      children: [
-                        Text(
-                          widget.hangout.dateWithoutYear(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        ResultBubbles(
-                            contacts: widget.hangout.contacts
-                              ..sort((a, b) =>
-                                  a?.displayName
-                                      ?.compareTo(b?.displayName ?? '') ??
-                                  0)),
-                        Expanded(
-                          child: Container(
-                            alignment: Alignment.centerRight,
-                            child: PopupMenuButton(
-                              icon: Icon(Icons.more_vert),
-                              onSelected: (result) {
-                                switch (result) {
-                                  case 'Delete':
-                                    widget.onDelete(widget.hangout);
-                                    break;
-                                  case 'Edit':
-                                    widget.onEdit(widget.hangout);
-                                    break;
-                                }
-                              },
-                              itemBuilder: (context) =>
-                                  <PopupMenuEntry<String>>[
-                                PopupMenuItem<String>(
-                                  value: 'Edit',
-                                  child: ListTile(
-                                    leading: const Icon(Icons.edit),
-                                    title: Text('Edit'),
-                                  ),
-                                ),
-                                PopupMenuItem<String>(
-                                  value: 'Delete',
-                                  child: ListTile(
-                                    leading: const Icon(Icons.delete),
-                                    title: Text('Delete'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+      child: isOpen
+          ? OpenResult(
+              hangout: widget.hangout,
+              onDelete: widget.onDelete,
+              onEdit: widget.onEdit,
+            )
+          : ClosedResult(
+              hangout: widget.hangout,
+              onDelete: widget.onDelete,
+              onEdit: widget.onEdit,
             ),
-          ],
-        ),
-      ),
     );
   }
 }
