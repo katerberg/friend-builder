@@ -6,6 +6,7 @@ class EncodableContact extends Contact {
   String displayName;
   String middleName;
   String givenName;
+  String identifier;
   String familyName;
   Uint8List avatar;
   DateTime birthday;
@@ -14,6 +15,7 @@ class EncodableContact extends Contact {
     this.displayName,
     this.middleName,
     this.givenName,
+    this.identifier,
     this.familyName,
     this.birthday,
     this.avatar,
@@ -23,6 +25,7 @@ class EncodableContact extends Contact {
     this.displayName = contact.displayName;
     this.middleName = contact.middleName;
     this.givenName = contact.givenName;
+    this.identifier = contact.identifier;
     this.familyName = contact.familyName;
     this.birthday = contact.birthday;
     this.avatar = contact.avatar;
@@ -53,6 +56,7 @@ class EncodableContact extends Contact {
       displayName: parsedJson['displayName'] ?? "",
       middleName: parsedJson['middleName'] ?? "",
       givenName: parsedJson['givenName'] ?? "",
+      identifier: parsedJson['identifier'] ?? "",
       familyName: parsedJson['familyName'] ?? "",
       avatar: parsedJson['avatar'] == null
           ? null
@@ -69,6 +73,7 @@ class EncodableContact extends Contact {
       "displayName": this.displayName,
       "middleName": this.middleName,
       "givenName": this.givenName,
+      "identifier": this.identifier,
       "familyName": this.familyName,
       "birthday":
           this.birthday != null ? this.birthday.toIso8601String() : null,
