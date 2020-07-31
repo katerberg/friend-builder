@@ -13,6 +13,8 @@ class ContactsPage extends StatefulWidget {
 
 class _ContactsPageState extends State<ContactsPage> {
   Iterable<Contact> _contacts;
+  List<Contact> _hangoutContacts;
+  List<Contact> _unusedContacts;
   List<Hangout> _hangouts;
   bool _missingPermission = false;
 
@@ -40,19 +42,24 @@ class _ContactsPageState extends State<ContactsPage> {
     });
   }
 
+  int _compareContacts(Contact c1, Contact c2) {
+    return (c1?.displayName ?? '').compareTo(c2?.displayName ?? '');
+  }
+
   void _sortContacts() {
     setState(() {
-      _contacts = _contacts.toList()
-        ..sort((c1, c2) {
-          var c1Exists = _hangouts.any((element) =>
-              element.contacts.any((c) => c.identifier == c1.identifier));
-          var c2Exists = _hangouts.any((element) =>
-              element.contacts.any((c) => c.identifier == c2.identifier));
-          if ((c1Exists || c2Exists) && (!c1Exists || !c2Exists)) {
-            return c1Exists ? -1 : 1;
-          }
-          return (c1?.displayName ?? '').compareTo(c2?.displayName ?? '');
-        });
+      _hangoutContacts = _contacts
+          .toList()
+          .where((c) => _hangouts.any((element) =>
+              element.contacts.any((hc) => hc.identifier == c.identifier)))
+          .toList()
+            ..sort(_compareContacts);
+      _unusedContacts = _contacts
+          .toList()
+          .where((c) => !_hangouts.any((element) =>
+              element.contacts.any((hc) => hc.identifier == c.identifier)))
+          .toList()
+            ..sort(_compareContacts);
     });
   }
 
@@ -92,18 +99,25 @@ class _ContactsPageState extends State<ContactsPage> {
     } else if (_contacts == null || _hangouts == null) {
       body = Center(child: const CircularProgressIndicator());
     } else {
-      // _contacts.sort((c1,c2) => )
       body = ListView(
-        children: _contacts
-            .map((c) => ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 2, horizontal: 18),
-                  leading: EncodableContact.fromContact(c).getAvatar(context),
-                  title: Text(c?.displayName ?? ''),
-                  //This can be further expanded to showing contacts detail
-                  // onPressed().
-                ))
-            .toList(),
+        children: [
+          ..._hangoutContacts.map((c) => ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 2, horizontal: 18),
+                leading: EncodableContact.fromContact(c).getAvatar(context),
+                title: Text(
+                  c?.displayName ?? '',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              )),
+          Divider(),
+          ..._unusedContacts.map((c) => ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 2, horizontal: 18),
+                leading: EncodableContact.fromContact(c).getAvatar(context),
+                title: Text(c?.displayName ?? ''),
+              )),
+        ],
       );
     }
 
