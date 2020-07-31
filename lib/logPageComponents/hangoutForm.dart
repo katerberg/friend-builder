@@ -24,6 +24,7 @@ class HangoutForm extends StatefulWidget {
 class _HangoutFormState extends State<HangoutForm> {
   final _formKey = GlobalKey<FormState>();
 
+  bool _submitting = false;
   Hangout _data;
   DateTime selectedDate;
   TextEditingController dateController =
@@ -51,6 +52,29 @@ class _HangoutFormState extends State<HangoutForm> {
       });
 
       dateController.text = _formatDate(picked);
+    }
+  }
+
+  Future<void> _handleSubmitPress() async {
+    if (!_submitting && _formKey.currentState.validate()) {
+      setState(() {
+        _submitting = true;
+      });
+      _formKey.currentState.save();
+      List<Hangout> hangouts = await Storage().getHangouts();
+      if (hangouts != null) {
+        var index = hangouts.indexWhere((element) => element.id == _data.id);
+        if (index == -1) {
+          hangouts.add(_data);
+        } else {
+          hangouts[index] = _data;
+        }
+      } else {
+        hangouts = [_data];
+      }
+      Storage().saveHangouts(hangouts).then((_) {
+        widget.onSubmit();
+      });
     }
   }
 
@@ -130,28 +154,8 @@ class _HangoutFormState extends State<HangoutForm> {
                   RaisedButton(
                     color: Theme.of(context).primaryColor,
                     textColor: Theme.of(context).cardColor,
-                    onPressed: () async {
-                      if (_formKey.currentState.validate()) {
-                        _formKey.currentState.save();
-                        List<Hangout> hangouts = await Storage().getHangouts();
-                        if (hangouts != null) {
-                          var index = hangouts
-                              .indexWhere((element) => element.id == _data.id);
-                          if (index == -1) {
-                            hangouts.add(_data);
-                          } else {
-                            hangouts[index] = _data;
-                          }
-                        } else {
-                          hangouts = [_data];
-                        }
-                        Storage().saveHangouts(hangouts);
-                        widget.onSubmit();
-                      } else {
-                        print('Form is not valid');
-                      }
-                    },
-                    child: Text('Save'),
+                    onPressed: _submitting ? null : _handleSubmitPress,
+                    child: Text(_submitting ? 'Submitting...' : 'Save'),
                   ),
                 ],
               ),
