@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/contactPageComponents/contactScheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:contacts_service/contacts_service.dart';
-import 'package:friend_builder/data/encodableContact.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:friend_builder/contactPageComponents/contactTile.dart';
 
 class ContactsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -85,6 +86,23 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
+  Future<void> _handleContactPress(Contact contact) async {
+    print(contact?.displayName);
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContactSchedulingDialog(
+          contact: contact,
+          onSave: () {
+            print('saved');
+          },
+        ),
+        fullscreenDialog: true,
+      ),
+    );
+    print('closed');
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget body;
@@ -101,22 +119,14 @@ class _ContactsPageState extends State<ContactsPage> {
     } else {
       body = ListView(
         children: [
-          ..._hangoutContacts.map((c) => ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 2, horizontal: 18),
-                leading: EncodableContact.fromContact(c).getAvatar(context),
-                title: Text(
-                  c?.displayName ?? '',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+          ..._hangoutContacts.map((c) => ContactTile(
+                contact: c,
+                onPressed: _handleContactPress,
+                isBold: true,
               )),
           Divider(),
-          ..._unusedContacts.map((c) => ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 2, horizontal: 18),
-                leading: EncodableContact.fromContact(c).getAvatar(context),
-                title: Text(c?.displayName ?? ''),
-              )),
+          ..._unusedContacts.map(
+              (c) => ContactTile(contact: c, onPressed: _handleContactPress)),
         ],
       );
     }

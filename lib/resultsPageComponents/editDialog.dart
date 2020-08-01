@@ -9,12 +9,11 @@ class EditDialog extends StatelessWidget {
   final void Function() onSubmit;
 
   EditDialog(
-      {@required List<Contact> selectedFriends,
-      @required Hangout hangout,
-      @required void Function() onSubmit})
-      : this.selectedFriends = selectedFriends,
-        this.hangout = hangout,
-        this.onSubmit = onSubmit;
+      {Key key,
+      @required this.selectedFriends,
+      @required this.hangout,
+      @required this.onSubmit})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
