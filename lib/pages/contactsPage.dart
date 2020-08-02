@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contactPageComponents/contactScheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/data/friend.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -88,7 +89,7 @@ class _ContactsPageState extends State<ContactsPage> {
 
   Future<void> _handleContactPress(Contact contact) async {
     print(contact?.displayName);
-    await Navigator.push<void>(
+    final result = await Navigator.push<Friend>(
       context,
       MaterialPageRoute(
         builder: (context) => ContactSchedulingDialog(
@@ -101,6 +102,7 @@ class _ContactsPageState extends State<ContactsPage> {
       ),
     );
     print('closed');
+    print(result?.contactIdentifier);
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/data/friend.dart';
 
 class ContactSchedulingDialog extends StatelessWidget {
   final Contact contact;
@@ -12,6 +13,11 @@ class ContactSchedulingDialog extends StatelessWidget {
     return GestureDetector(
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () =>
+                Navigator.pop(context, Friend(contactIdentifier: '4234')),
+          ),
           title: Text(this.contact?.displayName ?? 'Schedule'),
         ),
         body: SafeArea(
@@ -19,13 +25,7 @@ class ContactSchedulingDialog extends StatelessWidget {
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
               children: [
-                FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    onSave();
-                  },
-                  child: Text('thingy'),
-                ),
+                Text('thingy'),
               ]),
         ),
       ),
