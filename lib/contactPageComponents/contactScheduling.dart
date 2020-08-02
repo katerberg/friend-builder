@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
-import 'package:friend_builder/contactPageComponents/selectionChoiceChip.dart';
+import 'package:friend_builder/contactPageComponents/selectionChoiceGroup.dart';
 import 'package:friend_builder/data/friend.dart';
 
 class ContactSchedulingDialog extends StatefulWidget {
@@ -15,11 +15,14 @@ class ContactSchedulingDialog extends StatefulWidget {
 }
 
 class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
-  String selection = 'Weekly';
+  Map<String, String> selection = {
+    'How often do you want to contact this person?': 'Weekly',
+    'How do you want to stay in contact?': 'Any way',
+  };
 
-  void _handleSelectionTap(String selectedValue) {
+  void _handleSelectionTap(String groupName, String selectedValue) {
     setState(() {
-      selection = selectedValue;
+      selection[groupName] = selectedValue;
     });
   }
 
@@ -40,39 +43,17 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
               shrinkWrap: true,
               scrollDirection: Axis.vertical,
               children: [
-                Container(
-                  margin: EdgeInsets.fromLTRB(16, 16, 0, 8),
-                  child: Text(
-                    'How often do you want to contact this person?',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 8),
-                  child: Wrap(
-                    alignment: WrapAlignment.spaceEvenly,
-                    spacing: 8.0, // gap between adjacent chips
-                    runSpacing: 4.0, // gap between lines
-                    children: [
-                      SelectionChoiceChip(
-                          label: 'Not often',
-                          selection: selection,
-                          onTap: _handleSelectionTap),
-                      SelectionChoiceChip(
-                          label: 'Weekly',
-                          selection: selection,
-                          onTap: _handleSelectionTap),
-                      SelectionChoiceChip(
-                          label: 'Monthly',
-                          selection: selection,
-                          onTap: _handleSelectionTap),
-                      SelectionChoiceChip(
-                          label: 'Quarterly',
-                          selection: selection,
-                          onTap: _handleSelectionTap),
-                    ],
-                  ),
-                ),
+                SelectionChoiceGroup(
+                    choices: ['Not often', 'Weekly', 'Monthly', 'Quarterly'],
+                    onSelect: _handleSelectionTap,
+                    selection: selection[
+                        'How often do you want to contact this person?'],
+                    label: 'How often do you want to contact this person?'),
+                SelectionChoiceGroup(
+                    choices: ['Any way', 'Face to face', 'Text', 'Call'],
+                    onSelect: _handleSelectionTap,
+                    selection: selection['How do you want to stay in contact?'],
+                    label: 'How do you want to stay in contact?'),
               ]),
         ),
       ),

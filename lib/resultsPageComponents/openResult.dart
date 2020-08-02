@@ -21,8 +21,10 @@ class OpenResult extends StatelessWidget {
     IconData mediumIcon;
     switch (hangout.medium) {
       case 'Face to Face':
+      case 'Face to face':
         mediumIcon = Icons.tag_faces;
         break;
+      case 'Text':
       case 'Mail':
         mediumIcon = Icons.email;
         break;
@@ -32,6 +34,7 @@ class OpenResult extends StatelessWidget {
       case 'Chat':
         mediumIcon = Icons.chat;
         break;
+      case 'Call':
       case 'Phone':
       default:
         mediumIcon = Icons.phone_in_talk;

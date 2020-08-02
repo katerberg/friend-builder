@@ -15,17 +15,12 @@ class SelectionChoiceChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(_isSelected());
-    print(Theme.of(context).accentColor);
     return ChoiceChip(
       shape: StadiumBorder(
           side: BorderSide(
               color: _isSelected()
                   ? Theme.of(context).accentColor
                   : Color(0xffcccccc))),
-      // shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.all(Radius.elliptical(19999, 99999)),
-      //     side: BorderSide()),
       backgroundColor: Colors.white,
       label: Text(label),
       selected: selection == label,
