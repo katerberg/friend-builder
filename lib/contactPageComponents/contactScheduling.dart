@@ -43,7 +43,7 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
                 Container(
                   margin: EdgeInsets.fromLTRB(16, 16, 0, 8),
                   child: Text(
-                    'How often do you want to see this person?',
+                    'How often do you want to contact this person?',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -55,6 +55,10 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
                     runSpacing: 4.0, // gap between lines
                     children: [
                       SelectionChoiceChip(
+                          label: 'Not often',
+                          selection: selection,
+                          onTap: _handleSelectionTap),
+                      SelectionChoiceChip(
                           label: 'Weekly',
                           selection: selection,
                           onTap: _handleSelectionTap),
@@ -64,10 +68,6 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
                           onTap: _handleSelectionTap),
                       SelectionChoiceChip(
                           label: 'Quarterly',
-                          selection: selection,
-                          onTap: _handleSelectionTap),
-                      SelectionChoiceChip(
-                          label: 'Yearly',
                           selection: selection,
                           onTap: _handleSelectionTap),
                     ],
