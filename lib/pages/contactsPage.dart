@@ -88,7 +88,6 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   Future<void> _handleContactPress(Contact contact) async {
-    print(contact?.displayName);
     final result = await Navigator.push<Friend>(
       context,
       MaterialPageRoute(
@@ -101,7 +100,6 @@ class _ContactsPageState extends State<ContactsPage> {
         fullscreenDialog: true,
       ),
     );
-    print('closed');
     print(result?.contactIdentifier);
   }
 
@@ -125,6 +123,7 @@ class _ContactsPageState extends State<ContactsPage> {
                 contact: c,
                 onPressed: _handleContactPress,
                 isBold: true,
+                hangouts: _hangouts,
               )),
           Divider(),
           ..._unusedContacts.map(
