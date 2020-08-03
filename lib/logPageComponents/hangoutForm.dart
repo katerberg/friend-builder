@@ -32,7 +32,7 @@ class _HangoutFormState extends State<HangoutForm> {
 
   _HangoutFormState({Hangout hangout}) {
     _data = hangout ??
-        Hangout(howMany: 'One on One', where: '', medium: 'Face to Face');
+        Hangout(howMany: 'One on one', where: '', medium: 'Face to face');
     selectedDate = hangout != null ? hangout.when : DateTime.now();
     dateController = TextEditingController(text: _formatDate(selectedDate));
   }
@@ -84,14 +84,14 @@ class _HangoutFormState extends State<HangoutForm> {
       _data.contacts = widget.selectedFriends
           .map((f) => EncodableContact.fromContact(f))
           .toList();
-      if (_data.contacts.length > 1 && _data.howMany == 'One on One') {
-        _data.howMany = 'Small Group';
+      if (_data.contacts.length > 1 && _data.howMany == 'One on one') {
+        _data.howMany = 'Small group';
       }
     });
 
-    List<String> howManyOptions = ['Small Group', 'Party'];
+    List<String> howManyOptions = ['Small group', 'Party'];
     if (_data.contacts.length < 2) {
-      howManyOptions.insert(0, 'One on One');
+      howManyOptions.insert(0, 'One on one');
     }
 
     return Padding(
@@ -112,7 +112,7 @@ class _HangoutFormState extends State<HangoutForm> {
               }).toList(),
               onChanged: (String newValue) => {this._data.medium = newValue},
               onSaved: (String newValue) => {this._data.medium = newValue},
-              value: _data.medium ?? 'Face to Face',
+              value: _data.medium ?? 'Face to face',
             ),
             TextFormField(
               autocorrect: true,
@@ -135,7 +135,7 @@ class _HangoutFormState extends State<HangoutForm> {
               }).toList(),
               onChanged: (String newValue) => {this._data.howMany = newValue},
               onSaved: (String newValue) => {this._data.howMany = newValue},
-              value: _data.howMany ?? 'One on One',
+              value: _data.howMany ?? 'One on one',
             ),
             TextFormField(
               decoration: const InputDecoration(

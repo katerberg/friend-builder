@@ -6,8 +6,8 @@ class Hangout {
   List<EncodableContact> contacts = [];
   final String id;
   String where = '';
-  String howMany = 'One on One';
-  String medium = 'Face to Face';
+  String howMany = 'One on one';
+  String medium = 'Face to face';
   DateTime when = DateTime.now();
 
   Hangout(
@@ -29,8 +29,8 @@ class Hangout {
           .map((c) => EncodableContact.fromJson(c))
           .toList(),
       where: parsedJson['where'] ?? "",
-      howMany: parsedJson['howMany'] ?? "One on One",
-      medium: parsedJson['medium'] ?? "Face to Face",
+      howMany: parsedJson['howMany'] ?? "One on one",
+      medium: parsedJson['medium'] ?? "Face to face",
       when: DateTime.parse(parsedJson['when']),
     );
   }
