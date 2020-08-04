@@ -8,27 +8,19 @@ class ContactTile extends StatelessWidget {
   final Contact contact;
   final void Function(Contact contact) onPressed;
   final bool isBold;
-  final List<Hangout> hangouts;
+  final Hangout latestHangout;
 
   ContactTile({
     @required this.contact,
     @required this.onPressed,
-    this.hangouts,
+    this.latestHangout,
     bool isBold,
   }) : isBold = isBold ?? false;
 
   Text _getSubTitle() {
-    if (hangouts == null) {
+    if (latestHangout == null) {
       return null;
     }
-    var latestHangout = hangouts.reduce((value, hangout) {
-      var contacts = hangout.contacts
-          .where((c) => c.identifier == this.contact.identifier);
-      if (contacts.length == 1 && value.when.compareTo(hangout.when) < 0) {
-        return hangout;
-      }
-      return value;
-    });
     return Text(latestHangout == null
         ? 'Unknown'
         : DateFormat.yMMMMd().format(latestHangout.when));

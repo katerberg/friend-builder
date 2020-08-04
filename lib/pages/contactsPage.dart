@@ -13,6 +13,23 @@ class ContactsPage extends StatefulWidget {
   _ContactsPageState createState() => _ContactsPageState();
 }
 
+class ContactPageContact {
+  Contact contact;
+  Hangout latestHangout;
+
+  ContactPageContact(Contact contact, List<Hangout> hangouts) {
+    this.contact = contact;
+    this.latestHangout = hangouts.reduce((value, hangout) {
+      var contacts = hangout.contacts
+          .where((c) => c.identifier == this.contact.identifier);
+      if (contacts.length == 1 && value.when.compareTo(hangout.when) < 0) {
+        return hangout;
+      }
+      return value;
+    });
+  }
+}
+
 class _ContactsPageState extends State<ContactsPage> {
   Iterable<Contact> _contacts;
   List<Contact> _hangoutContacts;
@@ -119,12 +136,18 @@ class _ContactsPageState extends State<ContactsPage> {
     } else {
       body = ListView(
         children: [
-          ..._hangoutContacts.map((c) => ContactTile(
-                contact: c,
-                onPressed: _handleContactPress,
-                isBold: true,
-                hangouts: _hangouts,
-              )),
+          ...(_hangoutContacts
+                  .map((c) => ContactPageContact(c, _hangouts))
+                  .toList()
+                    ..sort((c1, c2) => (c1?.latestHangout?.when ??
+                            DateTime.now())
+                        .compareTo(c2?.latestHangout?.when ?? DateTime.now())))
+              .map((c) => ContactTile(
+                    contact: c.contact,
+                    onPressed: _handleContactPress,
+                    isBold: true,
+                    latestHangout: c.latestHangout,
+                  )),
           Divider(),
           ..._unusedContacts.map(
               (c) => ContactTile(contact: c, onPressed: _handleContactPress)),
