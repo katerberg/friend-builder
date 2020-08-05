@@ -39,22 +39,39 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
           title: Text(widget.contact?.displayName ?? 'Schedule'),
         ),
         body: SafeArea(
-          child: ListView(
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              children: [
-                SelectionChoiceGroup(
-                    choices: ['Not often', 'Weekly', 'Monthly', 'Quarterly'],
-                    onSelect: _handleSelectionTap,
-                    selection: selection[
-                        'How often do you want to contact this person?'],
-                    label: 'How often do you want to contact this person?'),
-                SelectionChoiceGroup(
-                    choices: ['Any way', 'Face to face', 'Text', 'Call'],
-                    onSelect: _handleSelectionTap,
-                    selection: selection['How do you want to stay in contact?'],
-                    label: 'How do you want to stay in contact?'),
-              ]),
+          child: Column(children: [
+            ListView(
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                children: [
+                  SelectionChoiceGroup(
+                      choices: ['Weekly', 'Monthly', 'Quarterly', 'Yearly'],
+                      onSelect: _handleSelectionTap,
+                      selection: selection[
+                          'How often do you want to contact this person?'],
+                      label: 'How often do you want to contact this person?'),
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    child: TextField(
+                      autocorrect: true,
+                      decoration: InputDecoration(labelText: 'Notes'),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                    ),
+                  ),
+                ]),
+            Spacer(),
+            Container(
+              padding: EdgeInsets.only(bottom: 16),
+              child: FlatButton(
+                child: Text(
+                  "I don't want reminders for this person",
+                  style: TextStyle(color: Color(0xffdd4444)),
+                ),
+                onPressed: () => {},
+              ),
+            ),
+          ]),
         ),
       ),
       onTap: () {
