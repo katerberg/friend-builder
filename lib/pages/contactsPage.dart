@@ -108,16 +108,11 @@ class _ContactsPageState extends State<ContactsPage> {
     final result = await Navigator.push<Friend>(
       context,
       MaterialPageRoute(
-        builder: (context) => ContactSchedulingDialog(
-          contact: contact,
-          onSave: () {
-            print('saved');
-          },
-        ),
+        builder: (context) => ContactSchedulingDialog(contact: contact),
         fullscreenDialog: true,
       ),
     );
-    print(result?.contactIdentifier);
+    print(result.notes);
   }
 
   @override

@@ -3,11 +3,13 @@ import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/contactPageComponents/selectionChoiceGroup.dart';
 import 'package:friend_builder/data/friend.dart';
 
+const oftenLabel = 'How often do you want to contact this person?';
+const notesLabel = 'Notes';
+
 class ContactSchedulingDialog extends StatefulWidget {
   final Contact contact;
-  final void Function() onSave;
 
-  ContactSchedulingDialog({@required this.contact, @required this.onSave});
+  ContactSchedulingDialog({@required this.contact});
 
   @override
   _ContactSchedulingDialogState createState() =>
@@ -16,8 +18,8 @@ class ContactSchedulingDialog extends StatefulWidget {
 
 class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
   Map<String, String> selection = {
-    'How often do you want to contact this person?': 'Weekly',
-    'How do you want to stay in contact?': 'Any way',
+    oftenLabel: 'Weekly',
+    notesLabel: '',
   };
 
   void _handleSelectionTap(String groupName, String selectedValue) {
@@ -33,8 +35,13 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(Icons.close),
-            onPressed: () =>
-                Navigator.pop(context, Friend(contactIdentifier: '4234')),
+            onPressed: () => Navigator.pop(
+                context,
+                Friend(
+                  contactIdentifier: widget.contact.identifier,
+                  frequency: selection[oftenLabel],
+                  notes: selection[notesLabel],
+                )),
           ),
           title: Text(widget.contact?.displayName ?? 'Schedule'),
         ),
@@ -47,14 +54,15 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
                   SelectionChoiceGroup(
                       choices: ['Weekly', 'Monthly', 'Quarterly', 'Yearly'],
                       onSelect: _handleSelectionTap,
-                      selection: selection[
-                          'How often do you want to contact this person?'],
-                      label: 'How often do you want to contact this person?'),
+                      selection: selection[oftenLabel],
+                      label: oftenLabel),
                   Container(
                     padding: EdgeInsets.all(16),
                     child: TextField(
+                      onChanged: (String newVal) =>
+                          _handleSelectionTap(notesLabel, newVal),
                       autocorrect: true,
-                      decoration: InputDecoration(labelText: 'Notes'),
+                      decoration: InputDecoration(labelText: notesLabel),
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
                     ),
