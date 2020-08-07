@@ -5,13 +5,13 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 
 class Storage {
-  Future<String> get _localPath async {
+  static Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
 
     return directory.path;
   }
 
-  Future<File> get _localHangoutsFile async {
+  static Future<File> get _localHangoutsFile async {
     final path = await _localPath;
     return File('$path/hangouts.txt');
   }
@@ -41,14 +41,14 @@ class Storage {
     return file.writeAsString(jsonEncode(hangouts));
   }
 
-  Future<File> get _localFriendsFile async {
+  static Future<File> get _localFriendsFile async {
     final path = await _localPath;
     return File('$path/friends.txt');
   }
 
-  Future<List<Friend>> getFriends() async {
+  static Future<List<Friend>> getFriends() async {
     try {
-      final file = await _localHangoutsFile;
+      final file = await _localFriendsFile;
       String contents = await file.readAsString();
 
       var contentList = jsonDecode(contents) as List;
@@ -63,7 +63,7 @@ class Storage {
     }
   }
 
-  Future<File> saveFriends(List<Friend> friends) async {
+  static Future<File> saveFriends(List<Friend> friends) async {
     final file = await _localFriendsFile;
 
     return file.writeAsString(jsonEncode(friends));
