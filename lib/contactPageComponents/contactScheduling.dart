@@ -86,6 +86,7 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
                       decoration: InputDecoration(labelText: notesLabel),
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
+                      textCapitalization: TextCapitalization.sentences,
                     ),
                   ),
                 ]),
