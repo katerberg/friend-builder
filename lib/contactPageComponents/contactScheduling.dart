@@ -22,12 +22,14 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
     oftenLabel: 'Weekly',
     notesLabel: '',
   };
+  bool isContactable;
 
   TextEditingController notesController;
 
   _ContactSchedulingDialogState(Friend friend) {
     selection[oftenLabel] = friend?.frequency ?? 'Weekly';
     selection[notesLabel] = friend?.notes ?? '';
+    isContactable = friend?.isContactable ?? true;
     notesController = new TextEditingController(text: friend?.notes ?? '');
   }
 
@@ -48,7 +50,38 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
     }
     widget.friend.notes = selection[notesLabel];
     widget.friend.frequency = selection[oftenLabel];
+    widget.friend.isContactable = isContactable;
     return widget.friend;
+  }
+
+  void _closePage() {
+    Navigator.pop(
+      context,
+      _getFriendToSubmit(),
+    );
+  }
+
+  FlatButton _getContactButton() {
+    var onPressed = () {
+      setState(() {
+        isContactable = !isContactable;
+      });
+      _closePage();
+    };
+    if (widget.friend.isContactable) {
+      return FlatButton(
+        child: Text(
+          "I don't want reminders for this person",
+          style: TextStyle(color: Color(0xffdd4444)),
+        ),
+        onPressed: onPressed,
+      );
+    }
+    return FlatButton(
+      child: Text('I want notifications for this person',
+          style: TextStyle(color: Theme.of(context).primaryColor)),
+      onPressed: onPressed,
+    );
   }
 
   @override
@@ -56,12 +89,7 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
     return GestureDetector(
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () => Navigator.pop(
-                    context,
-                    _getFriendToSubmit(),
-                  )),
+          leading: IconButton(icon: Icon(Icons.close), onPressed: _closePage),
           title: Text(widget.contact?.displayName ?? 'Schedule'),
         ),
         body: SafeArea(
@@ -93,13 +121,7 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
             Spacer(),
             Container(
               padding: EdgeInsets.only(bottom: 16),
-              child: FlatButton(
-                child: Text(
-                  "I don't want reminders for this person",
-                  style: TextStyle(color: Color(0xffdd4444)),
-                ),
-                onPressed: () => {},
-              ),
+              child: _getContactButton(),
             ),
           ]),
         ),
