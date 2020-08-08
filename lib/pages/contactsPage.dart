@@ -129,8 +129,6 @@ class _ContactsPageState extends State<ContactsPage> {
       friends = [result];
     }
     Storage.saveFriends(friends);
-    print(friends);
-    print(result.notes);
   }
 
   @override

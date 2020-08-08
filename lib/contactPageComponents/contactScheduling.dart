@@ -14,7 +14,7 @@ class ContactSchedulingDialog extends StatefulWidget {
 
   @override
   _ContactSchedulingDialogState createState() =>
-      _ContactSchedulingDialogState();
+      _ContactSchedulingDialogState(friend);
 }
 
 class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
@@ -22,6 +22,14 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
     oftenLabel: 'Weekly',
     notesLabel: '',
   };
+
+  TextEditingController notesController;
+
+  _ContactSchedulingDialogState(Friend friend) {
+    selection[oftenLabel] = friend?.frequency ?? 'Weekly';
+    selection[notesLabel] = friend?.notes ?? '';
+    notesController = new TextEditingController(text: friend?.notes ?? '');
+  }
 
   void _handleSelectionTap(String groupName, String selectedValue) {
     setState(() {
@@ -70,9 +78,11 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
                   Container(
                     padding: EdgeInsets.all(16),
                     child: TextField(
-                      onChanged: (String newVal) =>
+                      controller: notesController,
+                      onChanged: (newVal) =>
                           _handleSelectionTap(notesLabel, newVal),
                       autocorrect: true,
+                      enableSuggestions: false,
                       decoration: InputDecoration(labelText: notesLabel),
                       keyboardType: TextInputType.multiline,
                       maxLines: null,
