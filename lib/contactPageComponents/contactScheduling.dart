@@ -8,8 +8,9 @@ const notesLabel = 'Notes';
 
 class ContactSchedulingDialog extends StatefulWidget {
   final Contact contact;
+  final Friend friend;
 
-  ContactSchedulingDialog({@required this.contact});
+  ContactSchedulingDialog({@required this.contact, this.friend});
 
   @override
   _ContactSchedulingDialogState createState() =>
@@ -28,22 +29,31 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
     });
   }
 
+  Friend _getFriendToSubmit() {
+    if (widget.friend == null) {
+      return Friend(
+        contactIdentifier: widget.contact.identifier,
+        frequency: selection[oftenLabel],
+        notes: selection[notesLabel],
+        isContactable: true,
+      );
+    }
+    widget.friend.notes = selection[notesLabel];
+    widget.friend.frequency = selection[oftenLabel];
+    return widget.friend;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.close),
-            onPressed: () => Navigator.pop(
-                context,
-                Friend(
-                  contactIdentifier: widget.contact.identifier,
-                  frequency: selection[oftenLabel],
-                  notes: selection[notesLabel],
-                  isContactable: true,
-                )),
-          ),
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.pop(
+                    context,
+                    _getFriendToSubmit(),
+                  )),
           title: Text(widget.contact?.displayName ?? 'Schedule'),
         ),
         body: SafeArea(

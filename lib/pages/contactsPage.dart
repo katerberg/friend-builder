@@ -105,15 +105,18 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   Future<void> _handleContactPress(Contact contact) async {
-    Future<List<Friend>> futureFriends = Storage.getFriends();
+    List<Friend> friends = await Storage.getFriends();
+    Friend friend = friends.firstWhere(
+        (element) => element.contactIdentifier == contact.identifier,
+        orElse: () => null);
     Friend result = await Navigator.push<Friend>(
       context,
       MaterialPageRoute(
-        builder: (context) => ContactSchedulingDialog(contact: contact),
+        builder: (context) =>
+            ContactSchedulingDialog(contact: contact, friend: friend),
         fullscreenDialog: true,
       ),
     );
-    List<Friend> friends = await futureFriends;
     if (friends != null) {
       var index = friends.indexWhere(
           (element) => element.contactIdentifier == result.contactIdentifier);
