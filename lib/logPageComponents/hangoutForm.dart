@@ -11,11 +11,7 @@ class HangoutForm extends StatefulWidget {
   final Hangout hangout;
 
   HangoutForm(
-      {Key key,
-      @required this.onSubmit,
-      @required this.selectedFriends,
-      this.hangout})
-      : super(key: key);
+      {@required this.onSubmit, @required this.selectedFriends, this.hangout});
 
   @override
   _HangoutFormState createState() => _HangoutFormState(hangout: hangout);

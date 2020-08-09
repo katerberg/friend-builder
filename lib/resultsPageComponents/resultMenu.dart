@@ -7,11 +7,10 @@ class ResultMenu extends StatelessWidget {
   final void Function(Hangout) onEdit;
 
   ResultMenu({
-    Key key,
     @required this.hangout,
     @required this.onDelete,
     @required this.onEdit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

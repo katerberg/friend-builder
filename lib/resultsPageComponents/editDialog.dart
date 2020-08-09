@@ -9,11 +9,9 @@ class EditDialog extends StatelessWidget {
   final void Function() onSubmit;
 
   EditDialog(
-      {Key key,
-      @required this.selectedFriends,
+      {@required this.selectedFriends,
       @required this.hangout,
-      @required this.onSubmit})
-      : super(key: key);
+      @required this.onSubmit});
 
   @override
   Widget build(BuildContext context) {

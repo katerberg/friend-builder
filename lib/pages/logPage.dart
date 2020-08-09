@@ -6,7 +6,7 @@ import 'package:friend_builder/logPageComponents/friendSelector.dart';
 
 class LogPage extends StatefulWidget {
   final void Function() onSubmit;
-  LogPage({Key key, @required this.onSubmit}) : super(key: key);
+  LogPage({@required this.onSubmit});
 
   @override
   _LogPageState createState() => _LogPageState();

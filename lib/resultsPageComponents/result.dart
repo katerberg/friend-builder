@@ -9,11 +9,10 @@ class Result extends StatefulWidget {
   final void Function(Hangout) onEdit;
 
   Result({
-    Key key,
     @required this.hangout,
     @required this.onDelete,
     @required this.onEdit,
-  }) : super(key: key);
+  });
 
   @override
   _ResultState createState() => _ResultState();

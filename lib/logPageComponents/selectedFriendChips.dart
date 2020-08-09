@@ -7,8 +7,7 @@ class SelectedFriendChips extends StatelessWidget {
   final void Function(Contact contact) onRemoveFriend;
 
   SelectedFriendChips(
-      {Key key, @required this.selectedFriends, @required this.onRemoveFriend})
-      : super(key: key);
+      {@required this.selectedFriends, @required this.onRemoveFriend});
 
   @override
   Widget build(BuildContext context) {
