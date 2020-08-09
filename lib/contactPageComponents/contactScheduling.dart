@@ -68,7 +68,7 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
       });
       _closePage();
     };
-    if (widget.friend.isContactable) {
+    if (widget.friend?.isContactable ?? true) {
       return FlatButton(
         child: Text(
           "I don't want reminders for this person",

@@ -138,8 +138,6 @@ class _ContactsPageState extends State<ContactsPage> {
       body = Center(
         child: Text(
           'Missing contacts permission',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
         ),
       );
     } else if (_contacts == null || _hangouts == null) {

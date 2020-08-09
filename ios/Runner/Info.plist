@@ -50,7 +50,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>camera</string>
 	<key>NSContactsUsageDescription</key>
-	<string>contacts</string>
+	<string>Contacts are needed to know who you might be hanging out with!</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>microphone</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
