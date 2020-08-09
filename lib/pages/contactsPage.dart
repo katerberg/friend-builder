@@ -157,7 +157,7 @@ class _ContactsPageState extends State<ContactsPage> {
                     isBold: true,
                     latestHangout: c.latestHangout,
                   )),
-          Divider(),
+          _hangoutContacts.isNotEmpty ? Divider() : SizedBox.shrink(),
           ..._unusedContacts.map(
               (c) => ContactTile(contact: c, onPressed: _handleContactPress)),
         ],
