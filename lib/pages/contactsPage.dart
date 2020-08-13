@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contactPageComponents/contactScheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
@@ -6,9 +7,14 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:friend_builder/contactPageComponents/contactTile.dart';
+import 'package:friend_builder/notificationHelper.dart';
 
 class ContactsPage extends StatefulWidget {
   final Storage storage = Storage();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  ContactsPage({@required this.flutterLocalNotificationsPlugin});
+
   @override
   _ContactsPageState createState() => _ContactsPageState();
 }
@@ -105,6 +111,12 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   Future<void> _handleContactPress(Contact contact) async {
+    print('scheudling from contact');
+    scheduleNotification(
+        widget.flutterLocalNotificationsPlugin,
+        'my notification',
+        'Best call ur mom',
+        DateTime.now().add(new Duration(seconds: 5)));
     List<Friend> friends = await Storage.getFriends();
     Friend friend = friends.firstWhere(
         (element) => element.contactIdentifier == contact.identifier,

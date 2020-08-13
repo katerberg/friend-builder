@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:friend_builder/pages/contactsPage.dart';
 import 'package:friend_builder/pages/logPage.dart';
 import 'package:friend_builder/pages/resultsPage.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NavigationBar extends StatefulWidget {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
+  NavigationBar({@required this.flutterLocalNotificationsPlugin});
   @override
   _NavigationBarState createState() => _NavigationBarState();
 }
@@ -22,7 +26,9 @@ class _NavigationBarState extends State<NavigationBar> {
     List<Widget> tabs = <Widget>[
       ResultsPage(),
       LogPage(onSubmit: () => _changeTab(0)),
-      ContactsPage(),
+      ContactsPage(
+          flutterLocalNotificationsPlugin:
+              widget.flutterLocalNotificationsPlugin),
     ];
 
     return Scaffold(
