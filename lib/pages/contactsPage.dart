@@ -111,12 +111,6 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   Future<void> _handleContactPress(Contact contact) async {
-    print('scheudling from contact');
-    scheduleNotification(
-        widget.flutterLocalNotificationsPlugin,
-        'my notification',
-        'Best call ur mom',
-        DateTime.now().add(new Duration(seconds: 5)));
     List<Friend> friends = await Storage.getFriends();
     Friend friend = friends.firstWhere(
         (element) => element.contactIdentifier == contact.identifier,
@@ -129,6 +123,17 @@ class _ContactsPageState extends State<ContactsPage> {
         fullscreenDialog: true,
       ),
     );
+    if (result.isContactable) {
+      print('scheduling notification:');
+      print(contact.identifier);
+      print(contact.displayName);
+      scheduleNotification(
+          widget.flutterLocalNotificationsPlugin,
+          contact.identifier.hashCode,
+          'Want to chat with ' + contact.displayName + '?',
+          "It's been a minute!",
+          DateTime.now().add(new Duration(seconds: 5)));
+    }
     if (friends != null) {
       var index = friends.indexWhere(
           (element) => element.contactIdentifier == result.contactIdentifier);

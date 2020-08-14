@@ -33,13 +33,13 @@ Future<void> initNotifications(
 
 Future<void> scheduleNotification(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
-    String id,
+    int id,
+    String title,
     String body,
     DateTime scheduledNotificationDateTime) async {
-  print('scheduling notiication');
   requestIOSPermissions(flutterLocalNotificationsPlugin);
   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    id,
+    "$id",
     'Reminder notifications',
     'Remember about it',
     icon: 'app_icon',
@@ -47,9 +47,8 @@ Future<void> scheduleNotification(
   var iOSPlatformChannelSpecifics = IOSNotificationDetails();
   var platformChannelSpecifics = NotificationDetails(
       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-  await flutterLocalNotificationsPlugin.schedule(0, 'Call your mom', body,
-      scheduledNotificationDateTime, platformChannelSpecifics);
-  print('done with notiication');
+  await flutterLocalNotificationsPlugin.schedule(
+      id, title, body, scheduledNotificationDateTime, platformChannelSpecifics);
 }
 
 void requestIOSPermissions(
