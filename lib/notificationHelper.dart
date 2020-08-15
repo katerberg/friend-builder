@@ -31,6 +31,11 @@ Future<void> initNotifications(
   });
 }
 
+Future<void> cancelNotification(
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, int id) {
+  return flutterLocalNotificationsPlugin.cancel(id);
+}
+
 Future<void> scheduleNotification(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
     int id,

@@ -133,6 +133,9 @@ class _ContactsPageState extends State<ContactsPage> {
           'Want to chat with ' + contact.displayName + '?',
           "It's been a minute!",
           DateTime.now().add(new Duration(seconds: 5)));
+    } else {
+      cancelNotification(
+          widget.flutterLocalNotificationsPlugin, contact.identifier.hashCode);
     }
     if (friends != null) {
       var index = friends.indexWhere(
