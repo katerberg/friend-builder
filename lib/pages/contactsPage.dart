@@ -8,6 +8,7 @@ import 'package:friend_builder/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:friend_builder/contactPageComponents/contactTile.dart';
 import 'package:friend_builder/notificationHelper.dart';
+import 'package:friend_builder/schedulingUtils.dart';
 
 class ContactsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -123,16 +124,33 @@ class _ContactsPageState extends State<ContactsPage> {
         fullscreenDialog: true,
       ),
     );
+    print('what');
+    print(result.isContactable);
     if (result.isContactable) {
       print('scheduling notification:');
       print(contact.identifier);
       print(contact.displayName);
+
+      List<Hangout> contactHangouts = _hangouts
+          .where((element) =>
+              element.contacts.any((hc) => hc.identifier == contact.identifier))
+          .toList();
+      DateTime latestTime = contactHangouts
+          .reduce((value, element) =>
+              element.when.compareTo(value.when) > 0 ? element : value)
+          .when;
+      DateTime alertTime =
+          SchedulingUtils.howLong(latestTime, result.frequency);
+
+      print(alertTime);
+
       scheduleNotification(
-          widget.flutterLocalNotificationsPlugin,
-          contact.identifier.hashCode,
-          'Want to chat with ' + contact.displayName + '?',
-          "It's been a minute!",
-          DateTime.now().add(new Duration(seconds: 5)));
+        widget.flutterLocalNotificationsPlugin,
+        contact.identifier.hashCode,
+        'Want to chat with ' + contact.displayName + '?',
+        "It's been a minute!",
+        alertTime,
+      );
     } else {
       cancelNotification(
           widget.flutterLocalNotificationsPlugin, contact.identifier.hashCode);
