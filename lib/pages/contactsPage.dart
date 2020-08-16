@@ -129,10 +129,12 @@ class _ContactsPageState extends State<ContactsPage> {
           .where((element) =>
               element.contacts.any((hc) => hc.identifier == contact.identifier))
           .toList();
-      DateTime latestTime = contactHangouts
-          .reduce((value, element) =>
-              element.when.compareTo(value.when) > 0 ? element : value)
-          .when;
+      DateTime latestTime = contactHangouts.isEmpty
+          ? DateTime.now()
+          : contactHangouts
+              .reduce((value, element) =>
+                  element.when.compareTo(value.when) > 0 ? element : value)
+              .when;
       scheduleNotification(
         widget.flutterLocalNotificationsPlugin,
         contact.identifier.hashCode,
