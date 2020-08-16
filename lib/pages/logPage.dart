@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/logPageComponents/hangoutForm.dart';
 import 'package:friend_builder/logPageComponents/selectedFriendChips.dart';
@@ -6,7 +7,10 @@ import 'package:friend_builder/logPageComponents/friendSelector.dart';
 
 class LogPage extends StatefulWidget {
   final void Function() onSubmit;
-  LogPage({@required this.onSubmit});
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  LogPage(
+      {@required this.onSubmit,
+      @required this.flutterLocalNotificationsPlugin});
 
   @override
   _LogPageState createState() => _LogPageState();
@@ -54,6 +58,8 @@ class _LogPageState extends State<LogPage> {
             child: HangoutForm(
               onSubmit: widget.onSubmit,
               selectedFriends: _selectedFriends,
+              flutterLocalNotificationsPlugin:
+                  widget.flutterLocalNotificationsPlugin,
             ),
           ),
         ),

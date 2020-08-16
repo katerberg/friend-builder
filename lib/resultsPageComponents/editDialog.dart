@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/logPageComponents/hangoutForm.dart';
@@ -7,11 +8,14 @@ class EditDialog extends StatelessWidget {
   final List<Contact> selectedFriends;
   final Hangout hangout;
   final void Function() onSubmit;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-  EditDialog(
-      {@required this.selectedFriends,
-      @required this.hangout,
-      @required this.onSubmit});
+  EditDialog({
+    @required this.selectedFriends,
+    @required this.hangout,
+    @required this.onSubmit,
+    @required this.flutterLocalNotificationsPlugin,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +32,12 @@ class EditDialog extends StatelessWidget {
               HangoutForm(
                   hangout: hangout,
                   selectedFriends: this.selectedFriends,
+                  flutterLocalNotificationsPlugin:
+                      flutterLocalNotificationsPlugin,
                   onSubmit: () {
                     onSubmit();
                     Navigator.pop(context);
-                  })
+                  }),
             ],
           ),
         ),

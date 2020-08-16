@@ -124,13 +124,7 @@ class _ContactsPageState extends State<ContactsPage> {
         fullscreenDialog: true,
       ),
     );
-    print('what');
-    print(result.isContactable);
     if (result.isContactable) {
-      print('scheduling notification:');
-      print(contact.identifier);
-      print(contact.displayName);
-
       List<Hangout> contactHangouts = _hangouts
           .where((element) =>
               element.contacts.any((hc) => hc.identifier == contact.identifier))
@@ -139,17 +133,12 @@ class _ContactsPageState extends State<ContactsPage> {
           .reduce((value, element) =>
               element.when.compareTo(value.when) > 0 ? element : value)
           .when;
-      DateTime alertTime =
-          SchedulingUtils.howLong(latestTime, result.frequency);
-
-      print(alertTime);
-
       scheduleNotification(
         widget.flutterLocalNotificationsPlugin,
         contact.identifier.hashCode,
         'Want to chat with ' + contact.displayName + '?',
         "It's been a minute!",
-        alertTime,
+        SchedulingUtils.howLong(latestTime, result.frequency),
       );
     } else {
       cancelNotification(

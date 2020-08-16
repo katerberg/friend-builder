@@ -45,7 +45,7 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
         contactIdentifier: widget.contact.identifier,
         frequency: selection[oftenLabel],
         notes: selection[notesLabel],
-        isContactable: true,
+        isContactable: false,
       );
     }
     widget.friend.notes = selection[notesLabel];

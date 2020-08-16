@@ -14,7 +14,7 @@ class Friend {
       contactIdentifier: parsedJson['contactIdentifier'] ?? Uuid().v4(),
       notes: parsedJson['notes'] ?? '',
       frequency: parsedJson['frequency'] ?? 'Weekly',
-      isContactable: parsedJson['isContactable'] ?? true,
+      isContactable: parsedJson['isContactable'] ?? false,
     );
   }
 

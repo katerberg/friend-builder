@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:friend_builder/notificationHelper.dart';
+import 'package:friend_builder/schedulingUtils.dart';
+import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/encodableContact.dart';
 import 'package:friend_builder/storage.dart';
@@ -9,9 +13,13 @@ class HangoutForm extends StatefulWidget {
   final void Function() onSubmit;
   final List<Contact> selectedFriends;
   final Hangout hangout;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   HangoutForm(
-      {@required this.onSubmit, @required this.selectedFriends, this.hangout});
+      {@required this.onSubmit,
+      @required this.selectedFriends,
+      this.hangout,
+      @required this.flutterLocalNotificationsPlugin});
 
   @override
   _HangoutFormState createState() => _HangoutFormState(hangout: hangout);
@@ -51,6 +59,33 @@ class _HangoutFormState extends State<HangoutForm> {
     }
   }
 
+  Future<void> _handleNotificationScheduling(List<Hangout> hangouts) async {
+    List<Friend> friends = await Storage.getFriends();
+    widget.selectedFriends.forEach((contact) {
+      Friend friend = friends.firstWhere(
+          (element) => element.contactIdentifier == contact.identifier,
+          orElse: () => null);
+      if (friend != null && friend.isContactable) {
+        List<Hangout> contactHangouts = hangouts
+            .where((element) => element.contacts
+                .any((hc) => hc.identifier == contact.identifier))
+            .toList();
+        DateTime latestTime = contactHangouts
+            .reduce((value, element) =>
+                element.when.compareTo(value.when) > 0 ? element : value)
+            .when;
+        print('scheduled a chat with ' + contact.displayName);
+        scheduleNotification(
+          widget.flutterLocalNotificationsPlugin,
+          contact.identifier.hashCode,
+          'Want to chat with ' + contact.displayName + '?',
+          "It's been a minute!",
+          SchedulingUtils.howLong(latestTime, friend.frequency),
+        );
+      }
+    });
+  }
+
   Future<void> _handleSubmitPress() async {
     if (!_submitting && _formKey.currentState.validate()) {
       setState(() {
@@ -69,6 +104,7 @@ class _HangoutFormState extends State<HangoutForm> {
         hangouts = [_data];
       }
       Storage().saveHangouts(hangouts).then((_) {
+        _handleNotificationScheduling(hangouts);
         widget.onSubmit();
       });
     }

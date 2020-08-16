@@ -24,8 +24,13 @@ class _NavigationBarState extends State<NavigationBar> {
   @override
   Widget build(BuildContext context) {
     List<Widget> tabs = <Widget>[
-      ResultsPage(),
-      LogPage(onSubmit: () => _changeTab(0)),
+      ResultsPage(
+        flutterLocalNotificationsPlugin: widget.flutterLocalNotificationsPlugin,
+      ),
+      LogPage(
+        onSubmit: () => _changeTab(0),
+        flutterLocalNotificationsPlugin: widget.flutterLocalNotificationsPlugin,
+      ),
       ContactsPage(
           flutterLocalNotificationsPlugin:
               widget.flutterLocalNotificationsPlugin),
