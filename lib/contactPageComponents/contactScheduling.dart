@@ -61,14 +61,14 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
     );
   }
 
-  FlatButton _getContactButton() {
+  MaterialButton _getContactButton() {
     var onPressed = () {
       setState(() {
         isContactable = !isContactable;
       });
       _closePage();
     };
-    if (widget.friend?.isContactable ?? true) {
+    if (widget.friend?.isContactable ?? false) {
       return FlatButton(
         child: Text(
           "I don't want reminders for this person",
@@ -78,8 +78,11 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
       );
     }
     return FlatButton(
+      color: Colors.blue,
+      textColor: Colors.white,
+      splashColor: Colors.blueAccent,
       child: Text('I want notifications for this person',
-          style: TextStyle(color: Theme.of(context).primaryColor)),
+          style: TextStyle(color: Colors.white)),
       onPressed: onPressed,
     );
   }
