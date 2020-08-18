@@ -22,14 +22,21 @@ class ContactsPage extends StatefulWidget {
 
 class ContactPageContact {
   Contact contact;
+  String frequency;
   Hangout latestHangout;
 
-  ContactPageContact(Contact contact, List<Hangout> hangouts) {
+  ContactPageContact(
+      Contact contact, List<Hangout> hangouts, List<Friend> friends) {
     this.contact = contact;
+    this.frequency = friends
+        .firstWhere(
+            (element) => element.contactIdentifier == contact.identifier,
+            orElse: () => null)
+        ?.frequency;
     this.latestHangout = hangouts.reduce((value, hangout) {
-      var contacts = hangout.contacts
-          .where((c) => c.identifier == this.contact.identifier);
-      if (contacts.length == 1 && value.when.compareTo(hangout.when) < 0) {
+      if (hangout.hasContact(contact) &&
+          (value.when.compareTo(hangout.when) < 0 ||
+              !value.hasContact(contact))) {
         return hangout;
       }
       return value;
@@ -42,11 +49,13 @@ class _ContactsPageState extends State<ContactsPage> {
   List<Contact> _hangoutContacts;
   List<Contact> _unusedContacts;
   List<Hangout> _hangouts;
+  List<Friend> _friends;
   bool _missingPermission = false;
 
   @override
   void initState() {
-    Future.wait([_getContacts(), _refreshHangouts()]).then((list) {
+    Future.wait([_refreshFriends(), _getContacts(), _refreshHangouts()])
+        .then((list) {
       _sortContacts();
     });
     super.initState();
@@ -56,6 +65,13 @@ class _ContactsPageState extends State<ContactsPage> {
     var hangouts = await widget.storage.getHangouts();
     setState(() {
       _hangouts = hangouts;
+    });
+  }
+
+  Future<void> _refreshFriends() async {
+    var friends = await Storage.getFriends();
+    setState(() {
+      _friends = friends;
     });
   }
 
@@ -175,7 +191,7 @@ class _ContactsPageState extends State<ContactsPage> {
       body = ListView(
         children: [
           ...(_hangoutContacts
-                  .map((c) => ContactPageContact(c, _hangouts))
+                  .map((c) => ContactPageContact(c, _hangouts, _friends))
                   .toList()
                     ..sort((c1, c2) => (c1?.latestHangout?.when ??
                             DateTime.now())
@@ -183,7 +199,7 @@ class _ContactsPageState extends State<ContactsPage> {
               .map((c) => ContactTile(
                     contact: c.contact,
                     onPressed: _handleContactPress,
-                    isBold: true,
+                    frequency: c.frequency,
                     latestHangout: c.latestHangout,
                   )),
           _hangoutContacts.isNotEmpty ? Divider() : SizedBox.shrink(),

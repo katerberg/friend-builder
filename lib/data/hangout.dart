@@ -1,4 +1,5 @@
 import 'package:friend_builder/data/encodableContact.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -45,6 +46,12 @@ class Hangout {
       default:
         return medium;
     }
+  }
+
+  bool hasContact(Contact contact) {
+    return this
+        .contacts
+        .any((element) => element.identifier == contact.identifier);
   }
 
   factory Hangout.fromJson(Map<String, dynamic> parsedJson) {

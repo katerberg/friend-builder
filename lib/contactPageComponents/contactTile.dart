@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/encodableContact.dart';
@@ -7,23 +6,23 @@ import 'package:friend_builder/data/hangout.dart';
 class ContactTile extends StatelessWidget {
   final Contact contact;
   final void Function(Contact contact) onPressed;
-  final bool isBold;
+  final String frequency;
   final Hangout latestHangout;
 
   ContactTile({
     @required this.contact,
     @required this.onPressed,
     this.latestHangout,
-    bool isBold,
-  }) : isBold = isBold ?? false;
+    this.frequency,
+  });
 
   Text _getSubTitle() {
     if (latestHangout == null) {
       return null;
     }
-    return Text(latestHangout == null
-        ? 'Unknown'
-        : DateFormat.yMMMMd().format(latestHangout.when));
+    print(latestHangout.when);
+    var daysAgo = DateTime.now().difference(latestHangout.when).inDays;
+    return Text(daysAgo > 0 ? daysAgo.toString() + " days ago" : 'Today');
   }
 
   @override
@@ -34,8 +33,9 @@ class ContactTile extends StatelessWidget {
       onTap: () => onPressed(this.contact),
       title: Text(
         contact?.displayName ?? '',
-        style:
-            TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+        style: TextStyle(
+            fontWeight:
+                frequency == null ? FontWeight.normal : FontWeight.bold),
       ),
       subtitle: _getSubTitle(),
     );
