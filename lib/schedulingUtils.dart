@@ -1,22 +1,20 @@
 class SchedulingUtils {
-  static DateTime howLong(DateTime previousHangout, String interaction) {
-    Duration duration;
-    switch (interaction) {
+  static int daysFromFrequncy(String frequency) {
+    switch (frequency) {
       case 'Weekly':
-        duration = Duration(days: 7);
-        break;
-      case 'Monthly':
-        duration = Duration(days: 31);
-        break;
+        return 7;
       case 'Quarterly':
-        duration = Duration(days: 91);
-        break;
+        return 91;
+      case 'Monthly':
+        return 31;
       case 'Yearly':
-        duration = Duration(days: 365);
-        break;
+        return 365;
       default:
-        duration = Duration(days: 365);
+        return 365;
     }
-    return previousHangout.add(duration);
+  }
+
+  static DateTime howLong(DateTime previousHangout, String interaction) {
+    return previousHangout.add(Duration(days: daysFromFrequncy(interaction)));
   }
 }

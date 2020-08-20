@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/encodableContact.dart';
+import 'package:friend_builder/schedulingUtils.dart';
 import 'package:friend_builder/data/hangout.dart';
 
 class ContactTile extends StatelessWidget {
@@ -20,9 +21,10 @@ class ContactTile extends StatelessWidget {
     if (latestHangout == null) {
       return null;
     }
-    print(latestHangout.when);
-    var daysAgo = DateTime.now().difference(latestHangout.when).inDays;
-    return Text(daysAgo > 0 ? daysAgo.toString() + " days ago" : 'Today');
+    int daysAgo = DateTime.now().difference(latestHangout.when).inDays;
+    int howOften = SchedulingUtils.daysFromFrequncy(frequency);
+    String daysLeft = (howOften - daysAgo).toString() + ' days to go';
+    return frequency == null ? null : Text(daysLeft);
   }
 
   @override

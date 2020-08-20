@@ -28,11 +28,10 @@ class ContactPageContact {
   ContactPageContact(
       Contact contact, List<Hangout> hangouts, List<Friend> friends) {
     this.contact = contact;
-    this.frequency = friends
-        .firstWhere(
-            (element) => element.contactIdentifier == contact.identifier,
-            orElse: () => null)
-        ?.frequency;
+    Friend friend = friends.firstWhere(
+        (element) => element.contactIdentifier == contact.identifier,
+        orElse: () => null);
+    this.frequency = friend?.isContactable == true ? friend?.frequency : null;
     this.latestHangout = hangouts.reduce((value, hangout) {
       if (hangout.hasContact(contact) &&
           (value.when.compareTo(hangout.when) < 0 ||
