@@ -91,14 +91,16 @@ class _ContactsPageState extends State<ContactsPage> {
     setState(() {
       _hangoutContacts = _contacts
           .toList()
-          .where((c) => _hangouts.any((element) =>
-              element.contacts.any((hc) => hc.identifier == c.identifier)))
+          .where((c) => _friends.any((element) =>
+              element.contactIdentifier == c.identifier &&
+              element.isContactable))
           .toList()
             ..sort(_compareContacts);
       _unusedContacts = _contacts
           .toList()
-          .where((c) => !_hangouts.any((element) =>
-              element.contacts.any((hc) => hc.identifier == c.identifier)))
+          .where((c) => !_friends.any((element) =>
+              element.contactIdentifier == c.identifier &&
+              element.isContactable))
           .toList()
             ..sort(_compareContacts);
     });
@@ -172,7 +174,11 @@ class _ContactsPageState extends State<ContactsPage> {
     } else {
       friends = [result];
     }
-    Storage.saveFriends(friends);
+    Storage.saveFriends(friends).then((_) {
+      _refreshFriends().then((_) {
+        _sortContacts();
+      });
+    });
   }
 
   @override
