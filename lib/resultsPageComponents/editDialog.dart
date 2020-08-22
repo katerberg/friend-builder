@@ -4,7 +4,7 @@ import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/logPageComponents/hangoutForm.dart';
 
-class EditDialog extends StatelessWidget {
+class EditDialog extends StatefulWidget {
   final List<Contact> selectedFriends;
   final Hangout hangout;
   final void Function() onSubmit;
@@ -16,6 +16,17 @@ class EditDialog extends StatelessWidget {
     @required this.onSubmit,
     @required this.flutterLocalNotificationsPlugin,
   });
+
+  @override
+  _EditDialogState createState() => _EditDialogState(this.selectedFriends);
+}
+
+class _EditDialogState extends State<EditDialog> {
+  List<Contact> _selectedFriends;
+
+  _EditDialogState(List<Contact> selectedFriends) {
+    this._selectedFriends = selectedFriends;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +41,12 @@ class EditDialog extends StatelessWidget {
             scrollDirection: Axis.vertical,
             children: [
               HangoutForm(
-                  hangout: hangout,
-                  selectedFriends: this.selectedFriends,
+                  hangout: widget.hangout,
+                  selectedFriends: _selectedFriends,
                   flutterLocalNotificationsPlugin:
-                      flutterLocalNotificationsPlugin,
+                      widget.flutterLocalNotificationsPlugin,
                   onSubmit: () {
-                    onSubmit();
+                    widget.onSubmit();
                     Navigator.pop(context);
                   }),
             ],

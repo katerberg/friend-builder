@@ -74,7 +74,6 @@ class _HangoutFormState extends State<HangoutForm> {
             .reduce((value, element) =>
                 element.when.compareTo(value.when) > 0 ? element : value)
             .when;
-        print('scheduled a chat with ' + contact.displayName);
         scheduleNotification(
           widget.flutterLocalNotificationsPlugin,
           contact.identifier.hashCode,
