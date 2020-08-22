@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/logPageComponents/selectedFriendChips.dart';
+import 'package:friend_builder/logPageComponents/friendSelector.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/hangout.dart';
@@ -23,9 +25,25 @@ class EditDialog extends StatefulWidget {
 
 class _EditDialogState extends State<EditDialog> {
   List<Contact> _selectedFriends;
+  TextEditingController typeaheadController = TextEditingController(text: '');
 
   _EditDialogState(List<Contact> selectedFriends) {
     this._selectedFriends = selectedFriends;
+  }
+
+  void _setFriend(Contact friend) {
+    typeaheadController.text = '';
+    setState(() {
+      _selectedFriends = [..._selectedFriends, friend];
+    });
+  }
+
+  void _resetFriend(Contact friendToRemove) {
+    setState(() {
+      _selectedFriends = _selectedFriends
+          .where((element) => element.identifier != friendToRemove.identifier)
+          .toList();
+    });
   }
 
   @override
@@ -40,6 +58,20 @@ class _EditDialogState extends State<EditDialog> {
             shrinkWrap: true,
             scrollDirection: Axis.vertical,
             children: [
+              Container(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: ListView(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      children: [
+                        FriendSelector(
+                            selectedFriends: _selectedFriends,
+                            addFriend: _setFriend),
+                        SelectedFriendChips(
+                          selectedFriends: _selectedFriends,
+                          onRemoveFriend: _resetFriend,
+                        )
+                      ])),
               HangoutForm(
                   hangout: widget.hangout,
                   selectedFriends: _selectedFriends,
