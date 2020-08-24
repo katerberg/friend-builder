@@ -14,6 +14,13 @@ class SchedulingUtils {
     }
   }
 
+  static int daysLeft(String frequency, DateTime latestHangoutTime) {
+    int daysAgo =
+        DateTime.now().difference(latestHangoutTime ?? DateTime(1970)).inDays;
+    int howOften = daysFromFrequncy(frequency);
+    return howOften - daysAgo;
+  }
+
   static DateTime howLong(DateTime previousHangout, String interaction) {
     return previousHangout.add(Duration(days: daysFromFrequncy(interaction)));
   }

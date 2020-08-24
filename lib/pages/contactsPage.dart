@@ -40,6 +40,8 @@ class ContactPageContact {
       }
       return value;
     });
+    this.latestHangout =
+        this.latestHangout.hasContact(contact) ? this.latestHangout : null;
   }
 }
 
@@ -83,8 +85,20 @@ class _ContactsPageState extends State<ContactsPage> {
     });
   }
 
-  int _compareContacts(Contact c1, Contact c2) {
+  int _compareContactsByName(Contact c1, Contact c2) {
     return (c1?.displayName ?? '').compareTo(c2?.displayName ?? '');
+  }
+
+  int _compareContactsByTimeAndName(Contact c1, Contact c2) {
+    var cOne = ContactPageContact(c1, _hangouts, _friends);
+    var cTwo = ContactPageContact(c2, _hangouts, _friends);
+    int days1 =
+        SchedulingUtils.daysLeft(cOne.frequency, cOne.latestHangout?.when);
+    int days2 =
+        SchedulingUtils.daysLeft(cTwo.frequency, cTwo.latestHangout?.when);
+    return days1 - days2 == 0
+        ? (c1?.displayName ?? '').compareTo(c2?.displayName ?? '')
+        : days1 - days2;
   }
 
   void _sortContacts() {
@@ -95,14 +109,14 @@ class _ContactsPageState extends State<ContactsPage> {
               element.contactIdentifier == c.identifier &&
               element.isContactable))
           .toList()
-            ..sort(_compareContacts);
+            ..sort(_compareContactsByTimeAndName);
       _unusedContacts = _contacts
           .toList()
           .where((c) => !_friends.any((element) =>
               element.contactIdentifier == c.identifier &&
               element.isContactable))
           .toList()
-            ..sort(_compareContacts);
+            ..sort(_compareContactsByName);
     });
   }
 
@@ -196,17 +210,14 @@ class _ContactsPageState extends State<ContactsPage> {
       body = ListView(
         children: [
           ...(_hangoutContacts
-                  .map((c) => ContactPageContact(c, _hangouts, _friends))
-                  .toList()
-                    ..sort((c1, c2) => (c1?.latestHangout?.when ??
-                            DateTime.now())
-                        .compareTo(c2?.latestHangout?.when ?? DateTime.now())))
+              .map((c) => ContactPageContact(c, _hangouts, _friends))
+              .toList()
               .map((c) => ContactTile(
                     contact: c.contact,
                     onPressed: _handleContactPress,
                     frequency: c.frequency,
                     latestHangout: c.latestHangout,
-                  )),
+                  ))),
           _hangoutContacts.isNotEmpty ? Divider() : SizedBox.shrink(),
           ..._unusedContacts.map(
               (c) => ContactTile(contact: c, onPressed: _handleContactPress)),

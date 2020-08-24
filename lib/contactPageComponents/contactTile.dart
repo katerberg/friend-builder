@@ -21,9 +21,9 @@ class ContactTile extends StatelessWidget {
     if (latestHangout == null) {
       return null;
     }
-    int daysAgo = DateTime.now().difference(latestHangout.when).inDays;
-    int howOften = SchedulingUtils.daysFromFrequncy(frequency);
-    String daysLeft = (howOften - daysAgo).toString() + ' days to go';
+    String daysLeft =
+        (SchedulingUtils.daysLeft(frequency, latestHangout.when)).toString() +
+            ' days to go';
     return frequency == null ? null : Text(daysLeft);
   }
 
