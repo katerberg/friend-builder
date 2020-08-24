@@ -7,6 +7,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:friend_builder/contactPageComponents/contactTile.dart';
+import 'package:friend_builder/contactPageComponents/contactSearch.dart';
 import 'package:friend_builder/notificationHelper.dart';
 import 'package:friend_builder/schedulingUtils.dart';
 
@@ -47,6 +48,7 @@ class ContactPageContact {
 
 class _ContactsPageState extends State<ContactsPage> {
   Iterable<Contact> _contacts;
+  Iterable<Contact> _visibleContacts;
   List<Contact> _hangoutContacts;
   List<Contact> _unusedContacts;
   List<Hangout> _hangouts;
@@ -82,7 +84,15 @@ class _ContactsPageState extends State<ContactsPage> {
     setState(() {
       _missingPermission = missingPermission;
       _contacts = contacts;
+      _visibleContacts = contacts;
     });
+  }
+
+  void _handleContactsFilter(Iterable<Contact> contacts) {
+    setState(() {
+      _visibleContacts = contacts;
+    });
+    _sortContacts();
   }
 
   int _compareContactsByName(Contact c1, Contact c2) {
@@ -103,14 +113,14 @@ class _ContactsPageState extends State<ContactsPage> {
 
   void _sortContacts() {
     setState(() {
-      _hangoutContacts = _contacts
+      _hangoutContacts = _visibleContacts
           .toList()
           .where((c) => _friends.any((element) =>
               element.contactIdentifier == c.identifier &&
               element.isContactable))
           .toList()
             ..sort(_compareContactsByTimeAndName);
-      _unusedContacts = _contacts
+      _unusedContacts = _visibleContacts
           .toList()
           .where((c) => !_friends.any((element) =>
               element.contactIdentifier == c.identifier &&
@@ -209,6 +219,13 @@ class _ContactsPageState extends State<ContactsPage> {
     } else {
       body = ListView(
         children: [
+          Container(
+            padding: EdgeInsets.all(16),
+            child: ContactSearch(
+              contacts: _contacts,
+              filterList: _handleContactsFilter,
+            ),
+          ),
           ...(_hangoutContacts
               .map((c) => ContactPageContact(c, _hangouts, _friends))
               .toList()
