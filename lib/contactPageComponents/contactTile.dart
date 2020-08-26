@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/encodableContact.dart';
 import 'package:friend_builder/schedulingUtils.dart';
@@ -18,8 +19,11 @@ class ContactTile extends StatelessWidget {
   });
 
   Text _getSubTitle() {
-    if (latestHangout == null) {
+    if (frequency == null && latestHangout == null) {
       return null;
+    }
+    if (latestHangout == null) {
+      return Text('Never seen!');
     }
     String daysLeft =
         (SchedulingUtils.daysLeft(frequency, latestHangout.when)).toString() +

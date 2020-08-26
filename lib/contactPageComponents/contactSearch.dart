@@ -17,9 +17,19 @@ class _ContactSearchState extends State<ContactSearch> {
       TextEditingController(text: '');
 
   void _handleContactSelection(String pattern) {
-    var filtered = widget.contacts.where((element) =>
+    var exactMatches = widget.contacts.where((element) =>
+        (element?.displayName ?? '')
+            .toLowerCase()
+            .contains(pattern.toLowerCase()));
+    if (exactMatches.length > 0) {
+      return widget.filterList(exactMatches.toList()
+        ..sort(
+            (a, b) => (a?.displayName ?? '').compareTo(b?.displayName ?? '')));
+    }
+    var matchingLevel = widget.contacts.where((element) =>
         StringUtils.getComparison(element?.displayName, pattern) > 0.3);
-    widget.filterList(filtered.length > 0 ? filtered : widget.contacts);
+    widget
+        .filterList(matchingLevel.length > 0 ? matchingLevel : widget.contacts);
   }
 
   @override
