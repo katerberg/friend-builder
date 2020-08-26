@@ -18,7 +18,7 @@ class _ContactSearchState extends State<ContactSearch> {
 
   void _handleContactSelection(String pattern) {
     var filtered = widget.contacts.where((element) =>
-        StringUtils.getComparison(element?.displayName, pattern) > 0.1);
+        StringUtils.getComparison(element?.displayName, pattern) > 0.3);
     widget.filterList(filtered.length > 0 ? filtered : widget.contacts);
   }
 
