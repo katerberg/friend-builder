@@ -12,7 +12,7 @@ Future<void> main() async {
 }
 
 class FriendBuilderApp extends StatelessWidget {
-  static const String _title = 'Friend Builder';
+  static const String _title = 'Friend Crafter';
 
   // This widget is the root of your application.
   @override
