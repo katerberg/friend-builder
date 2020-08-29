@@ -29,7 +29,7 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
   _ContactSchedulingDialogState(Friend friend) {
     selection[oftenLabel] = friend?.frequency ?? 'Weekly';
     selection[notesLabel] = friend?.notes ?? '';
-    isContactable = friend?.isContactable ?? true;
+    isContactable = friend?.isContactable ?? false;
     notesController = new TextEditingController(text: friend?.notes ?? '');
   }
 
@@ -45,7 +45,7 @@ class _ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
         contactIdentifier: widget.contact.identifier,
         frequency: selection[oftenLabel],
         notes: selection[notesLabel],
-        isContactable: false,
+        isContactable: isContactable,
       );
     }
     widget.friend.notes = selection[notesLabel];
