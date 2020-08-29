@@ -158,6 +158,12 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
+  void _clearTextField() {
+    typeaheadController.text = '';
+    FocusScope.of(context).requestFocus(new FocusNode());
+    _handleContactSelection('');
+  }
+
   Future<void> _handleContactPress(Contact contact) async {
     List<Friend> friends = await Storage.getFriends();
     Friend friend = friends.firstWhere(
@@ -204,6 +210,7 @@ class _ContactsPageState extends State<ContactsPage> {
     } else {
       friends = [result];
     }
+    _clearTextField();
     Storage.saveFriends(friends).then((_) {
       _refreshFriends().then((_) {
         _sortContacts();
@@ -267,11 +274,16 @@ class _ContactsPageState extends State<ContactsPage> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: (Text('Contacts')),
+    return GestureDetector(
+      child: Scaffold(
+        appBar: AppBar(
+          title: (Text('Contacts')),
+        ),
+        body: body,
       ),
-      body: body,
+      onTap: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      },
     );
   }
 }
