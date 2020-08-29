@@ -33,16 +33,20 @@ class ContactPageContact {
         (element) => element.contactIdentifier == contact.identifier,
         orElse: () => null);
     this.frequency = friend?.isContactable == true ? friend?.frequency : null;
-    this.latestHangout = hangouts.reduce((value, hangout) {
-      if (hangout.hasContact(contact) &&
-          (value.when.compareTo(hangout.when) < 0 ||
-              !value.hasContact(contact))) {
-        return hangout;
-      }
-      return value;
-    });
+    this.latestHangout = hangouts.length < 1
+        ? null
+        : hangouts.reduce((value, hangout) {
+            if (hangout.hasContact(contact) &&
+                (value.when.compareTo(hangout.when) < 0 ||
+                    !value.hasContact(contact))) {
+              return hangout;
+            }
+            return value;
+          });
     this.latestHangout =
-        this.latestHangout.hasContact(contact) ? this.latestHangout : null;
+        this.latestHangout != null && this.latestHangout.hasContact(contact)
+            ? this.latestHangout
+            : null;
   }
 }
 
@@ -67,14 +71,14 @@ class _ContactsPageState extends State<ContactsPage> {
   Future<void> _refreshHangouts() async {
     var hangouts = await widget.storage.getHangouts();
     setState(() {
-      _hangouts = hangouts;
+      _hangouts = hangouts ?? [];
     });
   }
 
   Future<void> _refreshFriends() async {
     var friends = await Storage.getFriends();
     setState(() {
-      _friends = friends;
+      _friends = friends ?? [];
     });
   }
 
