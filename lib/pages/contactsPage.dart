@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/stringUtils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contactPageComponents/contactScheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
@@ -7,7 +8,6 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:friend_builder/contactPageComponents/contactTile.dart';
-import 'package:friend_builder/contactPageComponents/contactSearch.dart';
 import 'package:friend_builder/notificationHelper.dart';
 import 'package:friend_builder/schedulingUtils.dart';
 
@@ -58,6 +58,8 @@ class _ContactsPageState extends State<ContactsPage> {
   List<Hangout> _hangouts;
   List<Friend> _friends;
   bool _missingPermission = false;
+  final TextEditingController typeaheadController =
+      TextEditingController(text: '');
 
   @override
   void initState() {
@@ -209,6 +211,20 @@ class _ContactsPageState extends State<ContactsPage> {
     });
   }
 
+  void _handleContactSelection(String pattern) {
+    var exactMatches = _contacts.where((element) => (element?.displayName ?? '')
+        .toLowerCase()
+        .contains(pattern.toLowerCase()));
+    if (exactMatches.length > 0) {
+      return _handleContactsFilter(exactMatches.toList()
+        ..sort(
+            (a, b) => (a?.displayName ?? '').compareTo(b?.displayName ?? '')));
+    }
+    var matchingLevel = _contacts.where((element) =>
+        StringUtils.getComparison(element?.displayName, pattern) > 0.3);
+    _handleContactsFilter(matchingLevel.length > 0 ? matchingLevel : _contacts);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget body;
@@ -225,9 +241,14 @@ class _ContactsPageState extends State<ContactsPage> {
         children: [
           Container(
             padding: EdgeInsets.all(16),
-            child: ContactSearch(
-              contacts: _contacts,
-              filterList: _handleContactsFilter,
+            child: TextField(
+              textCapitalization: TextCapitalization.sentences,
+              autocorrect: false,
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.search),
+              ),
+              controller: typeaheadController,
+              onChanged: _handleContactSelection,
             ),
           ),
           ...(_hangoutContacts
