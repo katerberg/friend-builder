@@ -44,7 +44,9 @@ class _NavigationBarState extends State<NavigationBar> {
             title: Text('User'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.note_add),
+            icon: Icon(
+              Icons.note_add,
+            ),
             title: Text('Log'),
           ),
           BottomNavigationBarItem(
@@ -53,7 +55,14 @@ class _NavigationBarState extends State<NavigationBar> {
           ),
         ],
         currentIndex: _tabIndex,
-        selectedItemColor: Theme.of(context).primaryColor,
+        backgroundColor: _tabIndex != 1
+            ? Theme.of(context).canvasColor
+            : Theme.of(context).primaryColor,
+        selectedItemColor:
+            _tabIndex != 1 ? Theme.of(context).primaryColor : Colors.white,
+        unselectedItemColor: _tabIndex != 1
+            ? Theme.of(context).textTheme.caption.color
+            : Colors.white70,
         onTap: _changeTab,
       ),
       body: Center(

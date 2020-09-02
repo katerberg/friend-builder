@@ -68,11 +68,12 @@ class _LogPageState extends State<LogPage> {
 
     return GestureDetector(
       child: Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
         body: SafeArea(
           child: Container(
             padding: const EdgeInsets.all(24),
             child: ListView(
-              shrinkWrap: true,
+              shrinkWrap: false,
               scrollDirection: Axis.vertical,
               children: itemsToShow,
             ),
