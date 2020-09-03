@@ -35,8 +35,7 @@ class _HangoutFormState extends State<HangoutForm> {
       TextEditingController(text: _formatDate(DateTime.now()));
 
   _HangoutFormState({Hangout hangout}) {
-    _data = hangout ??
-        Hangout(howMany: 'One on one', where: '', medium: 'Face to face');
+    _data = hangout ?? Hangout(notes: '');
     selectedDate = hangout != null ? hangout.when : DateTime.now();
     dateController = TextEditingController(text: _formatDate(selectedDate));
   }
@@ -115,15 +114,7 @@ class _HangoutFormState extends State<HangoutForm> {
       _data.contacts = widget.selectedFriends
           .map((f) => EncodableContact.fromContact(f))
           .toList();
-      if (_data.contacts.length > 1 && _data.howMany == 'One on one') {
-        _data.howMany = 'Small group';
-      }
     });
-
-    List<String> howManyOptions = ['Small group', 'Party'];
-    if (_data.contacts.length < 2) {
-      howManyOptions.insert(0, 'One on one');
-    }
 
     return Padding(
       padding: EdgeInsets.all(16),
@@ -132,41 +123,16 @@ class _HangoutFormState extends State<HangoutForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            DropdownButtonFormField(
-              decoration: InputDecoration(labelText: 'How did you see them?'),
-              items: <String>['Face to face', 'Text', 'Call']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String newValue) => {this._data.medium = newValue},
-              onSaved: (String newValue) => {this._data.medium = newValue},
-              value: _data.medium ?? 'Face to face',
-            ),
             TextFormField(
               autocorrect: true,
               enableSuggestions: true,
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
-                labelText: 'Where?',
+                labelText: 'Notes',
               ),
-              initialValue: _data.where,
-              onChanged: (String value) => {this._data.where = value},
-              onSaved: (String value) => {this._data.where = value},
-            ),
-            DropdownButtonFormField(
-              decoration: InputDecoration(labelText: 'How many people?'),
-              items: howManyOptions.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String newValue) => {this._data.howMany = newValue},
-              onSaved: (String newValue) => {this._data.howMany = newValue},
-              value: _data.howMany ?? 'One on one',
+              initialValue: _data.notes,
+              onChanged: (String value) => {this._data.notes = value},
+              onSaved: (String value) => {this._data.notes = value},
             ),
             TextFormField(
               decoration: const InputDecoration(
