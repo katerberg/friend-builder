@@ -108,14 +108,6 @@ class _HangoutFormState extends State<HangoutForm> {
     }
   }
 
-  void _handleNotesChange(String value) {
-    this._data.notes = value;
-  }
-
-  void _handleDateChange(String value) {
-    this._data.when = selectedDate;
-  }
-
   @override
   Widget build(BuildContext context) {
     setState(() {
@@ -124,8 +116,7 @@ class _HangoutFormState extends State<HangoutForm> {
           .toList();
     });
 
-    return Container(
-      decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+    return Padding(
       padding: EdgeInsets.all(16),
       child: Form(
         key: _formKey,
@@ -133,23 +124,24 @@ class _HangoutFormState extends State<HangoutForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextFormField(
-              style: TextStyle(color: Colors.white),
-              decoration: const InputDecoration(labelText: 'Notes'),
-              cursorColor: Colors.white,
               autocorrect: true,
               enableSuggestions: true,
               textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(
+                labelText: 'Notes',
+              ),
               initialValue: _data.notes,
-              onChanged: _handleNotesChange,
-              onSaved: _handleNotesChange,
+              onChanged: (String value) => {this._data.notes = value},
+              onSaved: (String value) => {this._data.notes = value},
             ),
             TextFormField(
-              style: TextStyle(color: Colors.white),
-              decoration: const InputDecoration(labelText: 'When'),
+              decoration: const InputDecoration(
+                labelText: 'When?',
+              ),
               controller: dateController,
               onTap: () => _selectWhen(context),
-              onChanged: _handleDateChange,
-              onSaved: _handleDateChange,
+              onChanged: (String value) => {this._data.when = selectedDate},
+              onSaved: (String value) => {this._data.when = selectedDate},
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),

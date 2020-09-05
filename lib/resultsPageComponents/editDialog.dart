@@ -4,7 +4,7 @@ import 'package:friend_builder/logPageComponents/friendSelector.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/logPageComponents/hangoutForm.dart';
+import 'package:friend_builder/resultsPageComponents/hangoutForm.dart';
 
 class EditDialog extends StatefulWidget {
   final List<Contact> selectedFriends;
