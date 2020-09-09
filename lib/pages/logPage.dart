@@ -54,13 +54,11 @@ class _LogPageState extends State<LogPage> {
     if (_selectedFriends.isNotEmpty) {
       itemsToShow.add(Row(children: [
         Expanded(
-          child: Card(
-            child: HangoutForm(
-              onSubmit: widget.onSubmit,
-              selectedFriends: _selectedFriends,
-              flutterLocalNotificationsPlugin:
-                  widget.flutterLocalNotificationsPlugin,
-            ),
+          child: HangoutForm(
+            onSubmit: widget.onSubmit,
+            selectedFriends: _selectedFriends,
+            flutterLocalNotificationsPlugin:
+                widget.flutterLocalNotificationsPlugin,
           ),
         ),
       ]));

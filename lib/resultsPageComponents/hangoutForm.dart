@@ -56,6 +56,11 @@ class _HangoutFormState extends State<HangoutForm> {
 
       dateController.text = _formatDate(picked);
     }
+    _unfocus();
+  }
+
+  void _unfocus() {
+    FocusScope.of(context).requestFocus(new FocusNode());
   }
 
   Future<void> _handleNotificationScheduling(List<Hangout> hangouts) async {
@@ -124,17 +129,6 @@ class _HangoutFormState extends State<HangoutForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextFormField(
-              autocorrect: true,
-              enableSuggestions: true,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(
-                labelText: 'Notes',
-              ),
-              initialValue: _data.notes,
-              onChanged: (String value) => {this._data.notes = value},
-              onSaved: (String value) => {this._data.notes = value},
-            ),
-            TextFormField(
               decoration: const InputDecoration(
                 labelText: 'When?',
               ),
@@ -142,6 +136,18 @@ class _HangoutFormState extends State<HangoutForm> {
               onTap: () => _selectWhen(context),
               onChanged: (String value) => {this._data.when = selectedDate},
               onSaved: (String value) => {this._data.when = selectedDate},
+            ),
+            TextFormField(
+              autocorrect: true,
+              enableSuggestions: true,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(
+                labelText: 'Notes',
+              ),
+              maxLines: 8,
+              initialValue: _data.notes,
+              onChanged: (String value) => {this._data.notes = value},
+              onSaved: (String value) => {this._data.notes = value},
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),

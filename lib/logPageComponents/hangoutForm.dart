@@ -56,6 +56,7 @@ class _HangoutFormState extends State<HangoutForm> {
 
       dateController.text = _formatDate(picked);
     }
+    _unfocus();
   }
 
   Future<void> _handleNotificationScheduling(List<Hangout> hangouts) async {
@@ -112,6 +113,10 @@ class _HangoutFormState extends State<HangoutForm> {
     this._data.notes = value;
   }
 
+  void _unfocus() {
+    FocusScope.of(context).requestFocus(new FocusNode());
+  }
+
   void _handleDateChange(String value) {
     this._data.when = selectedDate;
   }
@@ -126,7 +131,6 @@ class _HangoutFormState extends State<HangoutForm> {
 
     return Container(
       decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-      padding: EdgeInsets.all(16),
       child: Form(
         key: _formKey,
         child: Column(
@@ -134,22 +138,32 @@ class _HangoutFormState extends State<HangoutForm> {
           children: <Widget>[
             TextFormField(
               style: TextStyle(color: Colors.white),
-              decoration: const InputDecoration(labelText: 'Notes'),
-              cursorColor: Colors.white,
-              autocorrect: true,
-              enableSuggestions: true,
-              textCapitalization: TextCapitalization.sentences,
-              initialValue: _data.notes,
-              onChanged: _handleNotesChange,
-              onSaved: _handleNotesChange,
-            ),
-            TextFormField(
-              style: TextStyle(color: Colors.white),
-              decoration: const InputDecoration(labelText: 'When'),
+              decoration: const InputDecoration(
+                labelText: 'When',
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+              ),
               controller: dateController,
               onTap: () => _selectWhen(context),
               onChanged: _handleDateChange,
               onSaved: _handleDateChange,
+            ),
+            TextFormField(
+              style: TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelStyle: TextStyle(color: Colors.white),
+                labelText: 'Notes',
+                floatingLabelBehavior: FloatingLabelBehavior.never,
+              ),
+              cursorColor: Colors.white,
+              autocorrect: true,
+              enableSuggestions: true,
+              onFieldSubmitted: (String string) {
+                _handleSubmitPress();
+              },
+              textCapitalization: TextCapitalization.sentences,
+              initialValue: _data.notes,
+              onChanged: _handleNotesChange,
+              onSaved: _handleNotesChange,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),

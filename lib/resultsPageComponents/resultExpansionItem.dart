@@ -20,13 +20,16 @@ class ResultExpansionItem extends StatelessWidget {
             color: iconColor,
           ),
         ),
-        Text(
+        Flexible(
+            child: Text(
           text,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 8,
           style: TextStyle(
             fontSize: 14.0,
             color: textColor,
           ),
-        ),
+        )),
       ],
     );
   }

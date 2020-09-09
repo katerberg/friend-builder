@@ -60,20 +60,13 @@ class FriendSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const inputBorder = UnderlineInputBorder(
-        borderSide: BorderSide(width: 1, color: Colors.white));
     return TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
         autofocus: false,
         autocorrect: false,
         controller: typeaheadController,
-        cursorColor: Colors.white,
-        style: TextStyle(color: Colors.white),
+        cursorColor: Theme.of(context).cursorColor,
         decoration: InputDecoration(
-          floatingLabelBehavior: FloatingLabelBehavior.never,
-          focusedBorder: inputBorder,
-          enabledBorder: inputBorder,
-          labelStyle: TextStyle(color: Colors.white),
           labelText: _getInputLabelText(),
         ),
       ),
