@@ -5,9 +5,12 @@ import 'package:friend_builder/logPageComponents/selectedFriendChip.dart';
 class SelectedFriendChips extends StatelessWidget {
   final List<Contact> selectedFriends;
   final void Function(Contact contact) onRemoveFriend;
+  final bool isWhite;
 
   SelectedFriendChips(
-      {@required this.selectedFriends, @required this.onRemoveFriend});
+      {@required this.selectedFriends,
+      @required this.onRemoveFriend,
+      this.isWhite = false});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +23,7 @@ class SelectedFriendChips extends StatelessWidget {
             .map((Contact contact) => SelectedFriendChip(
                   onPressed: onRemoveFriend,
                   selectedFriend: contact,
+                  isWhite: isWhite,
                 ))
             .toList(),
       ));

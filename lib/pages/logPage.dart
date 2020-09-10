@@ -48,9 +48,9 @@ class _LogPageState extends State<LogPage> {
       SelectedFriendChips(
         selectedFriends: _selectedFriends,
         onRemoveFriend: _resetFriend,
+        isWhite: true,
       )
     ];
-
     if (_selectedFriends.isNotEmpty) {
       itemsToShow.add(Row(children: [
         Expanded(

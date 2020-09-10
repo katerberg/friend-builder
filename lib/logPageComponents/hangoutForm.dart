@@ -129,6 +129,9 @@ class _HangoutFormState extends State<HangoutForm> {
           .toList();
     });
 
+    const inputBorder = UnderlineInputBorder(
+        borderSide: BorderSide(width: 1, color: Colors.white));
+
     return Container(
       decoration: BoxDecoration(color: Theme.of(context).primaryColor),
       child: Form(
@@ -141,6 +144,8 @@ class _HangoutFormState extends State<HangoutForm> {
               decoration: const InputDecoration(
                 labelText: 'When',
                 floatingLabelBehavior: FloatingLabelBehavior.never,
+                focusedBorder: inputBorder,
+                enabledBorder: inputBorder,
               ),
               controller: dateController,
               onTap: () => _selectWhen(context),
@@ -153,6 +158,8 @@ class _HangoutFormState extends State<HangoutForm> {
                 labelStyle: TextStyle(color: Colors.white),
                 labelText: 'Notes',
                 floatingLabelBehavior: FloatingLabelBehavior.never,
+                focusedBorder: inputBorder,
+                enabledBorder: inputBorder,
               ),
               cursorColor: Colors.white,
               autocorrect: true,
