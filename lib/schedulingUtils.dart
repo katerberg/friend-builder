@@ -22,6 +22,8 @@ class SchedulingUtils {
   }
 
   static DateTime howLong(DateTime previousHangout, String interaction) {
-    return previousHangout.add(Duration(days: daysFromFrequncy(interaction)));
+    return previousHangout
+        .add(Duration(days: daysFromFrequncy(interaction)))
+        .add(Duration(hours: 12));
   }
 }
