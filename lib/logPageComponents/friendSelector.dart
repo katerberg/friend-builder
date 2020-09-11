@@ -73,7 +73,7 @@ class FriendSelector extends StatelessWidget {
           floatingLabelBehavior: FloatingLabelBehavior.never,
           focusedBorder: inputBorder,
           enabledBorder: inputBorder,
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: Colors.white, fontSize: 24),
           labelText: _getInputLabelText(),
         ),
       ),
