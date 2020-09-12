@@ -16,7 +16,7 @@ class SchedulingUtils {
 
   static int daysLeft(String frequency, DateTime latestHangoutTime) {
     int daysAgo =
-        DateTime.now().difference(latestHangoutTime ?? DateTime(1970)).inDays;
+        DateTime.now().difference(latestHangoutTime ?? DateTime(2200)).inDays;
     int howOften = daysFromFrequncy(frequency);
     return howOften - daysAgo;
   }

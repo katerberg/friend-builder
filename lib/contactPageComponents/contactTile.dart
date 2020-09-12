@@ -17,17 +17,25 @@ class ContactTile extends StatelessWidget {
     this.frequency,
   });
 
-  Text _getSubTitle() {
+  Text _getSubTitle(context) {
     if (frequency == null && latestHangout == null) {
       return null;
     }
     if (latestHangout == null) {
       return Text('Never seen!');
     }
-    String daysLeft =
-        (SchedulingUtils.daysLeft(frequency, latestHangout.when)).toString() +
-            ' days to go';
-    return frequency == null ? null : Text(daysLeft);
+
+    int daysLeft = SchedulingUtils.daysLeft(frequency, latestHangout.when);
+
+    String daysLeftMessage = daysLeft > 0
+        ? (daysLeft).toString() + ' days to go'
+        : (daysLeft.abs().toString() + ' days late');
+    return frequency == null
+        ? null
+        : Text(daysLeftMessage,
+            style: TextStyle(
+                color:
+                    daysLeft > 0 ? Theme.of(context).hintColor : Colors.red));
   }
 
   @override
@@ -42,7 +50,7 @@ class ContactTile extends StatelessWidget {
             fontWeight:
                 frequency == null ? FontWeight.normal : FontWeight.bold),
       ),
-      subtitle: _getSubTitle(),
+      subtitle: _getSubTitle(context),
     );
   }
 }
