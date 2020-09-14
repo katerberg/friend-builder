@@ -64,6 +64,7 @@ class _LogPageState extends State<LogPage> {
       ]));
     }
 
+    print('building log page');
     return GestureDetector(
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,

@@ -29,8 +29,10 @@ class FriendSelector extends StatelessWidget {
   }
 
   Future<List<Contact>> _getSuggestions(String pattern) async {
+    print('getting suggestions');
     ContactPermission contactPermission =
         await ContactPermissionService().getContacts();
+    print('got contacts permission');
     if (!contactPermission.missingPermission) {
       var val = await Future.value(contactPermission.contacts
           .where((element) =>
@@ -40,7 +42,8 @@ class FriendSelector extends StatelessWidget {
                   StringUtils.getComparison(element?.displayName, pattern) >
                       0.1))
           .toList());
-      return val
+      print('got contacts');
+      var sorted = val
         ..sort((a, b) {
           RegExp regExp = new RegExp(
             '^' + pattern,
@@ -54,6 +57,7 @@ class FriendSelector extends StatelessWidget {
               StringUtils.getComparison(b?.displayName, pattern);
           return isBigger ? 1 : -1;
         });
+      return sorted.sublist(0, sorted.length > 7 ? 7 : sorted.length);
     }
     return Future.value([]);
   }
@@ -62,13 +66,14 @@ class FriendSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     const inputBorder = UnderlineInputBorder(
         borderSide: BorderSide(width: 1, color: Colors.white));
+    print('building friend selector');
     return TypeAheadField(
       textFieldConfiguration: TextFieldConfiguration(
         autofocus: false,
         autocorrect: false,
         controller: typeaheadController,
         cursorColor: Colors.white,
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white, fontSize: 24),
         decoration: InputDecoration(
           floatingLabelBehavior: FloatingLabelBehavior.never,
           focusedBorder: inputBorder,
