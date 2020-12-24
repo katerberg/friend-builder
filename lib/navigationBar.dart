@@ -41,17 +41,17 @@ class _NavigationBarState extends State<NavigationBar> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            title: Text('User'),
+            label: 'History',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.note_add,
             ),
-            title: Text('Log'),
+            label: 'Log',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
-            title: Text('Friends'),
+            label: 'Friends',
           ),
         ],
         currentIndex: _tabIndex,
