@@ -61,6 +61,7 @@ class FriendSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TypeAheadField(
+      animationDuration: Duration(days: 0),
       textFieldConfiguration: TextFieldConfiguration(
         autofocus: false,
         autocorrect: false,

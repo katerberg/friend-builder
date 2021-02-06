@@ -8,8 +8,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 class FriendSelector extends StatelessWidget {
   final List<Contact> selectedFriends;
   final void Function(Contact friend) addFriend;
-  final TextEditingController typeaheadController =
-      TextEditingController(text: '');
+  final TextEditingController _typeaheadController = TextEditingController();
   final String emptyLabel;
   final String populatedLabel;
 
@@ -29,10 +28,8 @@ class FriendSelector extends StatelessWidget {
   }
 
   Future<List<Contact>> _getSuggestions(String pattern) async {
-    print('getting suggestions');
     ContactPermission contactPermission =
         await ContactPermissionService().getContacts();
-    print('got contacts permission');
     if (!contactPermission.missingPermission) {
       var val = await Future.value(contactPermission.contacts
           .where((element) =>
@@ -42,7 +39,6 @@ class FriendSelector extends StatelessWidget {
                   StringUtils.getComparison(element?.displayName, pattern) >
                       0.1))
           .toList());
-      print('got contacts');
       var sorted = val
         ..sort((a, b) {
           RegExp regExp = new RegExp(
@@ -57,7 +53,9 @@ class FriendSelector extends StatelessWidget {
               StringUtils.getComparison(b?.displayName, pattern);
           return isBigger ? 1 : -1;
         });
-      return sorted.sublist(0, sorted.length > 7 ? 7 : sorted.length);
+      const maxResults = 7;
+      return sorted.sublist(
+          0, sorted.length > maxResults ? maxResults : sorted.length);
     }
     return Future.value([]);
   }
@@ -66,12 +64,12 @@ class FriendSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     const inputBorder = UnderlineInputBorder(
         borderSide: BorderSide(width: 1, color: Colors.white));
-    print('building friend selector');
     return TypeAheadField(
+      animationDuration: Duration(days: 0),
       textFieldConfiguration: TextFieldConfiguration(
         autofocus: false,
         autocorrect: false,
-        controller: typeaheadController,
+        controller: _typeaheadController,
         cursorColor: Colors.white,
         style: TextStyle(color: Colors.white, fontSize: 24),
         decoration: InputDecoration(
@@ -90,6 +88,7 @@ class FriendSelector extends StatelessWidget {
         );
       },
       noItemsFoundBuilder: (context) => NoItemsFound(),
+      getImmediateSuggestions: true,
       onSuggestionSelected: addFriend,
     );
   }
