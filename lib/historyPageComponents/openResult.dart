@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/resultsPageComponents/resultBubbles.dart';
-import 'package:friend_builder/resultsPageComponents/resultExpansionItem.dart';
-import 'package:friend_builder/resultsPageComponents/resultMenu.dart';
+import 'package:friend_builder/historyPageComponents/resultBubbles.dart';
+import 'package:friend_builder/historyPageComponents/resultExpansionItem.dart';
+import 'package:friend_builder/historyPageComponents/resultMenu.dart';
 
 class OpenResult extends StatelessWidget {
   final Hangout hangout;

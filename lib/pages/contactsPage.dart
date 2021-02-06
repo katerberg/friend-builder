@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/stringUtils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:friend_builder/contactPageComponents/contactScheduling.dart';
+import 'package:friend_builder/friendsPageComponents/contactScheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:friend_builder/contactPageComponents/contactTile.dart';
+import 'package:friend_builder/friendsPageComponents/contactTile.dart';
 import 'package:friend_builder/notificationHelper.dart';
 import 'package:friend_builder/schedulingUtils.dart';
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/resultsPageComponents/result.dart';
-import 'package:friend_builder/resultsPageComponents/editDialog.dart';
+import 'package:friend_builder/historyPageComponents/result.dart';
+import 'package:friend_builder/historyPageComponents/editDialog.dart';
 
 class ResultsPage extends StatefulWidget {
   final Storage storage = Storage();

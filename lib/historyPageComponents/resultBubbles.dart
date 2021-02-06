@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/encodableContact.dart';
-import 'package:friend_builder/resultsPageComponents/resultBubble.dart';
+import 'package:friend_builder/historyPageComponents/resultBubble.dart';
 
 class ResultBubbles extends StatelessWidget {
   final List<EncodableContact> contacts;

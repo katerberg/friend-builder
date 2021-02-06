@@ -65,7 +65,7 @@ class FriendSelector extends StatelessWidget {
         autofocus: false,
         autocorrect: false,
         controller: typeaheadController,
-        cursorColor: Theme.of(context).cursorColor,
+        cursorColor: TextSelectionTheme.of(context).cursorColor,
         decoration: InputDecoration(
           labelText: _getInputLabelText(),
         ),

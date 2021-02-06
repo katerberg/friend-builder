@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/resultsPageComponents/resultMenu.dart';
-import 'package:friend_builder/resultsPageComponents/resultBubbles.dart';
+import 'package:friend_builder/historyPageComponents/resultMenu.dart';
+import 'package:friend_builder/historyPageComponents/resultBubbles.dart';
 
 class ClosedResult extends StatelessWidget {
   final Hangout hangout;
