@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
-import 'package:friend_builder/logPageComponents/selectedFriendChip.dart';
+import 'package:friend_builder/pages/log/components/selectedFriendChip.dart';
 
 class SelectedFriendChips extends StatelessWidget {
   final List<Contact> selectedFriends;

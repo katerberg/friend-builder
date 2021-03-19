@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:friend_builder/pages/contactsPage.dart';
-import 'package:friend_builder/pages/logPage.dart';
-import 'package:friend_builder/pages/resultsPage.dart';
+import 'package:friend_builder/pages/friends/friendsPage.dart';
+import 'package:friend_builder/pages/log/logPage.dart';
+import 'package:friend_builder/pages/history/historyPage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NavigationBar extends StatefulWidget {

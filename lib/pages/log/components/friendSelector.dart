@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
-import 'package:friend_builder/logPageComponents/noItemsFound.dart';
+import 'package:friend_builder/pages/log/components/noItemsFound.dart';
 import 'package:friend_builder/data/encodableContact.dart';
 import 'package:friend_builder/stringUtils.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -27,37 +27,44 @@ class FriendSelector extends StatelessWidget {
     return populatedLabel ?? 'Anyone else?';
   }
 
+  int sortByBetterMatch(pattern, a, b) {
+    bool isBBetterMatch = StringUtils.getComparison(a?.displayName, pattern) <
+        StringUtils.getComparison(b?.displayName, pattern);
+    return isBBetterMatch ? 1 : -1;
+  }
+
+  int sortTwoFriendsInSuggestions(pattern, a, b) {
+    RegExp startsWithExactly = new RegExp(
+      '^' + pattern,
+      caseSensitive: false,
+    );
+    var aMatches = startsWithExactly.hasMatch(a?.displayName ?? '');
+    if (aMatches || startsWithExactly.hasMatch(b?.displayName ?? '')) {
+      return aMatches ? -1 : 1;
+    }
+    return sortByBetterMatch(pattern, a, b);
+  }
+
   Future<List<Contact>> _getSuggestions(String pattern) async {
     ContactPermission contactPermission =
         await ContactPermissionService().getContacts();
-    if (!contactPermission.missingPermission) {
-      var val = await Future.value(contactPermission.contacts
-          .where((element) =>
-              !selectedFriends.any(
-                  (selected) => selected.identifier == element.identifier) &&
-              (pattern.length < 2 ||
-                  StringUtils.getComparison(element?.displayName, pattern) >
-                      0.1))
-          .toList());
-      var sorted = val
-        ..sort((a, b) {
-          RegExp regExp = new RegExp(
-            '^' + pattern,
-            caseSensitive: false,
-          );
-          var aMatches = regExp.hasMatch(a?.displayName ?? '');
-          if (aMatches || regExp.hasMatch(b?.displayName ?? '')) {
-            return aMatches ? -1 : 1;
-          }
-          bool isBigger = StringUtils.getComparison(a?.displayName, pattern) <
-              StringUtils.getComparison(b?.displayName, pattern);
-          return isBigger ? 1 : -1;
-        });
-      const maxResults = 7;
-      return sorted.sublist(
-          0, sorted.length > maxResults ? maxResults : sorted.length);
+    if (contactPermission.missingPermission) {
+      return Future.value([]);
     }
-    return Future.value([]);
+    var listOfFriends = await Future.value(contactPermission.contacts
+        .where((element) =>
+            !selectedFriends
+                .any((selected) => selected.identifier == element.identifier) &&
+            (pattern.length < 2 ||
+                StringUtils.getComparison(element?.displayName, pattern) > 0.1))
+        .toList());
+    var sortedFriends = listOfFriends
+      ..sort((a, b) {
+        return sortTwoFriendsInSuggestions(pattern, a, b);
+      });
+    const maxResults = 7;
+    return sortedFriends.sublist(0,
+        sortedFriends.length > maxResults ? maxResults : sortedFriends.length);
   }
 
   @override

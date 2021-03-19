@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
-import 'package:friend_builder/logPageComponents/noItemsFound.dart';
+import 'package:friend_builder/pages/log/components/noItemsFound.dart';
 import 'package:friend_builder/data/encodableContact.dart';
 import 'package:friend_builder/stringUtils.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';

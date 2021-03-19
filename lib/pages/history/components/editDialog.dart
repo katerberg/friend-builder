@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:friend_builder/logPageComponents/selectedFriendChips.dart';
-import 'package:friend_builder/historyPageComponents/friendSelector.dart';
+import 'package:friend_builder/pages/log/components/selectedFriendChips.dart';
+import 'package:friend_builder/pages/history/components/friendSelector.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/historyPageComponents/hangoutForm.dart';
+import 'package:friend_builder/pages/history/components/hangoutForm.dart';
 
 class EditDialog extends StatefulWidget {
   final List<Contact> selectedFriends;

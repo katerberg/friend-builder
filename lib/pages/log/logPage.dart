@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
-import 'package:friend_builder/logPageComponents/hangoutForm.dart';
-import 'package:friend_builder/logPageComponents/selectedFriendChips.dart';
-import 'package:friend_builder/logPageComponents/friendSelector.dart';
+import 'package:friend_builder/pages/log/components/hangoutForm.dart';
+import 'package:friend_builder/pages/log/components/selectedFriendChips.dart';
+import 'package:friend_builder/pages/log/components/friendSelector.dart';
 
 class LogPage extends StatefulWidget {
   final void Function() onSubmit;

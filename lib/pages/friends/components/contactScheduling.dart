@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
-import 'package:friend_builder/friendsPageComponents/selectionChoiceGroup.dart';
+import 'package:friend_builder/pages/friends/components/selectionChoiceGroup.dart';
 import 'package:friend_builder/data/friend.dart';
 
 const oftenLabel = 'How often do you want to contact this person?';

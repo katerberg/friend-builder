@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/historyPageComponents/resultBubbles.dart';
-import 'package:friend_builder/historyPageComponents/resultExpansionItem.dart';
-import 'package:friend_builder/historyPageComponents/resultMenu.dart';
+import 'package:friend_builder/pages/history/components/resultMenu.dart';
+import 'package:friend_builder/pages/history/components/resultBubbles.dart';
 
-class OpenResult extends StatelessWidget {
+class ClosedResult extends StatelessWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
 
-  OpenResult({
+  ClosedResult({
     @required this.hangout,
     @required this.onDelete,
     @required this.onEdit,
@@ -18,9 +17,7 @@ class OpenResult extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(8),
-      padding: EdgeInsets.all(8),
-      color: Color(0xffefefef),
+      margin: EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
           Expanded(
@@ -33,7 +30,7 @@ class OpenResult extends StatelessWidget {
                     children: [
                       Text(
                         hangout.dateWithoutYear(),
-                        style: TextStyle(fontWeight: FontWeight.w700),
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       ResultBubbles(
                           contacts: hangout.contacts
@@ -54,10 +51,6 @@ class OpenResult extends StatelessWidget {
                     ],
                   ),
                 ),
-                hangout.notes != ''
-                    ? ResultExpansionItem(
-                        iconItem: Icons.note, text: hangout.notes)
-                    : SizedBox.shrink(),
               ],
             ),
           ),
