@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/encodableContact.dart';
-import 'package:friend_builder/schedulingUtils.dart';
+import 'package:friend_builder/utils/scheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
 
 class ContactTile extends StatelessWidget {
@@ -25,7 +25,7 @@ class ContactTile extends StatelessWidget {
       return Text('Never seen!');
     }
 
-    int daysLeft = SchedulingUtils.daysLeft(frequency, latestHangout.when);
+    int daysLeft = Scheduling.daysLeft(frequency, latestHangout.when);
 
     String daysLeftMessage = daysLeft > 0
         ? (daysLeft).toString() + ' days to go'

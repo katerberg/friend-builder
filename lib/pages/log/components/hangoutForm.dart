@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/notificationHelper.dart';
-import 'package:friend_builder/schedulingUtils.dart';
+import 'package:friend_builder/utils/scheduling.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/data/encodableContact.dart';
@@ -79,7 +79,7 @@ class _HangoutFormState extends State<HangoutForm> {
           contact.identifier.hashCode,
           'Want to chat with ' + contact.displayName + '?',
           "It's been a minute!",
-          SchedulingUtils.howLong(latestTime, friend.frequency),
+          Scheduling.howLong(latestTime, friend.frequency),
         );
       }
     });

@@ -9,7 +9,7 @@ import 'package:friend_builder/storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:friend_builder/pages/friends/components/contactTile.dart';
 import 'package:friend_builder/notificationHelper.dart';
-import 'package:friend_builder/schedulingUtils.dart';
+import 'package:friend_builder/utils/scheduling.dart';
 
 class ContactsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -108,10 +108,8 @@ class _ContactsPageState extends State<ContactsPage> {
   int _compareContactsByTimeAndName(Contact c1, Contact c2) {
     var cOne = ContactPageContact(c1, _hangouts, _friends);
     var cTwo = ContactPageContact(c2, _hangouts, _friends);
-    int days1 =
-        SchedulingUtils.daysLeft(cOne.frequency, cOne.latestHangout?.when);
-    int days2 =
-        SchedulingUtils.daysLeft(cTwo.frequency, cTwo.latestHangout?.when);
+    int days1 = Scheduling.daysLeft(cOne.frequency, cOne.latestHangout?.when);
+    int days2 = Scheduling.daysLeft(cTwo.frequency, cTwo.latestHangout?.when);
     return days1 - days2 == 0
         ? (c1?.displayName ?? '').compareTo(c2?.displayName ?? '')
         : days1 - days2;
@@ -193,7 +191,7 @@ class _ContactsPageState extends State<ContactsPage> {
         contact.identifier.hashCode,
         'Want to chat with ' + contact.displayName + '?',
         "It's been a minute!",
-        SchedulingUtils.howLong(latestTime, result.frequency),
+        Scheduling.howLong(latestTime, result.frequency),
       );
     } else {
       cancelNotification(

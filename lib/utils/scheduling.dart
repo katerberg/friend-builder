@@ -1,4 +1,4 @@
-class SchedulingUtils {
+class Scheduling {
   static int daysFromFrequncy(String frequency) {
     switch (frequency) {
       case 'Weekly':
