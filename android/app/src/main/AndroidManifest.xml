@@ -9,6 +9,12 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="Friend Crafter"
         android:icon="@mipmap/friend_builder">
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -37,12 +43,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
-            <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
-                <intent-filter>
-                    <action android:name="android.intent.action.BOOT_COMPLETED"></action>
-                </intent-filter>
-            </receiver>
+
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
