@@ -35,15 +35,8 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   void _onDelete(Hangout hangout) {
-    widget.storage.getHangouts().then((hangouts) {
-      widget.storage
-          .saveHangouts(
-              hangouts..removeWhere((element) => element.id == hangout.id))
-          .then((file) {
-        setState(() {
-          _hangouts = hangouts;
-        });
-      });
+    widget.storage.deleteHangout(hangout).then((_) {
+      _hangouts = _hangouts..removeWhere((element) => element.id == hangout.id);
     });
   }
 

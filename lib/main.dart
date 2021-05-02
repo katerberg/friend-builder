@@ -7,7 +7,9 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await initNotifications(flutterLocalNotificationsPlugin);
+
   runApp(FriendBuilderApp());
 }
 

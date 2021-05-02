@@ -32,10 +32,27 @@ class Hangout {
     );
   }
 
+  factory Hangout.fromMap(Map<String, dynamic> parsed) {
+    return new Hangout(
+      id: parsed['id'] ?? Uuid().v4(),
+      contacts: [],
+      notes: parsed['notes'] ?? "",
+      when: DateTime.parse(parsed['whenOccurred']),
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       "id": this.id,
       "contacts": this.contacts,
+      "notes": this.notes,
+      "when": this.when.toIso8601String(),
+    };
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": this.id,
       "notes": this.notes,
       "when": this.when.toIso8601String(),
     };

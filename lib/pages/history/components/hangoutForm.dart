@@ -99,17 +99,17 @@ class _HangoutFormState extends State<HangoutForm> {
       if (hangouts != null) {
         var index = hangouts.indexWhere((element) => element.id == _data.id);
         if (index == -1) {
+          await Storage().createHangout(_data);
           hangouts.add(_data);
         } else {
+          await Storage().updateHangout(_data);
           hangouts[index] = _data;
         }
       } else {
         hangouts = [_data];
       }
-      Storage().saveHangouts(hangouts).then((_) {
-        _handleNotificationScheduling(hangouts);
-        widget.onSubmit();
-      });
+      await _handleNotificationScheduling(hangouts);
+      widget.onSubmit();
     }
   }
 

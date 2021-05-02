@@ -67,6 +67,22 @@ class EncodableContact extends Contact {
     );
   }
 
+  factory EncodableContact.fromMap(Map<String, dynamic> parsedJson) {
+    return new EncodableContact(
+      displayName: parsedJson['displayName'] ?? "",
+      middleName: parsedJson['middleName'] ?? "",
+      givenName: parsedJson['givenName'] ?? "",
+      identifier: parsedJson['identifier'] ?? "",
+      familyName: parsedJson['familyName'] ?? "",
+      avatar: parsedJson['avatar'] == null
+          ? null
+          : new Uint8List.fromList(parsedJson['avatar'].cast<int>()),
+      birthday: parsedJson['birthday'] != null
+          ? DateTime.parse(parsedJson['birthday'])
+          : null,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       "avatar": this.avatar,

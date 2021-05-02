@@ -86,6 +86,7 @@ class _ContactsPageState extends State<ContactsPage> {
 
   Future<void> _getContacts() async {
     bool missingPermission = await _isMissingPermission();
+    // TODO: This is where the performance issue is.
     final Iterable<Contact> contacts = await ContactsService.getContacts();
     setState(() {
       _missingPermission = missingPermission;
@@ -209,7 +210,7 @@ class _ContactsPageState extends State<ContactsPage> {
       friends = [result];
     }
     _clearTextField();
-    Storage.saveFriends(friends).then((_) {
+    widget.storage.saveFriends(friends).then((_) {
       _refreshFriends().then((_) {
         _sortContacts();
       });
@@ -242,6 +243,7 @@ class _ContactsPageState extends State<ContactsPage> {
     } else if (_contacts == null || _hangouts == null) {
       body = Center(child: const CircularProgressIndicator());
     } else {
+      var safeHangoutContacts = _hangoutContacts ?? [];
       body = ListView(
         children: [
           Container(
@@ -256,7 +258,7 @@ class _ContactsPageState extends State<ContactsPage> {
               onChanged: _handleContactSelection,
             ),
           ),
-          ...(_hangoutContacts
+          ...(safeHangoutContacts
               .map((c) => ContactPageContact(c, _hangouts, _friends))
               .toList()
               .map((c) => ContactTile(
@@ -265,8 +267,8 @@ class _ContactsPageState extends State<ContactsPage> {
                     frequency: c.frequency,
                     latestHangout: c.latestHangout,
                   ))),
-          _hangoutContacts.isNotEmpty ? Divider() : SizedBox.shrink(),
-          ..._unusedContacts.map(
+          safeHangoutContacts.isNotEmpty ? Divider() : SizedBox.shrink(),
+          ...(_unusedContacts ?? []).map(
               (c) => ContactTile(contact: c, onPressed: _handleContactPress)),
         ],
       );

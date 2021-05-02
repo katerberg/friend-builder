@@ -1,71 +1,34 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 
 class Storage {
-  static Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-
-    return directory.path;
-  }
-
-  static Future<File> get _localHangoutsFile async {
-    final path = await _localPath;
-    return File('$path/hangouts.txt');
-  }
-
   Future<List<Hangout>> getHangouts() async {
-    try {
-      final file = await _localHangoutsFile;
-
-      // Read the file.
-      String contents = await file.readAsString();
-
-      var contentList = jsonDecode(contents) as List;
-      return contentList.map((hangout) => Hangout.fromJson(hangout)).toList();
-    } catch (e) {
-      if (e.runtimeType == FileSystemException) {
-        return [];
-      }
-      print('error reading hangout data');
-      print(e);
-      return null;
-    }
+    var dbHangouts = await DBProvider.db.getAllHangouts();
+    return dbHangouts;
   }
 
-  Future<File> saveHangouts(List<Hangout> hangouts) async {
-    final file = await _localHangoutsFile;
-
-    return file.writeAsString(jsonEncode(hangouts));
+  updateHangout(Hangout hangout) async {
+    return DBProvider.db.saveHangout(hangout);
   }
 
-  static Future<File> get _localFriendsFile async {
-    final path = await _localPath;
-    return File('$path/friends.txt');
+  Future<int> createHangout(Hangout hangout) async {
+    return DBProvider.db.saveHangout(hangout);
+  }
+
+  Future<int> deleteHangout(Hangout hangout) async {
+    return DBProvider.db.deleteHangout(hangout);
   }
 
   static Future<List<Friend>> getFriends() async {
-    try {
-      final file = await _localFriendsFile;
-      String contents = await file.readAsString();
-
-      var contentList = jsonDecode(contents) as List;
-      return contentList.map((friend) => Friend.fromJson(friend)).toList();
-    } catch (e) {
-      if (e.runtimeType == FileSystemException) {
-        return [];
-      }
-      print('error reading friend data');
-      print(e);
-      return null;
-    }
+    var dbFriends = await DBProvider.db.getAllFriends();
+    return dbFriends;
   }
 
-  static Future<File> saveFriends(List<Friend> friends) async {
-    final file = await _localFriendsFile;
-
-    return file.writeAsString(jsonEncode(friends));
+  Future saveFriends(List<Friend> friends) async {
+    var futureMap = friends.map((friend) {
+      return DBProvider.db.saveFriend(friend);
+    });
+    return Future.wait(futureMap);
   }
 }
