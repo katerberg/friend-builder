@@ -8,15 +8,15 @@ class Storage {
     return dbHangouts;
   }
 
-  updateHangout(Hangout hangout) async {
+  Future updateHangout(Hangout hangout) async {
     return DBProvider.db.saveHangout(hangout);
   }
 
-  Future<int> createHangout(Hangout hangout) async {
+  Future createHangout(Hangout hangout) async {
     return DBProvider.db.saveHangout(hangout);
   }
 
-  Future<int> deleteHangout(Hangout hangout) async {
+  Future deleteHangout(Hangout hangout) async {
     return DBProvider.db.deleteHangout(hangout);
   }
 
