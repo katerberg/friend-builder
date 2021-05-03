@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/stringUtils.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/pages/friends/components/contactScheduling.dart';
@@ -6,7 +7,6 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:friend_builder/storage.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:friend_builder/pages/friends/components/contactTile.dart';
 import 'package:friend_builder/notificationHelper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
@@ -85,13 +85,12 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   Future<void> _getContacts() async {
-    bool missingPermission = await _isMissingPermission();
     // TODO: This is where the performance issue is.
-    final Iterable<Contact> contacts = await ContactsService.getContacts();
+    var contactPermission = await ContactPermissionService().getContacts();
     setState(() {
-      _missingPermission = missingPermission;
-      _contacts = contacts;
-      _visibleContacts = contacts;
+      _missingPermission = contactPermission.missingPermission;
+      _contacts = contactPermission.contacts;
+      _visibleContacts = contactPermission.contacts;
     });
   }
 
@@ -133,28 +132,6 @@ class _ContactsPageState extends State<ContactsPage> {
           .toList()
             ..sort(_compareContactsByName);
     });
-  }
-
-  Future<PermissionStatus> _getPermission() async {
-    final PermissionStatus permission = await Permission.contacts.status;
-    if (permission != PermissionStatus.granted &&
-        permission != PermissionStatus.denied) {
-      final Map<Permission, PermissionStatus> permissionStatus =
-          await [Permission.contacts].request();
-      return permissionStatus[Permission.contacts] ??
-          PermissionStatus.undetermined;
-    } else {
-      return permission;
-    }
-  }
-
-  Future<bool> _isMissingPermission() async {
-    final PermissionStatus permissionStatus = await _getPermission();
-    if (permissionStatus == PermissionStatus.granted) {
-      return false;
-    } else {
-      return true;
-    }
   }
 
   void _clearTextField() {
