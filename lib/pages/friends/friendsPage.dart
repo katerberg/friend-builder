@@ -64,9 +64,7 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   void initState() {
     Future.wait([_refreshFriends(), _getContacts(), _refreshHangouts()])
-        .then((list) {
-      _sortContacts();
-    });
+        .then((list) => _sortContacts());
     super.initState();
   }
 
