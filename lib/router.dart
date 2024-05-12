@@ -8,19 +8,19 @@ class FriendRouter extends StatefulWidget {
 }
 
 class _FriendRouterState extends State<FriendRouter> {
-  var selectedIndex = 0;
+  var selectedIndex = 1;
 
   // List<Widget> tabs = <Widget>[
-  //   ResultsPage(
-  //     flutterLocalNotificationsPlugin: widget.flutterLocalNotificationsPlugin,
-  //   ),
-  //   LogPage(
-  //     onSubmit: () => _changeTab(0),
-  //     flutterLocalNotificationsPlugin: widget.flutterLocalNotificationsPlugin,
-  //   ),
-  //   ContactsPage(
-  //       flutterLocalNotificationsPlugin:
-  //           widget.flutterLocalNotificationsPlugin),
+  // ResultsPage(
+  //   flutterLocalNotificationsPlugin: widget.flutterLocalNotificationsPlugin,
+  // ),
+  // LogPage(
+  //   onSubmit: () => _changeTab(0),
+  //   flutterLocalNotificationsPlugin: widget.flutterLocalNotificationsPlugin,
+  // ),
+  // ContactsPage(
+  //     flutterLocalNotificationsPlugin:
+  //         widget.flutterLocalNotificationsPlugin),
   // ];
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class _FriendRouterState extends State<FriendRouter> {
       case 1:
         page = const Text('bar');
       case 2:
-        page = const Text('baz');
+        page = const Text('contacts');
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
