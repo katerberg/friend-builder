@@ -1,33 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:friend_builder/notificationHelper.dart';
-import 'package:friend_builder/navigationBar.dart';
+import 'package:friend_builder/router.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await initNotifications(flutterLocalNotificationsPlugin);
-
-  runApp(FriendBuilderApp());
+void main() {
+  runApp(const MainApp());
 }
 
-class FriendBuilderApp extends StatelessWidget {
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
   static const String _title = 'Friend Crafter';
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: _title,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: NavigationBar(
-        flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
-      ),
-    );
+        title: _title,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: const FriendRouter());
   }
 }
