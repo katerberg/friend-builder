@@ -1,40 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:friend_builder/contacts.dart';
-// import 'package:friend_builder/stringUtils.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:friend_builder/pages/friends/components/contactScheduling.dart';
-// import 'package:friend_builder/data/hangout.dart';
-// import 'package:friend_builder/data/friend.dart';
-// import 'package:contacts_service/contacts_service.dart';
-// import 'package:friend_builder/storage.dart';
-// import 'package:friend_builder/pages/friends/components/contactTile.dart';
-// import 'package:friend_builder/notificationHelper.dart';
-// import 'package:friend_builder/utils/scheduling.dart';
+import 'package:friend_builder/contacts.dart';
+import 'package:collection/collection.dart';
+import 'package:friend_builder/utils/string_utils.dart';
+import 'package:friend_builder/pages/friends/components/contact_scheduling.dart';
+import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/pages/friends/components/contact_tile.dart';
+import 'package:friend_builder/utils/notification_helper.dart';
+import 'package:friend_builder/utils/scheduling.dart';
 
-class ContactsPage extends StatefulWidget {
-  // final Storage storage = Storage();
+class FriendsPage extends StatefulWidget {
+  final Storage storage = Storage();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-  ContactsPage({@required this.flutterLocalNotificationsPlugin});
+  FriendsPage({super.key, required this.flutterLocalNotificationsPlugin});
 
   @override
-  _ContactsPageState createState() => _ContactsPageState();
+  FriendsPageState createState() => FriendsPageState();
 }
 
-class ContactPageContact {
+class FriendsPageContact {
   Contact contact;
-  String frequency;
-  Hangout latestHangout;
+  String? frequency;
+  Hangout? latestHangout;
 
-  ContactPageContact(
-      Contact contact, List<Hangout> hangouts, List<Friend> friends) {
-    this.contact = contact;
-    Friend friend = friends.firstWhere(
-        (element) => element.contactIdentifier == contact.identifier,
-        orElse: () => null);
-    this.frequency = friend?.isContactable == true ? friend?.frequency : null;
-    this.latestHangout = hangouts.length < 1
+  FriendsPageContact(
+      this.contact, List<Hangout> hangouts, List<Friend> friends) {
+    Friend? friend = friends
+        .firstWhereOrNull((element) => element.contactIdentifier == contact.id);
+    frequency = friend?.isContactable == true ? friend?.frequency : null;
+    latestHangout = hangouts.isEmpty
         ? null
         : hangouts.reduce((value, hangout) {
             if (hangout.hasContact(contact) &&
@@ -44,20 +41,19 @@ class ContactPageContact {
             }
             return value;
           });
-    this.latestHangout =
-        this.latestHangout != null && this.latestHangout.hasContact(contact)
-            ? this.latestHangout
-            : null;
+    latestHangout = latestHangout != null && latestHangout!.hasContact(contact)
+        ? latestHangout
+        : null;
   }
 }
 
-class _ContactsPageState extends State<ContactsPage> {
-  Iterable<Contact> _contacts;
-  Iterable<Contact> _visibleContacts;
-  List<Contact> _hangoutContacts;
-  List<Contact> _unusedContacts;
-  List<Hangout> _hangouts;
-  List<Friend> _friends;
+class FriendsPageState extends State<FriendsPage> {
+  Iterable<Contact> _contacts = [];
+  Iterable<Contact> _visibleContacts = [];
+  List<Contact> _hangoutContacts = [];
+  List<Contact> _unusedContacts = [];
+  List<Hangout> _hangouts = [];
+  List<Friend> _friends = [];
   bool _missingPermission = false;
   final TextEditingController typeaheadController =
       TextEditingController(text: '');
@@ -100,17 +96,19 @@ class _ContactsPageState extends State<ContactsPage> {
     _sortContacts();
   }
 
-  int _compareContactsByName(Contact c1, Contact c2) {
+  int _compareContactsByName(Contact? c1, Contact? c2) {
     return (c1?.displayName ?? '').compareTo(c2?.displayName ?? '');
   }
 
   int _compareContactsByTimeAndName(Contact c1, Contact c2) {
-    var cOne = ContactPageContact(c1, _hangouts, _friends);
-    var cTwo = ContactPageContact(c2, _hangouts, _friends);
-    int days1 = Scheduling.daysLeft(cOne.frequency, cOne.latestHangout?.when);
-    int days2 = Scheduling.daysLeft(cTwo.frequency, cTwo.latestHangout?.when);
+    var cOne = FriendsPageContact(c1, _hangouts, _friends);
+    var cTwo = FriendsPageContact(c2, _hangouts, _friends);
+    int days1 = Scheduling.daysLeft(
+        cOne.frequency ?? 'Weekly', cOne.latestHangout?.when);
+    int days2 = Scheduling.daysLeft(
+        cTwo.frequency ?? 'Weekly', cTwo.latestHangout?.when);
     return days1 - days2 == 0
-        ? (c1?.displayName ?? '').compareTo(c2?.displayName ?? '')
+        ? (c1.displayName).compareTo(c2.displayName)
         : days1 - days2;
   }
 
@@ -119,32 +117,33 @@ class _ContactsPageState extends State<ContactsPage> {
       _hangoutContacts = _visibleContacts
           .toList()
           .where((c) => _friends.any((element) =>
-              element.contactIdentifier == c.identifier &&
-              element.isContactable))
+              element.contactIdentifier == c.id && element.isContactable))
           .toList()
-            ..sort(_compareContactsByTimeAndName);
+        ..sort(_compareContactsByTimeAndName);
       _unusedContacts = _visibleContacts
           .toList()
           .where((c) => !_friends.any((element) =>
-              element.contactIdentifier == c.identifier &&
-              element.isContactable))
+              element.contactIdentifier == c.id && element.isContactable))
           .toList()
-            ..sort(_compareContactsByName);
+        ..sort(_compareContactsByName);
     });
   }
 
   void _clearTextField() {
     typeaheadController.text = '';
-    FocusScope.of(context).requestFocus(new FocusNode());
+    FocusScope.of(context).requestFocus(FocusNode());
     _handleContactSelection('');
   }
 
-  Future<void> _handleContactPress(Contact contact) async {
-    List<Friend> friends = await Storage.getFriends();
-    Friend friend = friends.firstWhere(
-        (element) => element.contactIdentifier == contact.identifier,
-        orElse: () => null);
-    Friend result = await Navigator.push<Friend>(
+  Future<void> _handleContactPress(Contact? contact) async {
+    List<Friend>? friends = await Storage.getFriends();
+    Friend? friend = friends?.firstWhereOrNull(
+      (element) => element.contactIdentifier == contact?.id,
+    );
+    if (friend == null || contact == null) {
+      return;
+    }
+    Friend? result = await Navigator.push<Friend>(
       context,
       MaterialPageRoute(
         builder: (context) =>
@@ -152,10 +151,13 @@ class _ContactsPageState extends State<ContactsPage> {
         fullscreenDialog: true,
       ),
     );
-    if (result.isContactable) {
+    if (result == null) {
+      return;
+    }
+    if (result.isContactable == true) {
       List<Hangout> contactHangouts = _hangouts
           .where((element) =>
-              element.contacts.any((hc) => hc.identifier == contact.identifier))
+              element.contacts.any((hc) => hc.identifier == contact.id))
           .toList();
       DateTime latestTime = contactHangouts.isEmpty
           ? DateTime.now()
@@ -165,14 +167,14 @@ class _ContactsPageState extends State<ContactsPage> {
               .when;
       scheduleNotification(
         widget.flutterLocalNotificationsPlugin,
-        contact.identifier.hashCode,
-        'Want to chat with ' + contact.displayName + '?',
+        contact.id.hashCode,
+        'Want to chat with ${contact.displayName}?',
         "It's been a minute!",
         Scheduling.howLong(latestTime, result.frequency),
       );
     } else {
       cancelNotification(
-          widget.flutterLocalNotificationsPlugin, contact.identifier.hashCode);
+          widget.flutterLocalNotificationsPlugin, contact.id.hashCode);
     }
     if (friends != null) {
       var index = friends.indexWhere(
@@ -194,40 +196,36 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   void _handleContactSelection(String pattern) {
-    var exactMatches = _contacts.where((element) => (element?.displayName ?? '')
-        .toLowerCase()
-        .contains(pattern.toLowerCase()));
-    if (exactMatches.length > 0) {
+    var exactMatches = _contacts.where((element) =>
+        (element.displayName).toLowerCase().contains(pattern.toLowerCase()));
+    if (exactMatches.isNotEmpty) {
       return _handleContactsFilter(exactMatches.toList()
-        ..sort(
-            (a, b) => (a?.displayName ?? '').compareTo(b?.displayName ?? '')));
+        ..sort((a, b) => (a.displayName ?? '').compareTo(b.displayName)));
     }
     var matchingLevel = _contacts.where((element) =>
-        StringUtils.getComparison(element?.displayName, pattern) > 0.3);
-    _handleContactsFilter(matchingLevel.length > 0 ? matchingLevel : _contacts);
+        StringUtils.getComparison(element.displayName, pattern) > 0.3);
+    _handleContactsFilter(matchingLevel.isNotEmpty ? matchingLevel : _contacts);
   }
 
   @override
   Widget build(BuildContext context) {
     Widget body;
     if (_missingPermission) {
-      body = Center(
+      body = const Center(
         child: Text(
           'Missing contacts permission',
         ),
       );
-    } else if (_contacts == null || _hangouts == null) {
-      body = Center(child: const CircularProgressIndicator());
     } else {
-      var safeHangoutContacts = _hangoutContacts ?? [];
+      var safeHangoutContacts = _hangoutContacts;
       body = ListView(
         children: [
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: TextField(
               textCapitalization: TextCapitalization.sentences,
               autocorrect: false,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.search),
               ),
               controller: typeaheadController,
@@ -235,7 +233,7 @@ class _ContactsPageState extends State<ContactsPage> {
             ),
           ),
           ...(safeHangoutContacts
-              .map((c) => ContactPageContact(c, _hangouts, _friends))
+              .map((c) => FriendsPageContact(c, _hangouts, _friends))
               .toList()
               .map((c) => ContactTile(
                     contact: c.contact,
@@ -243,7 +241,9 @@ class _ContactsPageState extends State<ContactsPage> {
                     frequency: c.frequency,
                     latestHangout: c.latestHangout,
                   ))),
-          safeHangoutContacts.isNotEmpty ? Divider() : SizedBox.shrink(),
+          safeHangoutContacts.isNotEmpty
+              ? const Divider()
+              : const SizedBox.shrink(),
           ...(_unusedContacts ?? []).map(
               (c) => ContactTile(contact: c, onPressed: _handleContactPress)),
         ],
@@ -253,12 +253,12 @@ class _ContactsPageState extends State<ContactsPage> {
     return GestureDetector(
       child: Scaffold(
         appBar: AppBar(
-          title: (Text('Contacts')),
+          title: (const Text('Contacts')),
         ),
         body: body,
       ),
       onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
+        FocusScope.of(context).requestFocus(FocusNode());
       },
     );
   }

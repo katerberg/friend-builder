@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:friend_builder/pages/friends/friends_page.dart';
 
 class FriendRouter extends StatefulWidget {
-  const FriendRouter({super.key});
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  const FriendRouter({
+    super.key,
+    required this.flutterLocalNotificationsPlugin,
+  });
 
   @override
   State<FriendRouter> createState() => _FriendRouterState();
@@ -32,7 +38,9 @@ class _FriendRouterState extends State<FriendRouter> {
       case 1:
         page = const Text('bar');
       case 2:
-        page = const Text('contacts');
+        page = FriendsPage(
+            flutterLocalNotificationsPlugin:
+                widget.flutterLocalNotificationsPlugin);
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
