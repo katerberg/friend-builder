@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/pages/friends/friends_page.dart';
+import 'package:friend_builder/pages/log/log_page.dart';
 
 class FriendRouter extends StatefulWidget {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -28,6 +29,13 @@ class _FriendRouterState extends State<FriendRouter> {
   //     flutterLocalNotificationsPlugin:
   //         widget.flutterLocalNotificationsPlugin),
   // ];
+
+  void _changeTab(int tabIndex) async {
+    setState(() {
+      selectedIndex = tabIndex;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -36,7 +44,10 @@ class _FriendRouterState extends State<FriendRouter> {
       case 0:
         page = const Text('foo');
       case 1:
-        page = const Text('bar');
+        page = LogPage(
+            onSubmit: () => _changeTab(0),
+            flutterLocalNotificationsPlugin:
+                widget.flutterLocalNotificationsPlugin);
       case 2:
         page = FriendsPage(
             flutterLocalNotificationsPlugin:

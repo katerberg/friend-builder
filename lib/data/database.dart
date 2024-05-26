@@ -138,18 +138,19 @@ class DBProvider {
 
   Future _insertContact(EncodableContact c, Hangout hangout) async {
     final db = await database;
+    List<Object?> variables = [
+      c.displayName,
+      c.familyName,
+      c.middleName,
+      c.givenName,
+      c.identifier,
+      hangout.id,
+      c.avatar
+    ];
     return db.rawInsert(
         "INSERT INTO contacts (displayName,familyName,middleName,givenName,identifier,hangoutId,avatar)"
-        " VALUES (?,?,?,?,?,?,?,?)",
-        [
-          c.displayName,
-          c.familyName,
-          c.middleName,
-          c.givenName,
-          c.identifier,
-          hangout.id,
-          c.avatar
-        ]);
+        " VALUES (?,?,?,?,?,?,?)",
+        variables);
   }
 
   Future _updateContact(EncodableContact c, Hangout hangout) async {

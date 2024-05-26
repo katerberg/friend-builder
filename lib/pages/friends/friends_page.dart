@@ -229,8 +229,9 @@ class FriendsPageState extends State<FriendsPage> {
                   'Missing contacts permission',
                 )),
             OutlinedButton(
-                onPressed: _handleContactPermissionRequest,
-                child: const Text('Change Permissions'))
+              onPressed: _handleContactPermissionRequest,
+              child: const Text('Change Permissions'),
+            )
           ],
         ),
       );
@@ -276,7 +277,9 @@ class FriendsPageState extends State<FriendsPage> {
         body: body,
       ),
       onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
+        if (mounted) {
+          FocusScope.of(context).requestFocus(FocusNode());
+        }
       },
     );
   }
