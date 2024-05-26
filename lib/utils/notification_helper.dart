@@ -55,7 +55,7 @@ Future<void> scheduleNotification(
       id,
       title,
       body,
-      tz.TZDateTime.from(scheduledNotificationDateTime, tz.local),
+      tz.TZDateTime.from(scheduledNotificationDateTime, tz.UTC),
       platformChannelSpecifics,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.wallClockTime);

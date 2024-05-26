@@ -8,10 +8,9 @@ const notesLabel = 'Notes';
 
 class ContactSchedulingDialog extends StatefulWidget {
   final Contact? contact;
-  final Friend friend;
+  final Friend? friend;
 
-  const ContactSchedulingDialog(
-      {super.key, this.contact, required this.friend});
+  const ContactSchedulingDialog({super.key, this.contact, this.friend});
 
   @override
   ContactSchedulingDialogState createState() => ContactSchedulingDialogState();
@@ -26,31 +25,43 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
 
   TextEditingController notesController = TextEditingController(text: '');
 
-  ContactSchedulingDialogState() {
-    selection[oftenLabel] = widget.friend.frequency;
-    selection[notesLabel] = widget.friend.notes;
-    isContactable = widget.friend.isContactable;
-    notesController = TextEditingController(text: widget.friend.notes);
+  @override
+  void initState() {
+    super.initState();
+    if (widget.friend == null && widget.contact == null) {
+      throw ArgumentError('contact and friend cannot both be null');
+    }
+    selection[oftenLabel] = widget.friend?.frequency ?? 'Weekly';
+    selection[notesLabel] = widget.friend?.notes ?? '';
+    isContactable = widget.friend?.isContactable ?? false;
+    notesController = TextEditingController(text: selection[notesLabel]);
+  }
+
+  Friend _getFriendToSubmit() {
+    if (widget.friend != null) {
+      widget.friend!.notes = selection[notesLabel] ?? '';
+      widget.friend!.frequency = selection[oftenLabel] ?? 'Weekly';
+      widget.friend!.isContactable = isContactable;
+      return widget.friend!;
+    }
+    return Friend(
+      contactIdentifier: widget.contact!.id,
+      frequency: selection[oftenLabel] ?? 'Weekly',
+      notes: selection[notesLabel] ?? '',
+      isContactable: isContactable,
+    );
+  }
+
+  void _closePage() {
+    if (mounted) {
+      Navigator.pop(context, _getFriendToSubmit());
+    }
   }
 
   void _handleSelectionTap(String groupName, String selectedValue) {
     setState(() {
       selection[groupName] = selectedValue;
     });
-  }
-
-  Friend _getFriendToSubmit() {
-    widget.friend.notes = selection[notesLabel] ?? '';
-    widget.friend.frequency = selection[oftenLabel] ?? 'Weekly';
-    widget.friend.isContactable = isContactable;
-    return widget.friend;
-  }
-
-  void _closePage() {
-    Navigator.pop(
-      context,
-      _getFriendToSubmit(),
-    );
   }
 
   ButtonStyleButton _getContactButton() {
@@ -61,7 +72,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
       _closePage();
     }
 
-    if (widget.friend.isContactable) {
+    if (widget.friend?.isContactable == true) {
       return TextButton(
         onPressed: onPressed,
         child: const Text(
@@ -130,7 +141,9 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
         ),
       ),
       onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
+        if (mounted) {
+          FocusScope.of(context).requestFocus(FocusNode());
+        }
       },
     );
   }

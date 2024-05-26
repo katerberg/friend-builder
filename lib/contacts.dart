@@ -1,6 +1,5 @@
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'dart:developer';
 
 export 'package:flutter_contacts/flutter_contacts.dart' show Contact;
 

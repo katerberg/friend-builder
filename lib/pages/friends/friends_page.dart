@@ -135,15 +135,36 @@ class FriendsPageState extends State<FriendsPage> {
     _handleContactSelection('');
   }
 
+  void _upsertNotifications(Friend result, Contact contact) {
+    List<Hangout> contactHangouts = _hangouts
+        .where((element) =>
+            element.contacts.any((hc) => hc.identifier == contact.id))
+        .toList();
+    DateTime latestTime = contactHangouts.isEmpty
+        ? DateTime.now()
+        : contactHangouts
+            .reduce((value, element) =>
+                element.when.compareTo(value.when) > 0 ? element : value)
+            .when;
+    scheduleNotification(
+      widget.flutterLocalNotificationsPlugin,
+      contact.id.hashCode,
+      'Want to chat with ${contact.displayName}?',
+      "It's been a minute!",
+      Scheduling.howLong(latestTime, result.frequency),
+    );
+  }
+
   Future<void> _handleContactPress(Contact? contact) async {
     List<Friend>? friends = await Storage.getFriends();
     Friend? friend = friends?.firstWhereOrNull(
       (element) => element.contactIdentifier == contact?.id,
     );
-    if (friend == null || contact == null) {
+    if (contact == null) {
       return;
     }
     Friend? result = await Navigator.push<Friend>(
+      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
         builder: (context) =>
@@ -155,23 +176,7 @@ class FriendsPageState extends State<FriendsPage> {
       return;
     }
     if (result.isContactable == true) {
-      List<Hangout> contactHangouts = _hangouts
-          .where((element) =>
-              element.contacts.any((hc) => hc.identifier == contact.id))
-          .toList();
-      DateTime latestTime = contactHangouts.isEmpty
-          ? DateTime.now()
-          : contactHangouts
-              .reduce((value, element) =>
-                  element.when.compareTo(value.when) > 0 ? element : value)
-              .when;
-      scheduleNotification(
-        widget.flutterLocalNotificationsPlugin,
-        contact.id.hashCode,
-        'Want to chat with ${contact.displayName}?',
-        "It's been a minute!",
-        Scheduling.howLong(latestTime, result.frequency),
-      );
+      _upsertNotifications(result, contact);
     } else {
       cancelNotification(
           widget.flutterLocalNotificationsPlugin, contact.id.hashCode);
@@ -200,7 +205,7 @@ class FriendsPageState extends State<FriendsPage> {
         (element.displayName).toLowerCase().contains(pattern.toLowerCase()));
     if (exactMatches.isNotEmpty) {
       return _handleContactsFilter(exactMatches.toList()
-        ..sort((a, b) => (a.displayName ?? '').compareTo(b.displayName)));
+        ..sort((a, b) => (a.displayName).compareTo(b.displayName)));
     }
     var matchingLevel = _contacts.where((element) =>
         StringUtils.getComparison(element.displayName, pattern) > 0.3);
@@ -257,7 +262,7 @@ class FriendsPageState extends State<FriendsPage> {
           safeHangoutContacts.isNotEmpty
               ? const Divider()
               : const SizedBox.shrink(),
-          ...(_unusedContacts ?? []).map(
+          ...(_unusedContacts).map(
               (c) => ContactTile(contact: c, onPressed: _handleContactPress)),
         ],
       );
