@@ -10,6 +10,7 @@ import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -80,7 +81,6 @@ class FriendsPageState extends State<FriendsPage> {
   }
 
   Future<void> _getContacts() async {
-    // TODO: This is where the performance issue is.
     var contactPermission = await ContactPermissionService().getContacts();
     setState(() {
       _missingPermission = contactPermission.missingPermission;
@@ -207,13 +207,26 @@ class FriendsPageState extends State<FriendsPage> {
     _handleContactsFilter(matchingLevel.isNotEmpty ? matchingLevel : _contacts);
   }
 
+  void _handleContactPermissionRequest() {
+    openAppSettings();
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget body;
     if (_missingPermission) {
-      body = const Center(
-        child: Text(
-          'Missing contacts permission',
+      body = Center(
+        child: Column(
+          children: [
+            Container(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: const Text(
+                  'Missing contacts permission',
+                )),
+            OutlinedButton(
+                onPressed: _handleContactPermissionRequest,
+                child: const Text('Change Permissions'))
+          ],
         ),
       );
     } else {

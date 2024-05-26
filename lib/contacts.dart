@@ -1,5 +1,6 @@
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'dart:developer';
 
 export 'package:flutter_contacts/flutter_contacts.dart' show Contact;
 
@@ -20,7 +21,8 @@ class ContactPermissionService {
   }
 
   Future<PermissionStatus?> _getPermission() async {
-    final PermissionStatus permission = await Permission.contacts.status;
+    final PermissionStatus permission = await Permission.contacts.request();
+
     if (permission != PermissionStatus.granted &&
         permission != PermissionStatus.denied) {
       final Map<Permission, PermissionStatus> permissionStatus =
