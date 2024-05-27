@@ -11,22 +11,18 @@ final BehaviorSubject<String> selectNotificationSubject =
 
 Future<void> initNotifications(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
-  // var initializationSettingsAndroid = const AndroidInitializationSettings('app_icon');
-  // var initializationSettingsIOS = DarwinInitializationSettings(
-  //     requestAlertPermission: false,
-  //     requestBadgePermission: false,
-  //     requestSoundPermission: false,
-  //     onDidReceiveLocalNotification:
-  //         (int id, String title, String body, String payload) async {
-  //       didReceiveLocalNotificationSubject.add(ReminderNotification(
-  //           id: "$id", title: title, body: body, payload: payload));
-  //     });
-  // var initializationSettings = InitializationSettings(
-  //     android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-  // await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-  //     onSelectNotification: (String payload) async {
-  //   selectNotificationSubject.add(payload);
-  // });
+  var initializationSettingsAndroid =
+      const AndroidInitializationSettings('app_icon');
+  var initializationSettingsIOS = const DarwinInitializationSettings(
+    requestAlertPermission: false,
+    requestBadgePermission: false,
+    requestSoundPermission: false,
+  );
+  var initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+  );
 }
 
 Future<void> cancelNotification(

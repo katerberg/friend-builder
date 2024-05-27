@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/pages/friends/components/selection_choice_group.dart';
 import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/permissions.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 const oftenLabel = 'How often do you want to contact this person?';
 const notesLabel = 'Notes';
@@ -16,14 +18,21 @@ class ContactSchedulingDialog extends StatefulWidget {
   ContactSchedulingDialogState createState() => ContactSchedulingDialogState();
 }
 
-class ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
+class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
+    with WidgetsBindingObserver {
   Map<String, String> selection = {
     oftenLabel: 'Weekly',
     notesLabel: '',
   };
   bool isContactable = false;
+  bool _hasNotificationsPermissions = false;
 
   TextEditingController notesController = TextEditingController(text: '');
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _setCurrentNotificationPermissions();
+  }
 
   @override
   void initState() {
@@ -31,10 +40,25 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
     if (widget.friend == null && widget.contact == null) {
       throw ArgumentError('contact and friend cannot both be null');
     }
+    WidgetsBinding.instance.addObserver(this);
+    _setCurrentNotificationPermissions();
     selection[oftenLabel] = widget.friend?.frequency ?? 'Weekly';
     selection[notesLabel] = widget.friend?.notes ?? '';
     isContactable = widget.friend?.isContactable ?? false;
     notesController = TextEditingController(text: selection[notesLabel]);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void _setCurrentNotificationPermissions() {
+    PermissionsUtils.isMissingPermission(Permission.notification)
+        .then((value) => setState(() {
+              _hasNotificationsPermissions = !value;
+            }));
   }
 
   Friend _getFriendToSubmit() {
@@ -72,6 +96,10 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
       _closePage();
     }
 
+    requestPermissions() {
+      openAppSettings();
+    }
+
     if (widget.friend?.isContactable == true) {
       return TextButton(
         onPressed: onPressed,
@@ -81,14 +109,18 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog> {
         ),
       );
     }
+
     return TextButton(
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(Colors.blue),
         foregroundColor: MaterialStateProperty.all(Colors.white),
       ),
-      onPressed: onPressed,
-      child: const Text('I want notifications for this person',
-          style: TextStyle(color: Colors.white)),
+      onPressed: !_hasNotificationsPermissions ? requestPermissions : onPressed,
+      child: Text(
+          !_hasNotificationsPermissions
+              ? 'Enable notifications'
+              : 'I want notifications for this person',
+          style: const TextStyle(color: Colors.white)),
     );
   }
 
