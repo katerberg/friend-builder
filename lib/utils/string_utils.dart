@@ -3,7 +3,7 @@ class StringUtils {
     if (str.length < 2) {
       return [];
     }
-    List<String> bigrams = [];
+    List<String?> bigrams = [];
     for (var i = 0; i < str.length - 1; i++) {
       bigrams.add(str.toLowerCase().substring(i, i + 2));
     }

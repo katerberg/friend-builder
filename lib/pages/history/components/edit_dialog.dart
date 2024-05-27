@@ -69,6 +69,7 @@ class EditDialogState extends State<EditDialog> {
                       children: [
                         FriendSelector(
                             selectedFriends: _selectedFriends,
+                            typeaheadController: typeaheadController,
                             addFriend: _setFriend),
                         SelectedFriendChips(
                           selectedFriends: _selectedFriends,

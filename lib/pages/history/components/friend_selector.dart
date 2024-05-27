@@ -8,15 +8,15 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 class FriendSelector extends StatelessWidget {
   final List<Contact> selectedFriends;
   final void Function(Contact friend) addFriend;
-  final TextEditingController typeaheadController =
-      TextEditingController(text: '');
+  final TextEditingController typeaheadController;
   final String? emptyLabel;
   final String? populatedLabel;
 
-  FriendSelector(
+  const FriendSelector(
       {super.key,
       required this.selectedFriends,
       required this.addFriend,
+      required this.typeaheadController,
       this.emptyLabel,
       this.populatedLabel});
 
@@ -31,14 +31,14 @@ class FriendSelector extends StatelessWidget {
     ContactPermission contactPermission =
         await ContactPermissionService().getContacts();
     if (!contactPermission.missingPermission) {
-      var val = await Future.value(contactPermission.contacts
+      var listOfFriends = await Future.value(contactPermission.contacts
           .where((element) =>
               !selectedFriends.any((selected) => selected.id == element.id) &&
               (pattern.length < 2 ||
                   StringUtils.getComparison(element.displayName, pattern) >
                       0.1))
           .toList());
-      return val
+      return listOfFriends
         ..sort((a, b) {
           RegExp regExp = RegExp(
             '^$pattern',
@@ -59,12 +59,13 @@ class FriendSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TypeAheadField(
+      controller: typeaheadController,
       builder: (context, controller, focusNode) {
         return TextField(
-          controller: typeaheadController,
+          controller: controller,
           focusNode: focusNode,
           cursorColor: TextSelectionTheme.of(context).cursorColor,
-          style: const TextStyle(color: Colors.white, fontSize: 24),
+          style: const TextStyle(fontSize: 24),
           autofocus: false,
           decoration: InputDecoration(
             labelText: _getInputLabelText(),
@@ -79,6 +80,7 @@ class FriendSelector extends StatelessWidget {
         );
       },
       emptyBuilder: (context) => const NoItemsFound(),
+      debounceDuration: Duration.zero,
       onSelected: addFriend,
     );
   }

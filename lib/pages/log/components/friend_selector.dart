@@ -8,14 +8,15 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 class FriendSelector extends StatelessWidget {
   final List<Contact> selectedFriends;
   final void Function(Contact friend) addFriend;
-  final TextEditingController _typeaheadController = TextEditingController();
+  final TextEditingController typeaheadController;
   final String? emptyLabel;
   final String? populatedLabel;
 
-  FriendSelector(
+  const FriendSelector(
       {super.key,
       required this.selectedFriends,
       required this.addFriend,
+      required this.typeaheadController,
       this.emptyLabel,
       this.populatedLabel});
 
@@ -70,9 +71,10 @@ class FriendSelector extends StatelessWidget {
     const inputBorder = UnderlineInputBorder(
         borderSide: BorderSide(width: 1, color: Colors.white));
     return TypeAheadField(
+      controller: typeaheadController,
       builder: (context, controller, focusNode) {
         return TextField(
-          controller: _typeaheadController,
+          controller: controller,
           focusNode: focusNode,
           cursorColor: Colors.white,
           style: const TextStyle(color: Colors.white, fontSize: 24),

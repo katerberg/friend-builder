@@ -45,7 +45,11 @@ class LogPageState extends State<LogPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> itemsToShow = [
-      FriendSelector(selectedFriends: _selectedFriends, addFriend: _setFriend),
+      FriendSelector(
+        selectedFriends: _selectedFriends,
+        addFriend: _setFriend,
+        typeaheadController: typeaheadController,
+      ),
       SelectedFriendChips(
         selectedFriends: _selectedFriends,
         onRemoveFriend: _resetFriend,
