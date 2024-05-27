@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/pages/friends/friends_page.dart';
 import 'package:friend_builder/pages/log/log_page.dart';
+import 'package:friend_builder/pages/history/history_page.dart';
 
 class FriendRouter extends StatefulWidget {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -42,7 +43,9 @@ class _FriendRouterState extends State<FriendRouter> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = const Text('foo');
+        page = HistoryPage(
+            flutterLocalNotificationsPlugin:
+                widget.flutterLocalNotificationsPlugin);
       case 1:
         page = LogPage(
             onSubmit: () => _changeTab(0),

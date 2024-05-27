@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 class HangoutForm extends StatefulWidget {
   final void Function() onSubmit;
   final List<Contact> selectedFriends;
-  final Hangout? hangout;
+  final Hangout hangout;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   const HangoutForm({
@@ -21,7 +21,7 @@ class HangoutForm extends StatefulWidget {
     required this.onSubmit,
     required this.selectedFriends,
     required this.flutterLocalNotificationsPlugin,
-    this.hangout,
+    required this.hangout,
   });
 
   @override
@@ -44,11 +44,8 @@ class HangoutFormState extends State<HangoutForm> {
   @override
   void initState() {
     super.initState();
-    if (widget.hangout != null) {
-      _data = widget.hangout!;
-    }
-    selectedDate =
-        widget.hangout != null ? widget.hangout!.when : DateTime.now();
+    _data = widget.hangout;
+    selectedDate = widget.hangout.when;
     dateController = TextEditingController(text: _formatDate(selectedDate));
   }
 
@@ -72,30 +69,33 @@ class HangoutFormState extends State<HangoutForm> {
     _unfocus();
   }
 
+  void _unfocus() {
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
+
   Future<void> _handleNotificationScheduling(List<Hangout> hangouts) async {
     List<Friend>? friends = await Storage.getFriends();
     for (var contact in widget.selectedFriends) {
       Friend? friend = friends?.firstWhereOrNull(
         (element) => element.contactIdentifier == contact.id,
       );
-      if (friend == null || !friend.isContactable) {
-        return;
+      if (friend != null && friend.isContactable) {
+        List<Hangout> contactHangouts = hangouts
+            .where((element) =>
+                element.contacts.any((hc) => hc.identifier == contact.id))
+            .toList();
+        DateTime latestTime = contactHangouts
+            .reduce((value, element) =>
+                element.when.compareTo(value.when) > 0 ? element : value)
+            .when;
+        scheduleNotification(
+          widget.flutterLocalNotificationsPlugin,
+          contact.id.hashCode,
+          'Want to chat with ${contact.displayName}?',
+          "It's been a minute!",
+          Scheduling.howLong(latestTime, friend.frequency),
+        );
       }
-      List<Hangout> contactHangouts = hangouts
-          .where((element) =>
-              element.contacts.any((hc) => hc.identifier == contact.id))
-          .toList();
-      DateTime latestTime = contactHangouts
-          .reduce((value, element) =>
-              element.when.compareTo(value.when) > 0 ? element : value)
-          .when;
-      scheduleNotification(
-        widget.flutterLocalNotificationsPlugin,
-        contact.id.hashCode,
-        'Want to chat with ${contact.displayName}?',
-        "It's been a minute!",
-        Scheduling.howLong(latestTime, friend.frequency),
-      );
     }
   }
 
@@ -132,10 +132,6 @@ class HangoutFormState extends State<HangoutForm> {
     _handleNotesChange(value ?? '');
   }
 
-  void _unfocus() {
-    FocusScope.of(context).requestFocus(FocusNode());
-  }
-
   void _handleDateChange(String value) {
     _data.when = selectedDate;
   }
@@ -152,23 +148,16 @@ class HangoutFormState extends State<HangoutForm> {
           .toList();
     });
 
-    const inputBorder = UnderlineInputBorder(
-        borderSide: BorderSide(width: 1, color: Colors.white));
-
-    return Container(
-      decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+    return Padding(
+      padding: const EdgeInsets.all(16),
       child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextFormField(
-              style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
-                labelText: 'When',
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-                focusedBorder: inputBorder,
-                enabledBorder: inputBorder,
+                labelText: 'When?',
               ),
               controller: dateController,
               onTap: () => _selectWhen(context),
@@ -176,21 +165,13 @@ class HangoutFormState extends State<HangoutForm> {
               onSaved: _handleNullableDateChange,
             ),
             TextFormField(
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelStyle: TextStyle(color: Colors.white),
-                labelText: 'Notes',
-                floatingLabelBehavior: FloatingLabelBehavior.never,
-                focusedBorder: inputBorder,
-                enabledBorder: inputBorder,
-              ),
-              cursorColor: Colors.white,
               autocorrect: true,
               enableSuggestions: true,
-              onFieldSubmitted: (String string) {
-                _handleSubmitPress();
-              },
               textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(
+                labelText: 'Notes',
+              ),
+              maxLines: 8,
               initialValue: _data.notes,
               onChanged: _handleNotesChange,
               onSaved: _handleNullableNotesChange,

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 class EncodableContact extends Contact {
   @override
+  // ignore: overridden_fields
   String displayName = "";
   String middleName = "";
   String givenName = "";
