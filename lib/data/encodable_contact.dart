@@ -22,12 +22,21 @@ class EncodableContact extends Contact {
   });
 
   EncodableContact.fromContact(Contact contact) {
-    displayName = contact.displayName;
-    middleName = contact.name.middle;
-    givenName = contact.name.first;
-    identifier = contact.id;
-    familyName = contact.name.last;
-    avatar = contact.photo;
+    if (contact is EncodableContact) {
+      displayName = contact.displayName;
+      middleName = contact.name.middle;
+      givenName = contact.name.first;
+      identifier = contact.id;
+      familyName = contact.name.last;
+      avatar = contact.photo ?? contact.avatar;
+    } else {
+      displayName = contact.displayName;
+      middleName = contact.name.middle;
+      givenName = contact.name.first;
+      identifier = contact.id;
+      familyName = contact.name.last;
+      avatar = contact.photo;
+    }
   }
 
   CircleAvatar getAvatar(context, [double? fontSize]) {
