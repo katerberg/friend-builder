@@ -15,7 +15,8 @@ class ContactPermission {
 class ContactPermissionService {
   Future<ContactPermission> getContacts() async {
     bool missingPermission = await _isMissingPermission();
-    List<Contact> contacts = await FlutterContacts.getContacts();
+    List<Contact> contacts = await FlutterContacts.getContacts(
+        withPhoto: true, withProperties: true);
     return ContactPermission(missingPermission, contacts);
   }
 

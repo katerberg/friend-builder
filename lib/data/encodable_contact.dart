@@ -33,10 +33,10 @@ class EncodableContact extends Contact {
   CircleAvatar getAvatar(context, [double? fontSize]) {
     if (avatar == null) {
       return CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Theme.of(context).primaryColor,
         child: Text(
           initials(),
-          style: TextStyle(fontSize: fontSize ?? 14),
+          style: TextStyle(fontSize: fontSize ?? 14, color: Colors.white),
         ),
       );
     }
