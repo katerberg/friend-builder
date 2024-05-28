@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/pages/friends/components/selection_choice_group.dart';
 import 'package:friend_builder/data/friend.dart';
@@ -97,6 +98,10 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     return (name == '') ? 'this person' : name;
   }
 
+  void _editContactPressed() {
+    FlutterContacts.openExternalEdit(widget.contact!.id);
+  }
+
   ButtonStyleButton _getContactButton() {
     onPressed() {
       setState(() {
@@ -161,6 +166,11 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                       label:
                           'How often do you want to contact ${_getContactName()}?',
                     ),
+                    widget.contact == null
+                        ? Container()
+                        : TextButton(
+                            onPressed: _editContactPressed,
+                            child: const Text('Edit Contact')),
                     Container(
                       padding: const EdgeInsets.all(16),
                       child: TextField(
