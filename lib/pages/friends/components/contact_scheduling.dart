@@ -88,6 +88,15 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     });
   }
 
+  String _getContactName() {
+    var fullName = widget.contact?.displayName.trim();
+    var nickName = widget.contact?.name.nickname.trim();
+    var firstName = widget.contact?.name.first.trim();
+    var name = nickName ?? firstName ?? fullName ?? '';
+
+    return (name == '') ? 'this person' : name;
+  }
+
   ButtonStyleButton _getContactButton() {
     onPressed() {
       setState(() {
@@ -103,9 +112,9 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     if (widget.friend?.isContactable == true) {
       return TextButton(
         onPressed: onPressed,
-        child: const Text(
-          "I don't want reminders for this person",
-          style: TextStyle(color: Color(0xffdd4444)),
+        child: Text(
+          "I don't want reminders for ${_getContactName()}",
+          style: const TextStyle(color: Color(0xffdd4444)),
         ),
       );
     }
@@ -119,7 +128,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
       child: Text(
           !_hasNotificationsPermissions
               ? 'Enable notifications'
-              : 'I want notifications for this person',
+              : 'I want notifications for ${_getContactName()}',
           style: const TextStyle(color: Colors.white)),
     );
   }
@@ -134,12 +143,13 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
           title: Text(widget.contact?.displayName ?? 'Schedule'),
         ),
         body: SafeArea(
-          child: Column(children: [
-            ListView(
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                children: [
-                  SelectionChoiceGroup(
+          child: Column(
+            children: [
+              ListView(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  children: [
+                    SelectionChoiceGroup(
                       choices: const [
                         'Weekly',
                         'Monthly',
@@ -148,28 +158,32 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                       ],
                       onSelect: _handleSelectionTap,
                       selection: selection[oftenLabel] ?? '',
-                      label: oftenLabel),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    child: TextField(
-                      controller: notesController,
-                      onChanged: (newVal) =>
-                          _handleSelectionTap(notesLabel, newVal),
-                      autocorrect: true,
-                      enableSuggestions: false,
-                      decoration: const InputDecoration(labelText: notesLabel),
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      textCapitalization: TextCapitalization.sentences,
+                      label:
+                          'How often do you want to contact ${_getContactName()}?',
                     ),
-                  ),
-                ]),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: _getContactButton(),
-            ),
-          ]),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: notesController,
+                        onChanged: (newVal) =>
+                            _handleSelectionTap(notesLabel, newVal),
+                        autocorrect: true,
+                        enableSuggestions: false,
+                        decoration:
+                            const InputDecoration(labelText: notesLabel),
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
+                        textCapitalization: TextCapitalization.sentences,
+                      ),
+                    ),
+                  ]),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _getContactButton(),
+              ),
+            ],
+          ),
         ),
       ),
       onTap: () {

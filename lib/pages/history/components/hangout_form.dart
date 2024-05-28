@@ -1,8 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:friend_builder/permissions.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
 import 'package:friend_builder/data/friend.dart';
