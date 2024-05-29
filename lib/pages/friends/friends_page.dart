@@ -132,7 +132,7 @@ class FriendsPageState extends State<FriendsPage> {
   void _clearTextField() {
     typeaheadController.text = '';
     FocusScope.of(context).requestFocus(FocusNode());
-    _handleContactSelection('');
+    _handleContactChange('');
   }
 
   void _upsertNotifications(Friend result, Contact contact) {
@@ -200,7 +200,7 @@ class FriendsPageState extends State<FriendsPage> {
     });
   }
 
-  void _handleContactSelection(String pattern) {
+  void _handleContactChange(String pattern) {
     var exactMatches = _contacts.where((element) =>
         (element.displayName).toLowerCase().contains(pattern.toLowerCase()));
     if (exactMatches.isNotEmpty) {
@@ -248,7 +248,7 @@ class FriendsPageState extends State<FriendsPage> {
                 prefixIcon: Icon(Icons.search),
               ),
               controller: typeaheadController,
-              onChanged: _handleContactSelection,
+              onChanged: _handleContactChange,
             ),
           ),
           ...(safeHangoutContacts

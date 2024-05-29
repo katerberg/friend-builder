@@ -80,7 +80,7 @@ class FriendSelector extends StatelessWidget {
         );
       },
       emptyBuilder: (context) => const NoItemsFound(),
-      debounceDuration: Duration.zero,
+      debounceDuration: const Duration(milliseconds: 200),
       onSelected: addFriend,
     );
   }

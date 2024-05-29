@@ -78,7 +78,7 @@ class FriendSelector extends StatelessWidget {
           focusNode: focusNode,
           cursorColor: Colors.white,
           style: const TextStyle(color: Colors.white, fontSize: 24),
-          autofocus: true,
+          autofocus: false,
           decoration: InputDecoration(
             floatingLabelBehavior: FloatingLabelBehavior.never,
             focusedBorder: inputBorder,
@@ -96,7 +96,7 @@ class FriendSelector extends StatelessWidget {
         );
       },
       emptyBuilder: (context) => const NoItemsFound(),
-      debounceDuration: Duration.zero,
+      debounceDuration: const Duration(milliseconds: 200),
       onSelected: addFriend,
     );
   }
