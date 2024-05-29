@@ -263,7 +263,7 @@ class FriendsPageState extends State<FriendsPage> {
           safeHangoutContacts.isNotEmpty
               ? const Divider()
               : const SizedBox.shrink(),
-          ...(_unusedContacts).map(
+          ...(_unusedContacts).whereNot((c) => c.displayName == '').map(
               (c) => ContactTile(contact: c, onPressed: _handleContactPress)),
         ],
       );
