@@ -24,10 +24,14 @@ class EncodableContact extends Contact {
   EncodableContact.fromContact(Contact contact) {
     if (contact is EncodableContact) {
       displayName = contact.displayName;
-      middleName = contact.name.middle;
-      givenName = contact.name.first;
-      identifier = contact.id;
-      familyName = contact.name.last;
+      middleName =
+          contact.middleName == '' ? contact.middleName : contact.name.middle;
+      givenName =
+          contact.givenName == '' ? contact.name.first : contact.givenName;
+      identifier = contact.identifier == '' ? contact.id : contact.identifier;
+      id = contact.id == '' ? contact.identifier : contact.id;
+      familyName =
+          contact.familyName == '' ? contact.name.last : contact.familyName;
       avatar = contact.photo ?? contact.avatar;
     } else {
       displayName = contact.displayName;
