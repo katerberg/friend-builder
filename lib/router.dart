@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:friend_builder/splash_screen.dart';
+import 'package:friend_builder/pages/start_screen.dart';
+import 'package:friend_builder/pages/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter/material.dart';
@@ -91,19 +92,22 @@ class _FriendRouterState extends State<FriendRouter> {
         googleFontsPending: _googleFontsPending,
       );
     } else if (firstTime == true) {
-      content = Column(children: [
-        Expanded(
-          child: LogPage(
-              onSubmit: () {
-                setState(() {
-                  firstTime = false;
-                });
-                _changeTab(0);
-              },
-              flutterLocalNotificationsPlugin:
-                  widget.flutterLocalNotificationsPlugin),
-        ),
-      ]);
+      content = Column(
+        children: [
+          Expanded(
+            child: StartScreen(
+                googleFontsPending: _googleFontsPending,
+                onSubmit: () {
+                  setState(() {
+                    firstTime = false;
+                  });
+                  _changeTab(1);
+                },
+                flutterLocalNotificationsPlugin:
+                    widget.flutterLocalNotificationsPlugin),
+          ),
+        ],
+      );
     } else {
       content = Column(children: [
         Expanded(child: mainArea),

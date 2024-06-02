@@ -19,10 +19,10 @@ class MissingContactsPermission extends StatelessWidget {
               child: const Text(
                 'Missing contacts permission',
               )),
-          OutlinedButton(
+          ElevatedButton(
             style: isWhite
                 ? null
-                : OutlinedButton.styleFrom(foregroundColor: Colors.white),
+                : ElevatedButton.styleFrom(foregroundColor: Colors.white),
             onPressed: _handleContactPermissionRequest,
             child: const Text('Change Permissions'),
           )

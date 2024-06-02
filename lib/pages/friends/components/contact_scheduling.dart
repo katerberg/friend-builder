@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:friend_builder/contacts.dart';
 import 'package:friend_builder/pages/friends/components/selection_choice_group.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/permissions.dart';
