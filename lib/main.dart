@@ -19,10 +19,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const color = Color(0xFF2898D5);
     return MaterialApp(
         title: _title,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: color,
+            primary: color,
+          ),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         home: FriendRouter(

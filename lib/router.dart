@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'package:google_fonts/google_fonts.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/pages/friends/friends_page.dart';
 import 'package:friend_builder/pages/log/log_page.dart';
 import 'package:friend_builder/pages/history/history_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FriendRouter extends StatefulWidget {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -18,18 +22,35 @@ class FriendRouter extends StatefulWidget {
 class _FriendRouterState extends State<FriendRouter> {
   var selectedIndex = 1;
 
-  // List<Widget> tabs = <Widget>[
-  // ResultsPage(
-  //   flutterLocalNotificationsPlugin: widget.flutterLocalNotificationsPlugin,
-  // ),
-  // LogPage(
-  //   onSubmit: () => _changeTab(0),
-  //   flutterLocalNotificationsPlugin: widget.flutterLocalNotificationsPlugin,
-  // ),
-  // ContactsPage(
-  //     flutterLocalNotificationsPlugin:
-  //         widget.flutterLocalNotificationsPlugin),
-  // ];
+  bool? firstTime;
+  late Future _googleFontsPending;
+
+  void navigationPageHome() {}
+
+  Future<void> _handleFirstLoad() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    Timer(const Duration(seconds: 1), () {
+      if (preferences.getBool('first_time') ?? true) {
+        preferences.setBool('first_time', false);
+        setState(() {
+          firstTime = true;
+        });
+      } else {
+        setState(() {
+          firstTime = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    _googleFontsPending =
+        GoogleFonts.pendingFonts([GoogleFonts.londrinaSketch]);
+    _handleFirstLoad();
+    super.initState();
+  }
 
   void _changeTab(int tabIndex) async {
     setState(() {
@@ -63,46 +84,95 @@ class _FriendRouterState extends State<FriendRouter> {
         color: colorScheme.surfaceVariant,
         child: AnimatedSwitcher(duration: Durations.medium1, child: page));
 
-    return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        body: Column(
-          children: [
-            Expanded(child: mainArea),
-            BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'History',
+    Widget content;
+    if (firstTime == null) {
+      var titleStyle = GoogleFonts.getFont(
+        'Londrina Sketch',
+        fontSize: 60,
+        fontWeight: FontWeight.w900,
+        backgroundColor: colorScheme.primary,
+      );
+
+      content = FutureBuilder(
+          future: _googleFontsPending,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const SizedBox();
+            }
+
+            return ColoredBox(
+              color: colorScheme.primary,
+              child: SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'Friends',
+                          style: titleStyle,
+                        ),
+                      ),
+                    ),
+                    Image.asset(
+                      'logo/splash.png',
+                      fit: BoxFit.cover,
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'Builder',
+                          style: titleStyle,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.note_add,
-                  ),
-                  label: 'Log',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.people),
-                  label: 'Friends',
-                ),
-              ],
-              currentIndex: selectedIndex,
-              backgroundColor: selectedIndex != 1
-                  ? Theme.of(context).canvasColor
-                  : Theme.of(context).primaryColor,
-              selectedItemColor: selectedIndex != 1
-                  ? Theme.of(context).primaryColor
-                  : Colors.white,
-              unselectedItemColor: selectedIndex != 1
-                  ? Theme.of(context).textTheme.bodySmall!.color
-                  : Colors.white70,
-              onTap: (value) {
-                setState(() {
-                  selectedIndex = value;
-                });
-              },
+              ),
+            );
+          });
+    } else {
+      content = Column(children: [
+        Expanded(child: mainArea),
+        BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'History',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.note_add,
+              ),
+              label: 'Log',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: 'Friends',
             ),
           ],
+          currentIndex: selectedIndex,
+          backgroundColor: selectedIndex != 1
+              ? Theme.of(context).canvasColor
+              : Theme.of(context).primaryColor,
+          selectedItemColor: selectedIndex != 1
+              ? Theme.of(context).primaryColor
+              : Colors.white,
+          unselectedItemColor: selectedIndex != 1
+              ? Theme.of(context).textTheme.bodySmall!.color
+              : Colors.white70,
+          onTap: (value) {
+            setState(() {
+              selectedIndex = value;
+            });
+          },
         ),
+      ]);
+    }
+
+    return LayoutBuilder(builder: (context, constraints) {
+      return Scaffold(
+        body: content,
       );
     });
   }
