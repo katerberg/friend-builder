@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
 import 'package:collection/collection.dart';
+import 'package:friend_builder/missing_contacts_permission.dart';
 import 'package:friend_builder/utils/string_utils.dart';
 import 'package:friend_builder/pages/friends/components/contact_scheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
@@ -10,7 +11,6 @@ import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -212,28 +212,12 @@ class FriendsPageState extends State<FriendsPage> {
     _handleContactsFilter(matchingLevel.isNotEmpty ? matchingLevel : _contacts);
   }
 
-  void _handleContactPermissionRequest() {
-    openAppSettings();
-  }
-
   @override
   Widget build(BuildContext context) {
     Widget body;
     if (_missingPermission) {
-      body = Center(
-        child: Column(
-          children: [
-            Container(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: const Text(
-                  'Missing contacts permission',
-                )),
-            OutlinedButton(
-              onPressed: _handleContactPermissionRequest,
-              child: const Text('Change Permissions'),
-            )
-          ],
-        ),
+      body = const MissingContactsPermission(
+        isWhite: true,
       );
     } else {
       var safeHangoutContacts = _hangoutContacts;

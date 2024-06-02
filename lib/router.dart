@@ -90,6 +90,20 @@ class _FriendRouterState extends State<FriendRouter> {
       content = SplashScreen(
         googleFontsPending: _googleFontsPending,
       );
+    } else if (firstTime == true) {
+      content = Column(children: [
+        Expanded(
+          child: LogPage(
+              onSubmit: () {
+                setState(() {
+                  firstTime = false;
+                });
+                _changeTab(0);
+              },
+              flutterLocalNotificationsPlugin:
+                  widget.flutterLocalNotificationsPlugin),
+        ),
+      ]);
     } else {
       content = Column(children: [
         Expanded(child: mainArea),

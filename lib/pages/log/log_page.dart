@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/missing_contacts_permission.dart';
 import 'package:friend_builder/pages/log/components/friend_selector.dart';
 import 'package:friend_builder/pages/log/components/hangout_form.dart';
 import 'package:friend_builder/pages/log/components/selected_friend_chips.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LogPage extends StatefulWidget {
   final void Function() onSubmit;
@@ -23,8 +25,8 @@ class LogPageState extends State<LogPage> {
 
   @override
   void initState() {
-    super.initState();
     _selectedFriends = [];
+    super.initState();
   }
 
   void _setFriend(Contact friend) {
@@ -56,6 +58,20 @@ class LogPageState extends State<LogPage> {
         isWhite: true,
       )
     ];
+    itemsToShow.add(
+      FutureBuilder(
+        future: Permission.contacts.status,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done ||
+              snapshot.data != PermissionStatus.permanentlyDenied) {
+            return const SizedBox();
+          }
+          return const MissingContactsPermission(
+            isWhite: false,
+          );
+        },
+      ),
+    );
     if (_selectedFriends.isNotEmpty) {
       itemsToShow.add(Row(children: [
         Expanded(
