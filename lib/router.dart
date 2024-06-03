@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:friend_builder/pages/start_screen.dart';
+import 'package:friend_builder/pages/onboarding/start_screen.dart';
 import 'package:friend_builder/pages/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
