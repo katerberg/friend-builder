@@ -38,11 +38,11 @@ class StartScreenState extends State<StartScreen> {
           'Londrina Sketch',
           fontSize: 60,
           fontWeight: FontWeight.w900,
-          backgroundColor: colorScheme.primary,
+          color: colorScheme.background,
         );
-        return ColoredBox(
-          color: colorScheme.primary,
-          child: SafeArea(
+        return Scaffold(
+          backgroundColor: colorScheme.primary,
+          body: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -52,9 +52,13 @@ class StartScreenState extends State<StartScreen> {
                     style: titleStyle,
                   ),
                 ),
-                Image.asset(
-                  'logo/splash.png',
-                  fit: BoxFit.cover,
+                Expanded(
+                  child: Center(
+                    child: Image.asset(
+                      'logo/splash.png',
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),

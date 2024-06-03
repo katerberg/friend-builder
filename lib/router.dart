@@ -32,18 +32,21 @@ class _FriendRouterState extends State<FriendRouter> {
   Future<void> _handleFirstLoad() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    Timer(const Duration(seconds: 1), () {
-      if (preferences.getBool('first_time') ?? true) {
-        preferences.setBool('first_time', false);
-        setState(() {
-          firstTime = true;
-        });
-      } else {
-        setState(() {
-          firstTime = false;
-        });
-      }
-    });
+    Timer(
+      const Duration(seconds: 1),
+      () {
+        if (preferences.getBool('first_time') ?? true) {
+          preferences.setBool('first_time', false);
+          setState(() {
+            firstTime = true;
+          });
+        } else {
+          setState(() {
+            firstTime = false;
+          });
+        }
+      },
+    );
   }
 
   @override
@@ -62,30 +65,6 @@ class _FriendRouterState extends State<FriendRouter> {
 
   @override
   Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = HistoryPage(
-            flutterLocalNotificationsPlugin:
-                widget.flutterLocalNotificationsPlugin);
-      case 1:
-        page = LogPage(
-            onSubmit: () => _changeTab(0),
-            flutterLocalNotificationsPlugin:
-                widget.flutterLocalNotificationsPlugin);
-      case 2:
-        page = FriendsPage(
-            flutterLocalNotificationsPlugin:
-                widget.flutterLocalNotificationsPlugin);
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
-    }
-
-    var mainArea = ColoredBox(
-        color: colorScheme.surfaceVariant,
-        child: AnimatedSwitcher(duration: Durations.medium1, child: page));
-
     Widget content;
     if (firstTime == null) {
       content = SplashScreen(
@@ -109,8 +88,33 @@ class _FriendRouterState extends State<FriendRouter> {
         ],
       );
     } else {
+      var colorScheme = Theme.of(context).colorScheme;
+      Widget page;
+      switch (selectedIndex) {
+        case 0:
+          page = HistoryPage(
+              flutterLocalNotificationsPlugin:
+                  widget.flutterLocalNotificationsPlugin);
+        case 1:
+          page = LogPage(
+              onSubmit: () => _changeTab(0),
+              flutterLocalNotificationsPlugin:
+                  widget.flutterLocalNotificationsPlugin);
+        case 2:
+          page = FriendsPage(
+              flutterLocalNotificationsPlugin:
+                  widget.flutterLocalNotificationsPlugin);
+        default:
+          throw UnimplementedError('no widget for $selectedIndex');
+      }
+
       content = Column(children: [
-        Expanded(child: mainArea),
+        Expanded(
+          child: ColoredBox(
+            color: colorScheme.surfaceVariant,
+            child: AnimatedSwitcher(duration: Durations.medium1, child: page),
+          ),
+        ),
         BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
