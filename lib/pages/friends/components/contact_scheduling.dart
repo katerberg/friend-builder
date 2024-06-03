@@ -55,7 +55,8 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   }
 
   void _setCurrentNotificationPermissions() {
-    PermissionsUtils.isMissingPermission(Permission.notification)
+    PermissionsUtils()
+        .isMissingPermission(Permission.notification)
         .then((value) => setState(() {
               _hasNotificationsPermissions = !value;
             }));
