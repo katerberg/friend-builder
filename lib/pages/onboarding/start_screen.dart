@@ -1,27 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class StartScreen extends StatefulWidget {
+class StartScreen extends StatelessWidget {
   final void Function(bool) onSubmit;
   final Future<dynamic> googleFontsPending;
 
-  const StartScreen({
-    super.key,
-    required this.googleFontsPending,
-    required this.onSubmit,
-  });
+  const StartScreen(
+      {super.key, required this.onSubmit, required this.googleFontsPending});
 
-  @override
-  StartScreenState createState() => StartScreenState();
-}
-
-class StartScreenState extends State<StartScreen> {
   void _startAddingFriends() {
-    widget.onSubmit(true);
+    onSubmit(true);
   }
 
   void _skipSetup() {
-    widget.onSubmit(false);
+    onSubmit(false);
   }
 
   @override
@@ -29,7 +21,7 @@ class StartScreenState extends State<StartScreen> {
     var colorScheme = Theme.of(context).colorScheme;
 
     return FutureBuilder(
-      future: widget.googleFontsPending,
+      future: googleFontsPending,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const SizedBox();

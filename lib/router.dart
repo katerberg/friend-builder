@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:friend_builder/pages/onboarding/add_friends_screen.dart';
 import 'package:friend_builder/pages/onboarding/start_screen.dart';
 import 'package:friend_builder/pages/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,12 +81,14 @@ class _FriendRouterState extends State<FriendRouter> {
                 child: StartScreen(
                   googleFontsPending: _googleFontsPending,
                   onSubmit: (bool moveToNextStep) {
-                    setState(() {
-                      firstTime = false;
-                    });
                     if (moveToNextStep) {
-                      onboardingStepper = 1;
+                      setState(() {
+                        onboardingStepper = 1;
+                      });
                     } else {
+                      setState(() {
+                        firstTime = false;
+                      });
                       _changeTab(1);
                     }
                   },
@@ -94,10 +97,15 @@ class _FriendRouterState extends State<FriendRouter> {
             ],
           );
         case 1:
-          content = const Column(
+          content = Column(
             children: [
               Expanded(
-                child: Text('hello'),
+                child: AddFriendsScreen(onSubmit: () {
+                  setState(() {
+                    firstTime = false;
+                  });
+                  _changeTab(1);
+                }),
               ),
             ],
           );
