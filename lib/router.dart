@@ -23,6 +23,7 @@ class FriendRouter extends StatefulWidget {
 
 class _FriendRouterState extends State<FriendRouter> {
   var selectedIndex = 1;
+  var onboardingStepper = 0;
 
   bool? firstTime;
   late Future _googleFontsPending;
@@ -71,22 +72,38 @@ class _FriendRouterState extends State<FriendRouter> {
         googleFontsPending: _googleFontsPending,
       );
     } else if (firstTime == true) {
-      content = Column(
-        children: [
-          Expanded(
-            child: StartScreen(
-                googleFontsPending: _googleFontsPending,
-                onSubmit: () {
-                  setState(() {
-                    firstTime = false;
-                  });
-                  _changeTab(1);
-                },
-                flutterLocalNotificationsPlugin:
-                    widget.flutterLocalNotificationsPlugin),
-          ),
-        ],
-      );
+      switch (onboardingStepper) {
+        case 0:
+          content = Column(
+            children: [
+              Expanded(
+                child: StartScreen(
+                  googleFontsPending: _googleFontsPending,
+                  onSubmit: (bool moveToNextStep) {
+                    setState(() {
+                      firstTime = false;
+                    });
+                    if (moveToNextStep) {
+                      onboardingStepper = 1;
+                    } else {
+                      _changeTab(1);
+                    }
+                  },
+                ),
+              ),
+            ],
+          );
+        case 1:
+          content = const Column(
+            children: [
+              Expanded(
+                child: Text('hello'),
+              ),
+            ],
+          );
+        default:
+          throw UnimplementedError('no onboarding widget for $selectedIndex');
+      }
     } else {
       var colorScheme = Theme.of(context).colorScheme;
       Widget page;

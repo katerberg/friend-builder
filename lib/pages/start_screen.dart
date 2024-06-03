@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StartScreen extends StatefulWidget {
-  final void Function() onSubmit;
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final void Function(bool) onSubmit;
   final Future<dynamic> googleFontsPending;
 
-  const StartScreen(
-      {super.key,
-      required this.googleFontsPending,
-      required this.onSubmit,
-      required this.flutterLocalNotificationsPlugin});
+  const StartScreen({
+    super.key,
+    required this.googleFontsPending,
+    required this.onSubmit,
+  });
 
   @override
   StartScreenState createState() => StartScreenState();
 }
 
 class StartScreenState extends State<StartScreen> {
-  void _startAddingFriends() {}
+  void _startAddingFriends() {
+    widget.onSubmit(true);
+  }
 
   void _skipSetup() {
-    widget.onSubmit();
+    widget.onSubmit(false);
   }
 
   @override

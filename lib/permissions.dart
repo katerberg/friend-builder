@@ -23,6 +23,7 @@ class PermissionsUtils {
     }
     final PermissionStatus? permissionStatus =
         await _getPermission(permissionType);
+    fetchingPermission = null;
     if (permissionStatus == PermissionStatus.granted) {
       return false;
     } else {
