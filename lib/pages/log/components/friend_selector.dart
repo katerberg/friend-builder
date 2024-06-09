@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:friend_builder/contacts.dart';
-import 'package:friend_builder/pages/log/components/no_items_found.dart';
+import 'package:friend_builder/contacts_permission.dart';
+import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
+import 'package:friend_builder/utils/search_utils.dart';
 import 'package:friend_builder/utils/string_utils.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
@@ -27,24 +28,6 @@ class FriendSelector extends StatelessWidget {
     return populatedLabel ?? 'Anyone else?';
   }
 
-  int sortByBetterMatch(pattern, a, b) {
-    bool isBBetterMatch = StringUtils.getComparison(a?.displayName, pattern) <
-        StringUtils.getComparison(b?.displayName, pattern);
-    return isBBetterMatch ? 1 : -1;
-  }
-
-  int sortTwoFriendsInSuggestions(pattern, a, b) {
-    RegExp startsWithExactly = RegExp(
-      "^$pattern",
-      caseSensitive: false,
-    );
-    var aMatches = startsWithExactly.hasMatch(a?.displayName ?? '');
-    if (aMatches || startsWithExactly.hasMatch(b?.displayName ?? '')) {
-      return aMatches ? -1 : 1;
-    }
-    return sortByBetterMatch(pattern, a, b);
-  }
-
   Future<List<Contact>> _getSuggestions(String pattern) async {
     ContactPermission contactPermission =
         await ContactPermissionService().getContacts();
@@ -59,7 +42,7 @@ class FriendSelector extends StatelessWidget {
         .toList());
     var sortedFriends = listOfFriends
       ..sort((a, b) {
-        return sortTwoFriendsInSuggestions(pattern, a, b);
+        return SearchUtils.sortTwoFriendsInSuggestions(pattern, a, b);
       });
     const maxResults = 7;
     return sortedFriends.sublist(0,
@@ -74,6 +57,7 @@ class FriendSelector extends StatelessWidget {
       controller: typeaheadController,
       builder: (context, controller, focusNode) {
         return TextField(
+          textCapitalization: TextCapitalization.sentences,
           controller: controller,
           focusNode: focusNode,
           cursorColor: Colors.white,

@@ -1,6 +1,8 @@
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionsUtils {
+  Future<bool>? fetchingPermission;
+
   static Future<PermissionStatus?> _getPermission(
       Permission permissionType) async {
     final PermissionStatus permission = await permissionType.request();
@@ -15,9 +17,13 @@ class PermissionsUtils {
     }
   }
 
-  static Future<bool> isMissingPermission(Permission permissionType) async {
+  Future<bool> isMissingPermission(Permission permissionType) async {
+    if (fetchingPermission != null) {
+      return fetchingPermission!;
+    }
     final PermissionStatus? permissionStatus =
         await _getPermission(permissionType);
+    fetchingPermission = null;
     if (permissionStatus == PermissionStatus.granted) {
       return false;
     } else {

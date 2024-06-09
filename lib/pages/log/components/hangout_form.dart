@@ -4,7 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
 import 'package:friend_builder/data/friend.dart';
-import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/data/hangout.dart';

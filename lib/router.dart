@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:friend_builder/pages/onboarding/add_friends_screen/add_friends_screen.dart';
+import 'package:friend_builder/pages/onboarding/start_screen.dart';
+import 'package:friend_builder/pages/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter/material.dart';
@@ -21,6 +24,7 @@ class FriendRouter extends StatefulWidget {
 
 class _FriendRouterState extends State<FriendRouter> {
   var selectedIndex = 1;
+  var onboardingStepper = 0;
 
   bool? firstTime;
   late Future _googleFontsPending;
@@ -30,18 +34,21 @@ class _FriendRouterState extends State<FriendRouter> {
   Future<void> _handleFirstLoad() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    Timer(const Duration(seconds: 1), () {
-      if (preferences.getBool('first_time') ?? true) {
-        preferences.setBool('first_time', false);
-        setState(() {
-          firstTime = true;
-        });
-      } else {
-        setState(() {
-          firstTime = false;
-        });
-      }
-    });
+    Timer(
+      const Duration(milliseconds: 500),
+      () {
+        if (preferences.getBool('first_time') ?? true) {
+          preferences.setBool('first_time', false);
+          setState(() {
+            firstTime = true;
+          });
+        } else {
+          setState(() {
+            firstTime = false;
+          });
+        }
+      },
+    );
   }
 
   @override
@@ -60,80 +67,80 @@ class _FriendRouterState extends State<FriendRouter> {
 
   @override
   Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = HistoryPage(
-            flutterLocalNotificationsPlugin:
-                widget.flutterLocalNotificationsPlugin);
-      case 1:
-        page = LogPage(
-            onSubmit: () => _changeTab(0),
-            flutterLocalNotificationsPlugin:
-                widget.flutterLocalNotificationsPlugin);
-      case 2:
-        page = FriendsPage(
-            flutterLocalNotificationsPlugin:
-                widget.flutterLocalNotificationsPlugin);
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
-    }
-
-    var mainArea = ColoredBox(
-        color: colorScheme.surfaceVariant,
-        child: AnimatedSwitcher(duration: Durations.medium1, child: page));
-
     Widget content;
     if (firstTime == null) {
-      var titleStyle = GoogleFonts.getFont(
-        'Londrina Sketch',
-        fontSize: 60,
-        fontWeight: FontWeight.w900,
-        backgroundColor: colorScheme.primary,
+      content = SplashScreen(
+        googleFontsPending: _googleFontsPending,
       );
-
-      content = FutureBuilder(
-          future: _googleFontsPending,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return const SizedBox();
-            }
-
-            return ColoredBox(
-              color: colorScheme.primary,
-              child: SafeArea(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          'Friends',
-                          style: titleStyle,
-                        ),
-                      ),
-                    ),
-                    Image.asset(
-                      'logo/splash.png',
-                      fit: BoxFit.cover,
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          'Builder',
-                          style: titleStyle,
-                        ),
-                      ),
-                    ),
-                  ],
+    } else if (firstTime == true) {
+      switch (onboardingStepper) {
+        case 0:
+          content = Column(
+            children: [
+              Expanded(
+                child: StartScreen(
+                  googleFontsPending: _googleFontsPending,
+                  onSubmit: (bool moveToNextStep) {
+                    if (moveToNextStep) {
+                      setState(() {
+                        onboardingStepper = 1;
+                      });
+                    } else {
+                      setState(() {
+                        firstTime = false;
+                      });
+                      _changeTab(1);
+                    }
+                  },
                 ),
               ),
-            );
-          });
+            ],
+          );
+        case 1:
+          content = Column(
+            children: [
+              Expanded(
+                child: AddFriendsScreen(onSubmit: () {
+                  setState(() {
+                    onboardingStepper = 0;
+                    firstTime = false;
+                  });
+                  _changeTab(1);
+                }),
+              ),
+            ],
+          );
+        default:
+          throw UnimplementedError('no onboarding widget for $selectedIndex');
+      }
     } else {
+      var colorScheme = Theme.of(context).colorScheme;
+      Widget page;
+      switch (selectedIndex) {
+        case 0:
+          page = HistoryPage(
+              flutterLocalNotificationsPlugin:
+                  widget.flutterLocalNotificationsPlugin);
+        case 1:
+          page = LogPage(
+              onSubmit: () => _changeTab(0),
+              flutterLocalNotificationsPlugin:
+                  widget.flutterLocalNotificationsPlugin);
+        case 2:
+          page = FriendsPage(
+              flutterLocalNotificationsPlugin:
+                  widget.flutterLocalNotificationsPlugin);
+        default:
+          throw UnimplementedError('no widget for $selectedIndex');
+      }
+
       content = Column(children: [
-        Expanded(child: mainArea),
+        Expanded(
+          child: ColoredBox(
+            color: colorScheme.surfaceVariant,
+            child: AnimatedSwitcher(duration: Durations.medium1, child: page),
+          ),
+        ),
         BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
