@@ -1,4 +1,4 @@
-import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:friend_builder/pages/friends/components/selection_choice_chip.dart';
+import 'package:friend_builder/shared/selection_choice_chip.dart';
 
 class SelectionChoiceGroup extends StatelessWidget {
   final List<String> choices;

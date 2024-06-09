@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:friend_builder/pages/onboarding/add_friends_screen.dart';
+import 'package:friend_builder/pages/onboarding/add_friends_screen/add_friends_screen.dart';
 import 'package:friend_builder/pages/onboarding/start_screen.dart';
 import 'package:friend_builder/pages/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,7 +35,7 @@ class _FriendRouterState extends State<FriendRouter> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
     Timer(
-      const Duration(seconds: 1),
+      const Duration(milliseconds: 500),
       () {
         if (preferences.getBool('first_time') ?? true) {
           preferences.setBool('first_time', false);
@@ -102,6 +102,7 @@ class _FriendRouterState extends State<FriendRouter> {
               Expanded(
                 child: AddFriendsScreen(onSubmit: () {
                   setState(() {
+                    onboardingStepper = 0;
                     firstTime = false;
                   });
                   _changeTab(1);

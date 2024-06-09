@@ -62,15 +62,17 @@ class StartScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
                                 'An app to help you keep up with your friends that you don’t get to see as often as you’d like.'),
                           ),
                           Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
-                                'Let’s get you started by adding some friends.'),
+                                'It can be really easy to lose touch with people that you care about, regardless of how important they are to you.'),
                           ),
+                          Text(
+                              'Let’s get you started by adding some friends to keep up with.'),
                         ],
                       ),
                     ),

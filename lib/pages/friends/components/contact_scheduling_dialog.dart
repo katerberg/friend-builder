@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:friend_builder/pages/friends/components/selection_choice_group.dart';
+import 'package:friend_builder/shared/selection_choice_group.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/permissions.dart';
+import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 const oftenLabel = 'How often do you want to contact this person?';
@@ -85,17 +86,8 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
 
   void _handleSelectionTap(String groupName, String selectedValue) {
     setState(() {
-      selection[groupName] = selectedValue;
+      selection[oftenLabel] = selectedValue;
     });
-  }
-
-  String _getContactName() {
-    var fullName = widget.contact?.displayName.trim();
-    var nickName = widget.contact?.name.nickname.trim();
-    var firstName = widget.contact?.name.first.trim();
-    var name = nickName ?? firstName ?? fullName ?? '';
-
-    return (name == '') ? 'this person' : name;
   }
 
   void _editContactPressed() {
@@ -118,7 +110,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
       return TextButton(
         onPressed: onPressed,
         child: Text(
-          "I don't want reminders for ${_getContactName()}",
+          "I don't want reminders for ${ContactsHelper.getContactName(widget.contact)}",
           style: const TextStyle(color: Color(0xffdd4444)),
         ),
       );
@@ -133,7 +125,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
       child: Text(
           !_hasNotificationsPermissions
               ? 'Enable notifications'
-              : 'I want notifications for ${_getContactName()}',
+              : 'I want notifications for ${ContactsHelper.getContactName(widget.contact)}',
           style: const TextStyle(color: Colors.white)),
     );
   }
@@ -164,7 +156,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                       onSelect: _handleSelectionTap,
                       selection: selection[oftenLabel] ?? '',
                       label:
-                          'How often do you want to contact ${_getContactName()}?',
+                          'How often do you want to contact ${ContactsHelper.getContactName(widget.contact)}?',
                     ),
                     widget.contact == null
                         ? Container()

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:friend_builder/pages/log/components/selected_friend_chips.dart';
+import 'package:friend_builder/shared/selected_friend_chips.dart';
 import 'package:friend_builder/pages/history/components/friend_selector.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/hangout_form.dart';
 

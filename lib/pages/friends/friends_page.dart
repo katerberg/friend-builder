@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:friend_builder/contacts.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:collection/collection.dart';
-import 'package:friend_builder/missing_contacts_permission.dart';
+import 'package:friend_builder/missing_permission.dart';
 import 'package:friend_builder/utils/string_utils.dart';
-import 'package:friend_builder/pages/friends/components/contact_scheduling.dart';
+import 'package:friend_builder/pages/friends/components/contact_scheduling_dialog.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/storage.dart';
@@ -216,7 +216,7 @@ class FriendsPageState extends State<FriendsPage> {
   Widget build(BuildContext context) {
     Widget body;
     if (_missingPermission) {
-      body = const MissingContactsPermission(
+      body = const MissingPermission(
         isWhite: true,
       );
     } else {

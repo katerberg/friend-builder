@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class MissingContactsPermission extends StatelessWidget {
+class MissingPermission extends StatelessWidget {
   final bool isWhite;
-  const MissingContactsPermission({super.key, required this.isWhite});
+  final String permissionType;
+  const MissingPermission(
+      {super.key, required this.isWhite, this.permissionType = 'contacts'});
 
   void _handleContactPermissionRequest() {
     openAppSettings();
@@ -16,8 +18,8 @@ class MissingContactsPermission extends StatelessWidget {
         children: [
           Container(
               padding: const EdgeInsets.symmetric(vertical: 32),
-              child: const Text(
-                'Missing contacts permission',
+              child: Text(
+                "Missing $permissionType permission",
               )),
           ElevatedButton(
             style: isWhite
