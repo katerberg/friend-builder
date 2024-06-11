@@ -78,6 +78,16 @@ class _AddFriendsScreenState extends State<AddFriendsScreen> {
     _selectedFriends = selectedFriends;
   }
 
+  void _handleNextPress() {
+    setState(() {
+      if (_isSelectingFriends) {
+        _isSelectingFriends = false;
+      } else {
+        widget.onSubmit();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -124,13 +134,7 @@ class _AddFriendsScreenState extends State<AddFriendsScreen> {
                         : const SizedBox(),
                     const Spacer(),
                     ElevatedButton(
-                        onPressed: () => setState(() {
-                              if (_isSelectingFriends) {
-                                _isSelectingFriends = false;
-                              } else {
-                                widget.onSubmit();
-                              }
-                            }),
+                        onPressed: _handleNextPress,
                         child: Text(_isSelectingFriends ? 'Next' : 'Done'))
                   ],
                 ),

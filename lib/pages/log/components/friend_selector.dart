@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
+import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:friend_builder/utils/search_utils.dart';
 import 'package:friend_builder/utils/string_utils.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -28,27 +29,6 @@ class FriendSelector extends StatelessWidget {
     return populatedLabel ?? 'Anyone else?';
   }
 
-  Future<List<Contact>> _getSuggestions(String pattern) async {
-    ContactPermission contactPermission =
-        await ContactPermissionService().getContacts();
-    if (contactPermission.missingPermission) {
-      return Future.value([]);
-    }
-    var listOfFriends = await Future.value(contactPermission.contacts
-        .where((element) =>
-            !selectedFriends.any((selected) => selected.id == element.id) &&
-            (pattern.length < 2 ||
-                StringUtils.getComparison(element.displayName, pattern) > 0.1))
-        .toList());
-    var sortedFriends = listOfFriends
-      ..sort((a, b) {
-        return SearchUtils.sortTwoFriendsInSuggestions(pattern, a, b);
-      });
-    const maxResults = 7;
-    return sortedFriends.sublist(0,
-        sortedFriends.length > maxResults ? maxResults : sortedFriends.length);
-  }
-
   @override
   Widget build(BuildContext context) {
     const inputBorder = UnderlineInputBorder(
@@ -72,7 +52,8 @@ class FriendSelector extends StatelessWidget {
           ),
         );
       },
-      suggestionsCallback: (pattern) async => await _getSuggestions(pattern),
+      suggestionsCallback: (pattern) async =>
+          await ContactsHelper.getSuggestions(selectedFriends, pattern),
       itemBuilder: (context, Contact suggestion) {
         return ListTile(
           leading: EncodableContact.fromContact(suggestion).getAvatar(context),
