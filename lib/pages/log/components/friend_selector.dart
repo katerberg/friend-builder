@@ -3,8 +3,6 @@ import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
-import 'package:friend_builder/utils/search_utils.dart';
-import 'package:friend_builder/utils/string_utils.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class FriendSelector extends StatelessWidget {

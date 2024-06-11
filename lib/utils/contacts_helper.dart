@@ -28,7 +28,7 @@ class ContactsHelper {
   }
 
   static Future<List<Contact>> getSuggestions(
-      List<Contact> contacts, String pattern) async {
+      List<Contact> excludedContacts, String pattern) async {
     ContactPermission contactPermission =
         await ContactPermissionService().getContacts();
     if (contactPermission.missingPermission) {
@@ -36,7 +36,7 @@ class ContactsHelper {
     }
     var listOfFriends = await Future.value(contactPermission.contacts
         .where((element) =>
-            !contacts.any((selected) => selected.id == element.id) &&
+            !excludedContacts.any((selected) => selected.id == element.id) &&
             (pattern.length < 2 ||
                 StringUtils.getComparison(element.displayName, pattern) > 0.1))
         .toList());

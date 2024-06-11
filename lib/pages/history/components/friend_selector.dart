@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
-import 'package:friend_builder/utils/string_utils.dart';
+import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class FriendSelector extends StatelessWidget {
@@ -27,34 +27,6 @@ class FriendSelector extends StatelessWidget {
     return populatedLabel ?? 'Anyone else?';
   }
 
-  Future<List<Contact>> _getSuggestions(String pattern) async {
-    ContactPermission contactPermission =
-        await ContactPermissionService().getContacts();
-    if (contactPermission.missingPermission) {
-      return Future.value([]);
-    }
-    var listOfFriends = await Future.value(contactPermission.contacts
-        .where((element) =>
-            !selectedFriends.any((selected) => selected.id == element.id) &&
-            (pattern.length < 2 ||
-                StringUtils.getComparison(element.displayName, pattern) > 0.1))
-        .toList());
-    return listOfFriends
-      ..sort((a, b) {
-        RegExp regExp = RegExp(
-          '^$pattern',
-          caseSensitive: false,
-        );
-        var aMatches = regExp.hasMatch(a.displayName);
-        if (aMatches || regExp.hasMatch(b.displayName)) {
-          return aMatches ? -1 : 1;
-        }
-        bool isBigger = StringUtils.getComparison(a.displayName, pattern) <
-            StringUtils.getComparison(b.displayName, pattern);
-        return isBigger ? 1 : -1;
-      });
-  }
-
   @override
   Widget build(BuildContext context) {
     return TypeAheadField(
@@ -71,7 +43,8 @@ class FriendSelector extends StatelessWidget {
           ),
         );
       },
-      suggestionsCallback: (pattern) async => await _getSuggestions(pattern),
+      suggestionsCallback: (pattern) async =>
+          ContactsHelper.getSuggestions(selectedFriends, pattern),
       itemBuilder: (context, Contact suggestion) {
         return ListTile(
           leading: EncodableContact.fromContact(suggestion).getAvatar(context),
