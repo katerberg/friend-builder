@@ -28,18 +28,26 @@ class ContactsHelper {
   }
 
   static Future<List<Contact>> getSuggestions(
-      List<Contact> excludedContacts, String pattern) async {
-    ContactPermission contactPermission =
-        await ContactPermissionService().getContacts();
-    if (contactPermission.missingPermission) {
-      return Future.value([]);
+      List<Contact> excludedContacts, String pattern,
+      {Iterable<Contact>? contacts}) async {
+    Iterable<Contact> contactsFromWhichToSuggest;
+    if (contacts == null) {
+      ContactPermission contactPermission =
+          await ContactPermissionService().getContacts();
+      if (contactPermission.missingPermission) {
+        return Future.value([]);
+      }
+      contactsFromWhichToSuggest =
+          await Future.value(contactPermission.contacts);
+    } else {
+      contactsFromWhichToSuggest = contacts;
     }
-    var listOfFriends = await Future.value(contactPermission.contacts
+    var listOfFriends = contactsFromWhichToSuggest
         .where((element) =>
             !excludedContacts.any((selected) => selected.id == element.id) &&
             (pattern.length < 2 ||
                 StringUtils.getComparison(element.displayName, pattern) > 0.1))
-        .toList());
+        .toList();
     var sortedFriends = listOfFriends
       ..sort((a, b) {
         return SearchUtils.sortTwoFriendsInSuggestions(pattern, a, b);

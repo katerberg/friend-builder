@@ -6,8 +6,6 @@ import 'package:friend_builder/missing_permission.dart';
 import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/shared/selected_friend_chips.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
-import 'package:friend_builder/utils/string_utils.dart';
-import 'package:friend_builder/utils/search_utils.dart';
 
 class FriendAdder extends StatefulWidget {
   final void Function(List<Contact>) onSelectedFriendsChange;
@@ -40,19 +38,8 @@ class FriendAdderState extends State<FriendAdder> {
       }
       _contacts = contactPermission.contacts;
     }
-    var listOfFriends = _contacts
-        .where((element) =>
-            !excludeList.any((selected) => selected.id == element.id) &&
-            (pattern.length < 2 ||
-                StringUtils.getComparison(element.displayName, pattern) > 0.1))
-        .toList();
-    var sortedFriends = listOfFriends
-      ..sort((a, b) {
-        return SearchUtils.sortTwoFriendsInSuggestions(pattern, a, b);
-      });
-    const maxResults = 7;
-    return sortedFriends.sublist(0,
-        sortedFriends.length > maxResults ? maxResults : sortedFriends.length);
+    return ContactsHelper.getSuggestions(excludeList, pattern,
+        contacts: _contacts);
   }
 
   void _onSelected(Contact contact) {
