@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/hangout_form.dart';
+import 'package:friend_builder/utils/contacts_helper.dart';
 
 class EditDialog extends StatefulWidget {
   final List<Contact> selectedFriends;
@@ -43,9 +44,8 @@ class EditDialogState extends State<EditDialog> {
 
   void _resetFriend(Contact friendToRemove) {
     setState(() {
-      _selectedFriends = _selectedFriends
-          .where((element) => element.id != friendToRemove.id)
-          .toList();
+      _selectedFriends =
+          ContactsHelper.filterContacts(_selectedFriends, friendToRemove);
     });
   }
 

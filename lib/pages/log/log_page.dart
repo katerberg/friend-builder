@@ -5,6 +5,7 @@ import 'package:friend_builder/missing_permission.dart';
 import 'package:friend_builder/pages/log/components/friend_selector.dart';
 import 'package:friend_builder/pages/log/components/hangout_form.dart';
 import 'package:friend_builder/shared/selected_friend_chips.dart';
+import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LogPage extends StatefulWidget {
@@ -38,9 +39,8 @@ class LogPageState extends State<LogPage> {
 
   void _resetFriend(Contact friendToRemove) {
     setState(() {
-      _selectedFriends = _selectedFriends
-          .where((element) => element.id != friendToRemove.id)
-          .toList();
+      _selectedFriends =
+          ContactsHelper.filterContacts(_selectedFriends, friendToRemove);
     });
   }
 

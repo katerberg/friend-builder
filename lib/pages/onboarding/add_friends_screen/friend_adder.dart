@@ -5,6 +5,7 @@ import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/missing_permission.dart';
 import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/shared/selected_friend_chips.dart';
+import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:friend_builder/utils/string_utils.dart';
 import 'package:friend_builder/utils/search_utils.dart';
 
@@ -64,9 +65,8 @@ class FriendAdderState extends State<FriendAdder> {
   }
 
   void _resetFriend(Contact friendToRemove) {
-    var newFriends = _selectedFriends
-        .where((element) => element.id != friendToRemove.id)
-        .toList();
+    var newFriends =
+        ContactsHelper.filterContacts(_selectedFriends, friendToRemove);
     setState(() {
       _selectedFriends = newFriends;
     });

@@ -17,4 +17,10 @@ class ContactsHelper {
 
     return 'this person';
   }
+
+  static List<Contact> filterContacts(List<Contact> contacts, Contact friendToRemove) {
+      return contacts
+          .where((element) => element.id != friendToRemove.id)
+          .toList();
+  }
 }
