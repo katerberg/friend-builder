@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "941002509812",
+    "project_id": "friend-builder-39324",
+    "storage_bucket": "friend-builder-39324.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941002509812:android:e169afeb3487faa6ed3da1",
+        "android_client_info": {
+          "package_name": "com.example.friend_builder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNQjih3asxIACkTQ-Rq9nGWSYNmjSOYPo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
