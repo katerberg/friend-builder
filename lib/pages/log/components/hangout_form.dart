@@ -78,20 +78,11 @@ class HangoutFormState extends State<HangoutForm> {
       if (friend == null || !friend.isContactable) {
         return;
       }
-      List<Hangout> contactHangouts = hangouts
-          .where((element) =>
-              element.contacts.any((hc) => hc.identifier == contact.id))
-          .toList();
-      DateTime latestTime = contactHangouts
-          .reduce((value, element) =>
-              element.when.compareTo(value.when) > 0 ? element : value)
-          .when;
-      scheduleNotification(
+      upsertNotifications(
         widget.flutterLocalNotificationsPlugin,
-        contact.id.hashCode,
-        'Want to chat with ${contact.displayName}?',
-        "It's been a minute!",
-        Scheduling.howLong(latestTime, friend.frequency),
+        hangouts,
+        friend,
+        contact,
       );
     }
   }
@@ -162,7 +153,7 @@ class HangoutFormState extends State<HangoutForm> {
             TextFormField(
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
-                labelText: 'When',
+                labelText: 'When?',
                 floatingLabelBehavior: FloatingLabelBehavior.never,
                 focusedBorder: inputBorder,
                 enabledBorder: inputBorder,
@@ -187,6 +178,7 @@ class HangoutFormState extends State<HangoutForm> {
               onFieldSubmitted: (String string) {
                 _handleSubmitPress();
               },
+              maxLines: 8,
               textCapitalization: TextCapitalization.sentences,
               initialValue: _data.notes,
               onChanged: _handleNotesChange,

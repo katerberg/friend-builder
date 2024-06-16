@@ -135,26 +135,6 @@ class FriendsPageState extends State<FriendsPage> {
     _handleContactChange('');
   }
 
-  void _upsertNotifications(Friend result, Contact contact) {
-    List<Hangout> contactHangouts = _hangouts
-        .where((element) =>
-            element.contacts.any((hc) => hc.identifier == contact.id))
-        .toList();
-    DateTime latestTime = contactHangouts.isEmpty
-        ? DateTime.now()
-        : contactHangouts
-            .reduce((value, element) =>
-                element.when.compareTo(value.when) > 0 ? element : value)
-            .when;
-    scheduleNotification(
-      widget.flutterLocalNotificationsPlugin,
-      contact.id.hashCode,
-      'Want to chat with ${contact.displayName}?',
-      "It's been a minute!",
-      Scheduling.howLong(latestTime, result.frequency),
-    );
-  }
-
   Future<void> _handleContactPress(Contact? contact) async {
     List<Friend>? friends = await Storage.getFriends();
     Friend? friend = friends?.firstWhereOrNull(
@@ -176,7 +156,8 @@ class FriendsPageState extends State<FriendsPage> {
       return;
     }
     if (result.isContactable == true) {
-      _upsertNotifications(result, contact);
+      upsertNotifications(
+          widget.flutterLocalNotificationsPlugin, _hangouts, result, contact);
     } else {
       cancelNotification(
           widget.flutterLocalNotificationsPlugin, contact.id.hashCode);

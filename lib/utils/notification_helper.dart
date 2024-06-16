@@ -1,4 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:friend_builder/contacts_permission.dart';
+import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/utils/scheduling.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:friend_builder/data/reminder_notification.dart';
@@ -67,4 +71,28 @@ void requestIOSPermissions(
         badge: true,
         sound: true,
       );
+}
+
+void upsertNotifications(
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+    List<Hangout> hangouts,
+    Friend result,
+    Contact contact) {
+  List<Hangout> contactHangouts = hangouts
+      .where((element) =>
+          element.contacts.any((hc) => hc.identifier == contact.id))
+      .toList();
+  DateTime latestTime = contactHangouts.isEmpty
+      ? DateTime.now()
+      : contactHangouts
+          .reduce((value, element) =>
+              element.when.compareTo(value.when) > 0 ? element : value)
+          .when;
+  scheduleNotification(
+    flutterLocalNotificationsPlugin,
+    contact.id.hashCode,
+    'Want to chat with ${contact.displayName}?',
+    "It's been a minute!",
+    Scheduling.howLong(latestTime, result.frequency),
+  );
 }
