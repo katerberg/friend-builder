@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Scheduling {
   static int daysFromFrequency(String frequency) {
     switch (frequency) {
@@ -26,4 +28,7 @@ class Scheduling {
         .add(Duration(days: daysFromFrequency(interaction)))
         .add(const Duration(hours: 12));
   }
+
+  static String formatDate(DateTime date) =>
+      DateFormat.yMMMMEEEEd().format(date);
 }

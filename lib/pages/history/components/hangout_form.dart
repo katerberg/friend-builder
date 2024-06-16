@@ -8,7 +8,6 @@ import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:intl/intl.dart';
 
 class HangoutForm extends StatefulWidget {
   final void Function() onSubmit;
@@ -39,18 +38,16 @@ class HangoutFormState extends State<HangoutForm> {
   );
   DateTime selectedDate = DateTime.now();
   TextEditingController dateController =
-      TextEditingController(text: _formatDate(DateTime.now()));
+      TextEditingController(text: Scheduling.formatDate(DateTime.now()));
 
   @override
   void initState() {
     super.initState();
     _data = widget.hangout;
     selectedDate = widget.hangout.when;
-    dateController = TextEditingController(text: _formatDate(selectedDate));
+    dateController =
+        TextEditingController(text: Scheduling.formatDate(selectedDate));
   }
-
-  static String _formatDate(DateTime date) =>
-      DateFormat.yMMMMEEEEd().format(date);
 
   Future<void> _selectWhen(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -64,7 +61,7 @@ class HangoutFormState extends State<HangoutForm> {
         selectedDate = picked;
       });
 
-      dateController.text = _formatDate(picked);
+      dateController.text = Scheduling.formatDate(picked);
     }
     _unfocus();
   }
