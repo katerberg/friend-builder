@@ -30,7 +30,7 @@ class StartScreen extends StatelessWidget {
           'Londrina Sketch',
           fontSize: 60,
           fontWeight: FontWeight.w900,
-          color: colorScheme.background,
+          color: colorScheme.surface,
         );
         return Scaffold(
           backgroundColor: colorScheme.primary,

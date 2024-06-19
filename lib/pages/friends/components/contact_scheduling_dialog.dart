@@ -118,8 +118,8 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
 
     return TextButton(
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.blue),
-        foregroundColor: MaterialStateProperty.all(Colors.white),
+        backgroundColor: WidgetStateProperty.all(Colors.blue),
+        foregroundColor: WidgetStateProperty.all(Colors.white),
       ),
       onPressed: !_hasNotificationsPermissions ? requestPermissions : onPressed,
       child: Text(

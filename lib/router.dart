@@ -137,11 +137,17 @@ class _FriendRouterState extends State<FriendRouter> {
       content = Column(children: [
         Expanded(
           child: ColoredBox(
-            color: colorScheme.surfaceVariant,
+            color: colorScheme.surfaceContainerHighest,
             child: AnimatedSwitcher(duration: Durations.medium1, child: page),
           ),
         ),
-        BottomNavigationBar(
+      ]);
+    }
+
+    return LayoutBuilder(builder: (context, constraints) {
+      return Scaffold(
+        body: content,
+        bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
@@ -174,12 +180,6 @@ class _FriendRouterState extends State<FriendRouter> {
             });
           },
         ),
-      ]);
-    }
-
-    return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        body: content,
       );
     });
   }
