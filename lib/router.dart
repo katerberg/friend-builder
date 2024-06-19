@@ -147,39 +147,41 @@ class _FriendRouterState extends State<FriendRouter> {
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
         body: content,
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'History',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.note_add,
+        bottomNavigationBar: firstTime == true
+            ? null
+            : BottomNavigationBar(
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'History',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.note_add,
+                    ),
+                    label: 'Log',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.people),
+                    label: 'Friends',
+                  ),
+                ],
+                currentIndex: selectedIndex,
+                backgroundColor: selectedIndex != 1
+                    ? Theme.of(context).canvasColor
+                    : Theme.of(context).primaryColor,
+                selectedItemColor: selectedIndex != 1
+                    ? Theme.of(context).primaryColor
+                    : Colors.white,
+                unselectedItemColor: selectedIndex != 1
+                    ? Theme.of(context).textTheme.bodySmall!.color
+                    : Colors.white70,
+                onTap: (value) {
+                  setState(() {
+                    selectedIndex = value;
+                  });
+                },
               ),
-              label: 'Log',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.people),
-              label: 'Friends',
-            ),
-          ],
-          currentIndex: selectedIndex,
-          backgroundColor: selectedIndex != 1
-              ? Theme.of(context).canvasColor
-              : Theme.of(context).primaryColor,
-          selectedItemColor: selectedIndex != 1
-              ? Theme.of(context).primaryColor
-              : Colors.white,
-          unselectedItemColor: selectedIndex != 1
-              ? Theme.of(context).textTheme.bodySmall!.color
-              : Colors.white70,
-          onTap: (value) {
-            setState(() {
-              selectedIndex = value;
-            });
-          },
-        ),
       );
     });
   }

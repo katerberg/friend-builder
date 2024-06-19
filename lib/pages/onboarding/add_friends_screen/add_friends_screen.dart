@@ -75,7 +75,9 @@ class _AddFriendsScreenState extends State<AddFriendsScreen> {
   }
 
   void _handleSelectedFriendsChange(List<Contact> selectedFriends) {
-    _selectedFriends = selectedFriends;
+    setState(() {
+      _selectedFriends = selectedFriends;
+    });
   }
 
   void _handleNextPress() {
@@ -140,7 +142,10 @@ class _AddFriendsScreenState extends State<AddFriendsScreen> {
                         : const SizedBox(),
                     const Spacer(),
                     ElevatedButton(
-                        onPressed: _handleNextPress,
+                        onPressed:
+                            (_isSelectingFriends && _selectedFriends.isEmpty)
+                                ? null
+                                : _handleNextPress,
                         child: Text(_isSelectingFriends ? 'Next' : 'Done'))
                   ],
                 ),
