@@ -36,7 +36,7 @@ class StartScreen extends StatelessWidget {
           backgroundColor: colorScheme.primary,
           body: SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Center(
                   child: Text(

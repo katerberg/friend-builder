@@ -22,6 +22,7 @@ class MainApp extends StatelessWidget {
     const color = Color(0xFF2898D5);
     return MaterialApp(
         title: _title,
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: color,
