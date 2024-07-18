@@ -147,7 +147,7 @@ class _FriendRouterState extends State<FriendRouter> {
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
         body: content,
-        bottomNavigationBar: firstTime == true
+        bottomNavigationBar: firstTime != false
             ? null
             : BottomNavigationBar(
                 items: const <BottomNavigationBarItem>[

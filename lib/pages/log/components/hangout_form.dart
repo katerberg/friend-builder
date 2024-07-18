@@ -178,7 +178,7 @@ class HangoutFormState extends State<HangoutForm> {
               onFieldSubmitted: (String string) {
                 _handleSubmitPress();
               },
-              maxLines: 8,
+              maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
               initialValue: _data.notes,
               onChanged: _handleNotesChange,
