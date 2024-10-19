@@ -157,7 +157,7 @@ class HangoutFormState extends State<HangoutForm> {
                 labelText: 'Notes',
                 floatingLabelBehavior: FloatingLabelBehavior.never,
               ),
-              maxLines: 8,
+              maxLines: 3,
               initialValue: _data.notes,
               onChanged: _handleNotesChange,
               onSaved: _handleNullableNotesChange,
