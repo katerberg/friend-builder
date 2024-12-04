@@ -38,6 +38,7 @@ class FriendSelector extends StatelessWidget {
           cursorColor: TextSelectionTheme.of(context).cursorColor,
           style: const TextStyle(fontSize: 24),
           autofocus: false,
+          autocorrect: false,
           decoration: InputDecoration(
             labelText: _getInputLabelText(),
           ),

@@ -41,6 +41,7 @@ class FriendSelector extends StatelessWidget {
           cursorColor: Colors.white,
           style: const TextStyle(color: Colors.white, fontSize: 24),
           autofocus: false,
+          autocorrect: false,
           decoration: InputDecoration(
             floatingLabelBehavior: FloatingLabelBehavior.never,
             focusedBorder: inputBorder,
