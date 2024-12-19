@@ -4,6 +4,7 @@ import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:friend_builder/data/hangout.dart';
 
 class FriendSelector extends StatelessWidget {
   final List<Contact> selectedFriends;
@@ -11,14 +12,17 @@ class FriendSelector extends StatelessWidget {
   final TextEditingController typeaheadController;
   final String? emptyLabel;
   final String? populatedLabel;
+  final List<Hangout>? previousHangouts;
 
-  const FriendSelector(
-      {super.key,
-      required this.selectedFriends,
-      required this.addFriend,
-      required this.typeaheadController,
-      this.emptyLabel,
-      this.populatedLabel});
+  const FriendSelector({
+    super.key,
+    required this.selectedFriends,
+    required this.addFriend,
+    required this.typeaheadController,
+    this.emptyLabel,
+    this.populatedLabel,
+    this.previousHangouts,
+  });
 
   String _getInputLabelText() {
     if (selectedFriends.isEmpty) {
@@ -52,7 +56,8 @@ class FriendSelector extends StatelessWidget {
         );
       },
       suggestionsCallback: (pattern) async =>
-          await ContactsHelper.getSuggestions(selectedFriends, pattern),
+          await ContactsHelper.getSuggestions(selectedFriends, pattern,
+              previousHangouts: previousHangouts),
       itemBuilder: (context, Contact suggestion) {
         return ListTile(
           leading: EncodableContact.fromContact(suggestion).getAvatar(context),

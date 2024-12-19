@@ -5,13 +5,17 @@ import 'package:friend_builder/missing_permission.dart';
 import 'package:friend_builder/pages/log/components/friend_selector.dart';
 import 'package:friend_builder/pages/log/components/hangout_form.dart';
 import 'package:friend_builder/shared/selected_friend_chips.dart';
+import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LogPage extends StatefulWidget {
   final void Function() onSubmit;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  const LogPage(
+  final Storage storage = Storage();
+
+  LogPage(
       {super.key,
       required this.onSubmit,
       required this.flutterLocalNotificationsPlugin});
@@ -22,12 +26,24 @@ class LogPage extends StatefulWidget {
 
 class LogPageState extends State<LogPage> {
   List<Contact> _selectedFriends = [];
+  List<Hangout> _hangouts = [];
   TextEditingController typeaheadController = TextEditingController(text: '');
 
   @override
   void initState() {
     _selectedFriends = [];
     super.initState();
+    _refreshHangouts();
+  }
+
+  void _refreshHangouts() {
+    widget.storage.getHangouts().then((hangouts) {
+      if (hangouts != null) {
+        setState(() {
+          _hangouts = hangouts;
+        });
+      }
+    });
   }
 
   void _setFriend(Contact friend) {
@@ -51,6 +67,7 @@ class LogPageState extends State<LogPage> {
         selectedFriends: _selectedFriends,
         addFriend: _setFriend,
         typeaheadController: typeaheadController,
+        previousHangouts: _hangouts,
       ),
       SelectedFriendChips(
         selectedFriends: _selectedFriends,
