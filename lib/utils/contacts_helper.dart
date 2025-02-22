@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
-import 'package:friend_builder/utils/search_utils.dart';
 import 'package:friend_builder/utils/string_utils.dart';
 import 'package:friend_builder/data/hangout.dart';
 
@@ -29,6 +28,44 @@ class ContactsHelper {
     return contacts
         .where((element) => element.id != friendToRemove.id)
         .toList();
+  }
+
+  static bool isPerfectSubsetMatch(String testString, String pattern) {
+    return testString.toLowerCase().startsWith(pattern.toLowerCase());
+  }
+
+  static List<Contact> sortRecentContactsFirst(List<Contact> contactsToSort,
+      LinkedHashSet<EncodableContact> recentContacts, String pattern) {
+    const maxResults = 7;
+    var sorted = contactsToSort
+      ..sort((a, b) {
+        if (isPerfectSubsetMatch(a.displayName, pattern)) {
+          if (isPerfectSubsetMatch(b.displayName, pattern) &&
+              recentContacts.any((c) => c.identifier == b.id)) {
+            return 1;
+          }
+          return -1;
+        }
+        if (isPerfectSubsetMatch(b.displayName, pattern)) {
+          if (isPerfectSubsetMatch(a.displayName, pattern) &&
+              recentContacts.any((c) => c.identifier == a.id)) {
+            return -1;
+          }
+          return 1;
+        }
+        if (recentContacts.any((c) => c.identifier == a.id)) {
+          return -1;
+        }
+        if (recentContacts.any((c) => c.identifier == b.id)) {
+          return 1;
+        }
+        return 0;
+      });
+    return sorted.sublist(
+        0,
+        contactsToSort.length > maxResults
+            ? maxResults
+            : contactsToSort.length);
   }
 
   static Future<List<Contact>> getSuggestions(
@@ -67,26 +104,6 @@ class ContactsHelper {
         }
       }
     });
-    var sortedFriends = listOfFriends
-      ..sort((a, b) => SearchUtils.sortTwoFriendsInSuggestions(pattern, a, b));
-    const maxResults = 7;
-
-    return sortedFriends.sublist(0,
-        sortedFriends.length > maxResults ? maxResults : sortedFriends.length)
-      ..sort((a, b) {
-        if (a.displayName.toLowerCase().startsWith(pattern.toLowerCase())) {
-          return -1;
-        }
-        if (b.displayName.toLowerCase().startsWith(pattern.toLowerCase())) {
-          return 1;
-        }
-        if (recentContacts.any((c) => c.identifier == a.id)) {
-          return -1;
-        }
-        if (recentContacts.any((c) => c.identifier == b.id)) {
-          return 1;
-        }
-        return 0;
-      });
+    return sortRecentContactsFirst(listOfFriends, recentContacts, pattern);
   }
 }
