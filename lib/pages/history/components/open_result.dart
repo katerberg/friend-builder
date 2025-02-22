@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/pages/history/components/result_bubbles.dart';
 import 'package:friend_builder/pages/history/components/result_expansion_item.dart';
 import 'package:friend_builder/pages/history/components/result_menu.dart';
@@ -57,6 +58,9 @@ class OpenResult extends StatelessWidget {
                     ? ResultExpansionItem(
                         iconItem: Icons.note, text: hangout.notes)
                     : const SizedBox.shrink(),
+              ...(hangout.contacts.toList().map((c) => ContactTile(
+                    contact: c,
+                  ))),
               ],
             ),
           ),

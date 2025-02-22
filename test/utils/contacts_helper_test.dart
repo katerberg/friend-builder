@@ -1,6 +1,5 @@
 import 'dart:collection';
 import 'dart:math';
-import 'package:flutter/material.dart';
 
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:friend_builder/data/encodable_contact.dart';

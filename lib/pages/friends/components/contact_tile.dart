@@ -6,14 +6,14 @@ import 'package:friend_builder/data/hangout.dart';
 
 class ContactTile extends StatelessWidget {
   final Contact contact;
-  final void Function(Contact contact) onPressed;
+  final void Function(Contact contact)? onPressed;
   final String? frequency;
   final Hangout? latestHangout;
 
   const ContactTile({
     super.key,
     required this.contact,
-    required this.onPressed,
+    this.onPressed,
     this.latestHangout,
     this.frequency,
   });
@@ -43,7 +43,7 @@ class ContactTile extends StatelessWidget {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 18),
       leading: EncodableContact.fromContact(contact).getAvatar(context),
-      onTap: () => onPressed(contact),
+      onTap: () => onPressed?.call(contact),
       title: Text(
         contact.displayName,
         style: TextStyle(
