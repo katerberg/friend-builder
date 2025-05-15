@@ -84,9 +84,6 @@ class FriendSelectorState extends State<FriendSelector> {
           ),
         );
       },
-      // suggestionsCallback: (pattern) async =>
-      //     await ContactsHelper.getSuggestions(widget.selectedFriends, pattern,
-      //         previousHangouts: widget.previousHangouts),
       suggestionsCallback: (pattern) async => await _getSuggestions(
         pattern,
         excludeList: widget.selectedFriends,
