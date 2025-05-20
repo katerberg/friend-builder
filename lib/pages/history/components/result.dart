@@ -5,14 +5,14 @@ import 'package:friend_builder/pages/history/components/closed_result.dart';
 
 class Result extends StatefulWidget {
   final Hangout hangout;
-  final void Function(Hangout) onDelete;
-  final void Function(Hangout) onEdit;
+  final void Function(Hangout)? onDelete;
+  final void Function(Hangout)? onEdit;
 
   const Result({
     super.key,
     required this.hangout,
-    required this.onDelete,
-    required this.onEdit,
+    this.onDelete,
+    this.onEdit,
   });
 
   @override

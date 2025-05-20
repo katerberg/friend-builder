@@ -3,6 +3,9 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:friend_builder/shared/selection_choice_group.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/permissions.dart';
+import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/pages/history/components/result.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -27,8 +30,22 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   };
   bool isContactable = false;
   bool _hasNotificationsPermissions = false;
+  final Storage _storage = Storage();
+  List<Hangout> _hangouts = [];
+  bool _isFetchingHangouts = true;
 
   TextEditingController notesController = TextEditingController(text: '');
+
+  void _refreshHangouts() {
+    _storage.getHangouts().then((hangouts) {
+      if (hangouts != null) {
+        setState(() {
+          _isFetchingHangouts = false;
+          _hangouts = hangouts;
+        });
+      }
+    });
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -41,6 +58,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     if (widget.friend == null && widget.contact == null) {
       throw ArgumentError('contact and friend cannot both be null');
     }
+    _refreshHangouts();
     WidgetsBinding.instance.addObserver(this);
     _setCurrentNotificationPermissions();
     selection[oftenLabel] = widget.friend?.frequency ?? 'Weekly';
@@ -130,8 +148,39 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     );
   }
 
+  List<Widget> _notesAndHangouts() {
+    return [
+      Expanded(
+          child: TextField(
+        controller: notesController,
+        onChanged: (newVal) => _handleSelectionTap(notesLabel, newVal),
+        autocorrect: true,
+        enableSuggestions: false,
+        decoration: const InputDecoration(labelText: notesLabel),
+        keyboardType: TextInputType.multiline,
+        maxLines: null,
+        textCapitalization: TextCapitalization.sentences,
+      )),
+      const Text('Hangouts'),
+      _isFetchingHangouts
+          ? const CircularProgressIndicator()
+          : Expanded(
+              child: ListView(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  children: _hangouts
+                      .map((hangout) => Result(
+                            hangout: hangout,
+                          ))
+                      .toList()),
+            )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
+
     return GestureDetector(
       child: Scaffold(
         appBar: AppBar(
@@ -163,26 +212,18 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                         : TextButton(
                             onPressed: _editContactPressed,
                             child: const Text('Edit Contact')),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      child: TextField(
-                        controller: notesController,
-                        onChanged: (newVal) =>
-                            _handleSelectionTap(notesLabel, newVal),
-                        autocorrect: true,
-                        enableSuggestions: false,
-                        decoration:
-                            const InputDecoration(labelText: notesLabel),
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                      ),
-                    ),
                   ]),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: _getContactButton(),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [..._notesAndHangouts()],
+                ),
               ),
             ],
           ),

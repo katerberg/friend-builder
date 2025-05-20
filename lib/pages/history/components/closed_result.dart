@@ -5,15 +5,24 @@ import 'package:friend_builder/pages/history/components/result_bubbles.dart';
 
 class ClosedResult extends StatelessWidget {
   final Hangout hangout;
-  final void Function(Hangout) onDelete;
-  final void Function(Hangout) onEdit;
+  final Function(Hangout)? onDelete;
+  final void Function(Hangout)? onEdit;
 
   const ClosedResult({
     super.key,
     required this.hangout,
-    required this.onDelete,
-    required this.onEdit,
+    this.onDelete,
+    this.onEdit,
   });
+
+  void _onEdit(Hangout hangout) {
+    print('one');
+    onEdit?.call(hangout);
+  }
+
+  void _onDelete(Hangout hangout) {
+    onDelete?.call(hangout);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,16 +46,18 @@ class ClosedResult extends StatelessWidget {
                           contacts: hangout.contacts
                             ..sort((a, b) =>
                                 a.displayName.compareTo(b.displayName))),
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.centerRight,
-                          child: ResultMenu(
-                            hangout: hangout,
-                            onEdit: onEdit,
-                            onDelete: onDelete,
-                          ),
-                        ),
-                      )
+                      (onDelete != null && onEdit != null)
+                          ? Expanded(
+                              child: Container(
+                                alignment: Alignment.centerRight,
+                                child: ResultMenu(
+                                  hangout: hangout,
+                                  onEdit: _onEdit,
+                                  onDelete: _onDelete,
+                                ),
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ),
