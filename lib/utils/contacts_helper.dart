@@ -31,7 +31,10 @@ class ContactsHelper {
   }
 
   static bool isPerfectSubsetMatch(String testString, String pattern) {
-    return testString.toLowerCase().startsWith(pattern.toLowerCase());
+    var lowerTestString = testString.toLowerCase();
+    var lowerPattern = pattern.toLowerCase();
+    return lowerTestString.startsWith(pattern) ||
+        lowerTestString.split(' ').any((part) => part.startsWith(lowerPattern));
   }
 
   static List<Contact> sortRecentContactsFirst(List<Contact> contactsToSort,
