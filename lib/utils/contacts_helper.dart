@@ -33,7 +33,7 @@ class ContactsHelper {
   static bool isPerfectSubsetMatch(String testString, String pattern) {
     var lowerTestString = testString.toLowerCase();
     var lowerPattern = pattern.toLowerCase();
-    return lowerTestString.startsWith(pattern) ||
+    return lowerTestString.startsWith(lowerPattern) ||
         lowerTestString.split(' ').any((part) => part.startsWith(lowerPattern));
   }
 
