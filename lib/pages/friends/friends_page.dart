@@ -61,37 +61,59 @@ class FriendsPageState extends State<FriendsPage> {
   List<Hangout> _hangouts = [];
   List<Friend> _friends = [];
   bool _missingPermission = false;
+  bool _isLoading = true;
   final TextEditingController typeaheadController =
       TextEditingController(text: '');
 
   @override
   void initState() {
-    Future.wait([_refreshFriends(), _getContacts(), _refreshHangouts()])
-        .then((list) => _sortContacts());
     super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _getContacts();
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+
+    await Future.wait([_refreshFriends(), _refreshHangouts()]);
+
+    if (mounted) {
+      _sortContacts();
+    }
   }
 
   Future<void> _refreshHangouts() async {
     var hangouts = await widget.storage.getHangouts();
-    setState(() {
-      _hangouts = hangouts ?? [];
-    });
+    if (mounted) {
+      setState(() {
+        _hangouts = hangouts ?? [];
+      });
+    }
   }
 
   Future<void> _refreshFriends() async {
     var friends = await Storage.getFriends();
-    setState(() {
-      _friends = friends ?? [];
-    });
+    if (mounted) {
+      setState(() {
+        _friends = friends ?? [];
+      });
+    }
   }
 
   Future<void> _getContacts() async {
     var contactPermission = await ContactPermissionService().getContacts();
-    setState(() {
-      _missingPermission = contactPermission.missingPermission;
-      _contacts = contactPermission.contacts;
-      _visibleContacts = contactPermission.contacts;
-    });
+    if (mounted) {
+      setState(() {
+        _missingPermission = contactPermission.missingPermission;
+        _contacts = contactPermission.contacts;
+        _visibleContacts = contactPermission.contacts;
+      });
+    }
   }
 
   void _handleContactsFilter(Iterable<Contact> contacts) {
@@ -208,6 +230,30 @@ class FriendsPageState extends State<FriendsPage> {
     if (_missingPermission) {
       body = const MissingPermission(
         isWhite: true,
+      );
+    } else if (_isLoading) {
+      // Show loading state with basic UI structure
+      body = ListView(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              textCapitalization: TextCapitalization.sentences,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.search),
+              ),
+              controller: typeaheadController,
+              onChanged: _handleContactChange,
+            ),
+          ),
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ],
       );
     } else {
       var safeHangoutContacts = _hangoutContacts;

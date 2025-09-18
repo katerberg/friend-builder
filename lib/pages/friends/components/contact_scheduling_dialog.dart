@@ -39,6 +39,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   bool isContactable = false;
   bool _hasNotificationsPermissions = false;
   List<Hangout> _contactHangouts = [];
+  bool _isLoadingHangouts = true;
   final Storage _storage = Storage();
 
   TextEditingController notesController = TextEditingController(text: '');
@@ -60,7 +61,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     selection[notesLabel] = widget.friend?.notes ?? '';
     isContactable = widget.friend?.isContactable ?? false;
     notesController = TextEditingController(text: selection[notesLabel]);
-    _loadContactHangouts();
+    _loadContactHangoutsAsync();
   }
 
   @override
@@ -77,8 +78,15 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
             }));
   }
 
-  void _loadContactHangouts() async {
-    if (widget.contact == null) return;
+  Future<void> _loadContactHangoutsAsync() async {
+    if (widget.contact == null) {
+      if (mounted) {
+        setState(() {
+          _isLoadingHangouts = false;
+        });
+      }
+      return;
+    }
 
     final allHangouts = await _storage.getHangouts();
     if (allHangouts != null) {
@@ -92,6 +100,13 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
       if (mounted) {
         setState(() {
           _contactHangouts = contactHangouts;
+          _isLoadingHangouts = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoadingHangouts = false;
         });
       }
     }
@@ -221,7 +236,30 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                           textCapitalization: TextCapitalization.sentences,
                         ),
                       ),
-                      if (_contactHangouts.isNotEmpty)
+                      if (_isLoadingHangouts)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: const Row(
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Loading hangout history...',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else if (_contactHangouts.isNotEmpty)
                         GestureDetector(
                           onTap: _navigateToHistory,
                           child: Container(
