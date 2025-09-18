@@ -9,6 +9,7 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/pages/friends/components/contact_tile.dart';
+import 'package:friend_builder/pages/friends/components/skeleton_contact_tile.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
 
@@ -232,7 +233,6 @@ class FriendsPageState extends State<FriendsPage> {
         isWhite: true,
       );
     } else if (_isLoading) {
-      // Show loading state with basic UI structure
       body = ListView(
         children: [
           Container(
@@ -247,12 +247,7 @@ class FriendsPageState extends State<FriendsPage> {
               onChanged: _handleContactChange,
             ),
           ),
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(32.0),
-              child: CircularProgressIndicator(),
-            ),
-          ),
+          ...List.generate(10, (index) => const SkeletonContactTile()),
         ],
       );
     } else {
