@@ -199,7 +199,8 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                           decoration:
                               const InputDecoration(labelText: notesLabel),
                           keyboardType: TextInputType.multiline,
-                          maxLines: null,
+                          minLines: 1,
+                          maxLines: 8,
                           textCapitalization: TextCapitalization.sentences,
                         ),
                       ),
