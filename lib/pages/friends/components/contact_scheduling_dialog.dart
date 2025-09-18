@@ -167,63 +167,65 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
         body: SafeArea(
           child: Column(
             children: [
-              ListView(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  children: [
-                    SelectionChoiceGroup(
-                      choices: const [
-                        'Weekly',
-                        'Monthly',
-                        'Quarterly',
-                        'Yearly'
-                      ],
-                      onSelect: _handleSelectionTap,
-                      selection: selection[oftenLabel] ?? '',
-                      label:
-                          'How often do you want to contact ${ContactsHelper.getContactName(widget.contact)}?',
-                    ),
-                    widget.contact == null
-                        ? Container()
-                        : TextButton(
-                            onPressed: _editContactPressed,
-                            child: const Text('Edit Contact')),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      child: TextField(
-                        controller: notesController,
-                        onChanged: (newVal) =>
-                            _handleSelectionTap(notesLabel, newVal),
-                        autocorrect: true,
-                        enableSuggestions: false,
-                        decoration:
-                            const InputDecoration(labelText: notesLabel),
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SelectionChoiceGroup(
+                        choices: const [
+                          'Weekly',
+                          'Monthly',
+                          'Quarterly',
+                          'Yearly'
+                        ],
+                        onSelect: _handleSelectionTap,
+                        selection: selection[oftenLabel] ?? '',
+                        label:
+                            'How often do you want to contact ${ContactsHelper.getContactName(widget.contact)}?',
                       ),
-                    ),
-                    if (_contactHangouts.isNotEmpty)
+                      widget.contact == null
+                          ? Container()
+                          : TextButton(
+                              onPressed: _editContactPressed,
+                              child: const Text('Edit Contact')),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.event,
-                                size: 16, color: Colors.grey),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Last hangout: ${_contactHangouts.first.dateWithYear()}',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
+                        padding: const EdgeInsets.all(16),
+                        child: TextField(
+                          controller: notesController,
+                          onChanged: (newVal) =>
+                              _handleSelectionTap(notesLabel, newVal),
+                          autocorrect: true,
+                          enableSuggestions: false,
+                          decoration:
+                              const InputDecoration(labelText: notesLabel),
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          textCapitalization: TextCapitalization.sentences,
                         ),
                       ),
-                  ]),
-              const Spacer(),
+                      if (_contactHangouts.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.event,
+                                  size: 16, color: Colors.grey),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Last hangout: ${_contactHangouts.first.dateWithYear()}',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
               Container(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: _getContactButton(),
