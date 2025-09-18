@@ -210,11 +210,6 @@ class DBProvider {
     });
     return Future.wait(
         [...contactPromises, ...deletionPromises, hangoutPromise]);
-
-    // final db = await database;
-    // var res = await db.update("friends", friend.toMap(),
-    //     where: "contactIdentifier = ?", whereArgs: [friend.contactIdentifier]);
-    // return res;
   }
 
   Future<List<Hangout>> getAllHangouts() async {

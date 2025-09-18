@@ -15,8 +15,13 @@ import 'package:friend_builder/utils/scheduling.dart';
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final Function(Hangout)? onNavigateToHistory;
 
-  FriendsPage({super.key, required this.flutterLocalNotificationsPlugin});
+  FriendsPage({
+    super.key,
+    required this.flutterLocalNotificationsPlugin,
+    this.onNavigateToHistory,
+  });
 
   @override
   FriendsPageState createState() => FriendsPageState();
@@ -147,8 +152,12 @@ class FriendsPageState extends State<FriendsPage> {
       // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            ContactSchedulingDialog(contact: contact, friend: friend),
+        builder: (context) => ContactSchedulingDialog(
+            flutterLocalNotificationsPlugin:
+                widget.flutterLocalNotificationsPlugin,
+            contact: contact,
+            friend: friend,
+            onNavigateToHistory: widget.onNavigateToHistory),
         fullscreenDialog: true,
       ),
     );

@@ -7,12 +7,14 @@ class Result extends StatefulWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
+  final bool initiallyOpen;
 
   const Result({
     super.key,
     required this.hangout,
     required this.onDelete,
     required this.onEdit,
+    this.initiallyOpen = false,
   });
 
   @override
@@ -20,7 +22,13 @@ class Result extends StatefulWidget {
 }
 
 class ResultState extends State<Result> {
-  bool isOpen = false;
+  late bool isOpen;
+
+  @override
+  void initState() {
+    super.initState();
+    isOpen = widget.initiallyOpen;
+  }
 
   void _handleResultTap() {
     setState(() {

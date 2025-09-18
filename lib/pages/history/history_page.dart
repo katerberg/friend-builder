@@ -8,10 +8,12 @@ import 'package:friend_builder/pages/history/components/edit_dialog.dart';
 class HistoryPage extends StatefulWidget {
   final Storage storage = Storage();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final Hangout? initialHangout;
 
   HistoryPage({
     super.key,
     required this.flutterLocalNotificationsPlugin,
+    this.initialHangout,
   });
 
   @override
@@ -76,6 +78,7 @@ class HistoryPageState extends State<HistoryPage> {
                 hangout: h,
                 onDelete: _onDelete,
                 onEdit: _onEdit,
+                initiallyOpen: widget.initialHangout?.id == h.id,
               ))
           .toList(),
     );

@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/pages/friends/friends_page.dart';
 import 'package:friend_builder/pages/log/log_page.dart';
 import 'package:friend_builder/pages/history/history_page.dart';
+import 'package:friend_builder/data/hangout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FriendRouter extends StatefulWidget {
@@ -25,6 +26,7 @@ class FriendRouter extends StatefulWidget {
 class _FriendRouterState extends State<FriendRouter> {
   var selectedIndex = 1;
   var onboardingStepper = 0;
+  Hangout? _initialHangout;
 
   bool? firstTime;
   late Future _googleFontsPending;
@@ -59,9 +61,10 @@ class _FriendRouterState extends State<FriendRouter> {
     super.initState();
   }
 
-  void _changeTab(int tabIndex) async {
+  void _changeTab(int tabIndex, {Hangout? initialHangout}) async {
     setState(() {
       selectedIndex = tabIndex;
+      _initialHangout = initialHangout;
     });
   }
 
@@ -120,7 +123,8 @@ class _FriendRouterState extends State<FriendRouter> {
         case 0:
           page = HistoryPage(
               flutterLocalNotificationsPlugin:
-                  widget.flutterLocalNotificationsPlugin);
+                  widget.flutterLocalNotificationsPlugin,
+              initialHangout: _initialHangout);
         case 1:
           page = LogPage(
               onSubmit: () => _changeTab(0),
@@ -129,7 +133,9 @@ class _FriendRouterState extends State<FriendRouter> {
         case 2:
           page = FriendsPage(
               flutterLocalNotificationsPlugin:
-                  widget.flutterLocalNotificationsPlugin);
+                  widget.flutterLocalNotificationsPlugin,
+              onNavigateToHistory: (hangout) =>
+                  _changeTab(0, initialHangout: hangout));
         default:
           throw UnimplementedError('no widget for $selectedIndex');
       }

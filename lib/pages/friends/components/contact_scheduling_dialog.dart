@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/shared/selection_choice_group.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/hangout.dart';
@@ -14,8 +15,16 @@ const notesLabel = 'Notes';
 class ContactSchedulingDialog extends StatefulWidget {
   final Contact? contact;
   final Friend? friend;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final Function(Hangout)? onNavigateToHistory;
 
-  const ContactSchedulingDialog({super.key, this.contact, this.friend});
+  const ContactSchedulingDialog({
+    super.key,
+    this.contact,
+    this.friend,
+    required this.flutterLocalNotificationsPlugin,
+    this.onNavigateToHistory,
+  });
 
   @override
   ContactSchedulingDialogState createState() => ContactSchedulingDialogState();
@@ -119,6 +128,14 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     FlutterContacts.openExternalEdit(widget.contact!.id);
   }
 
+  void _navigateToHistory() {
+    Navigator.pop(context);
+
+    if (widget.onNavigateToHistory != null && _contactHangouts.isNotEmpty) {
+      widget.onNavigateToHistory!(_contactHangouts.first);
+    }
+  }
+
   ButtonStyleButton _getContactButton() {
     onPressed() {
       setState(() {
@@ -205,22 +222,28 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                         ),
                       ),
                       if (_contactHangouts.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.event,
-                                  size: 16, color: Colors.grey),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Last hangout: ${_contactHangouts.first.dateWithYear()}',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
+                        GestureDetector(
+                          onTap: _navigateToHistory,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.event,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Last hangout: ${_contactHangouts.first.dateWithYear()}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const Spacer(),
+                                const Icon(Icons.arrow_forward_ios,
+                                    size: 12, color: Colors.grey),
+                              ],
+                            ),
                           ),
                         ),
                     ],
