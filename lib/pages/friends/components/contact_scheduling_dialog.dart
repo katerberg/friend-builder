@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:friend_builder/shared/selection_choice_group.dart';
 import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/permissions.dart';
+import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -27,6 +29,8 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   };
   bool isContactable = false;
   bool _hasNotificationsPermissions = false;
+  List<Hangout> _contactHangouts = [];
+  final Storage _storage = Storage();
 
   TextEditingController notesController = TextEditingController(text: '');
 
@@ -47,6 +51,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     selection[notesLabel] = widget.friend?.notes ?? '';
     isContactable = widget.friend?.isContactable ?? false;
     notesController = TextEditingController(text: selection[notesLabel]);
+    _loadContactHangouts();
   }
 
   @override
@@ -61,6 +66,26 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
         .then((value) => setState(() {
               _hasNotificationsPermissions = !value;
             }));
+  }
+
+  void _loadContactHangouts() async {
+    if (widget.contact == null) return;
+
+    final allHangouts = await _storage.getHangouts();
+    if (allHangouts != null) {
+      final contactHangouts = allHangouts
+          .where((hangout) => hangout.hasContact(widget.contact!))
+          .toList();
+
+      // Sort by date descending to get most recent first
+      contactHangouts.sort((a, b) => b.when.compareTo(a.when));
+
+      if (mounted) {
+        setState(() {
+          _contactHangouts = contactHangouts;
+        });
+      }
+    }
   }
 
   Friend _getFriendToSubmit() {
@@ -178,6 +203,25 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                         textCapitalization: TextCapitalization.sentences,
                       ),
                     ),
+                    if (_contactHangouts.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.event,
+                                size: 16, color: Colors.grey),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Last hangout: ${_contactHangouts.first.dateWithYear()}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ]),
               const Spacer(),
               Container(
