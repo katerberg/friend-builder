@@ -3,6 +3,7 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/shared/selection_choice_group.dart';
 import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/permissions.dart';
 import 'package:friend_builder/storage.dart';
@@ -57,7 +58,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     }
     WidgetsBinding.instance.addObserver(this);
     _setCurrentNotificationPermissions();
-    selection[oftenLabel] = widget.friend?.frequency ?? 'Weekly';
+    selection[oftenLabel] = widget.friend?.frequency.type ?? 'Weekly';
     selection[notesLabel] = widget.friend?.notes ?? '';
     isContactable = widget.friend?.isContactable ?? false;
     notesController = TextEditingController(text: selection[notesLabel]);
@@ -115,13 +116,14 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   Friend _getFriendToSubmit() {
     if (widget.friend != null) {
       widget.friend!.notes = selection[notesLabel] ?? '';
-      widget.friend!.frequency = selection[oftenLabel] ?? 'Weekly';
+      widget.friend!.frequency =
+          Frequency.fromType(selection[oftenLabel] ?? 'Weekly');
       widget.friend!.isContactable = isContactable;
       return widget.friend!;
     }
     return Friend(
       contactIdentifier: widget.contact!.id,
-      frequency: selection[oftenLabel] ?? 'Weekly',
+      frequency: Frequency.fromType(selection[oftenLabel] ?? 'Weekly'),
       notes: selection[notesLabel] ?? '',
       isContactable: isContactable,
     );
@@ -208,7 +210,8 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                           'Weekly',
                           'Monthly',
                           'Quarterly',
-                          'Yearly'
+                          'Yearly',
+                          'Custom',
                         ],
                         onSelect: _handleSelectionTap,
                         selection: selection[oftenLabel] ?? '',

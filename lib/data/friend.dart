@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'package:uuid/uuid.dart';
+import 'package:friend_builder/data/frequency.dart';
 
 class Friend {
   String contactIdentifier;
-  String frequency;
+  Frequency frequency;
   String notes;
   bool isContactable;
 
@@ -12,20 +14,28 @@ class Friend {
       required this.frequency,
       required this.isContactable});
 
-  factory Friend.fromJson(Map<String, dynamic> parsedJson) {
-    return Friend(
-      contactIdentifier: parsedJson['contactIdentifier'] ?? const Uuid().v4(),
-      notes: parsedJson['notes'] ?? '',
-      frequency: parsedJson['frequency'] ?? 'Weekly',
-      isContactable: parsedJson['isContactable'] ?? false,
-    );
-  }
-
   factory Friend.fromMap(Map<String, dynamic> parsedJson) {
+    Frequency freq;
+    if (parsedJson['frequency'] is String) {
+      String freqString = parsedJson['frequency'] ?? 'Weekly';
+      try {
+        final decoded = jsonDecode(freqString);
+        if (decoded is Map<String, dynamic>) {
+          freq = Frequency.fromJson(decoded);
+        } else {
+          freq = Frequency.fromString(freqString);
+        }
+      } catch (e) {
+        freq = Frequency.fromString(freqString);
+      }
+    } else {
+      freq = Frequency.fromType('Weekly');
+    }
+
     return Friend(
       contactIdentifier: parsedJson['contactIdentifier'] ?? const Uuid().v4(),
       notes: parsedJson['notes'] ?? '',
-      frequency: parsedJson['frequency'] ?? 'Weekly',
+      frequency: freq,
       isContactable: parsedJson['isContactable'] == 1,
     );
   }
@@ -34,7 +44,7 @@ class Friend {
     return {
       "contactIdentifier": contactIdentifier,
       "notes": notes,
-      "frequency": frequency,
+      "frequency": frequency.toJson(),
       "isContactable": isContactable,
     };
   }
@@ -43,7 +53,7 @@ class Friend {
     return {
       "contactIdentifier": contactIdentifier,
       "notes": notes,
-      "frequency": frequency,
+      "frequency": jsonEncode(frequency.toJson()),
       "isContactable": isContactable ? 1 : 0,
     };
   }

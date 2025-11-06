@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
+import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/utils/scheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
 
 class ContactTile extends StatelessWidget {
   final Contact contact;
   final void Function(Contact contact)? onPressed;
-  final String? frequency;
+  final Frequency? frequency;
   final Hangout? latestHangout;
 
   const ContactTile({

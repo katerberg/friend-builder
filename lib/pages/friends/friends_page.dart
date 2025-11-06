@@ -7,6 +7,7 @@ import 'package:friend_builder/utils/string_utils.dart';
 import 'package:friend_builder/pages/friends/components/contact_scheduling_dialog.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/pages/friends/components/skeleton_contact_tile.dart';
@@ -30,7 +31,7 @@ class FriendsPage extends StatefulWidget {
 
 class FriendsPageContact {
   Contact contact;
-  String? frequency;
+  Frequency? frequency;
   Hangout? latestHangout;
 
   FriendsPageContact(
@@ -132,9 +133,11 @@ class FriendsPageState extends State<FriendsPage> {
     var cOne = FriendsPageContact(c1, _hangouts, _friends);
     var cTwo = FriendsPageContact(c2, _hangouts, _friends);
     int days1 = Scheduling.daysLeft(
-        cOne.frequency ?? 'Weekly', cOne.latestHangout?.when);
+        cOne.frequency ?? Frequency.fromType('Weekly'),
+        cOne.latestHangout?.when);
     int days2 = Scheduling.daysLeft(
-        cTwo.frequency ?? 'Weekly', cTwo.latestHangout?.when);
+        cTwo.frequency ?? Frequency.fromType('Weekly'),
+        cTwo.latestHangout?.when);
     return days1 - days2 == 0
         ? (c1.displayName).compareTo(c2.displayName)
         : days1 - days2;

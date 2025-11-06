@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/main.dart';
 import 'package:friend_builder/missing_permission.dart';
 import 'package:friend_builder/shared/selection_choice_group.dart';
@@ -67,7 +68,7 @@ class FriendSchedulerState extends State<FriendScheduler>
         contact.id.hashCode,
         'Want to chat with ${contact.displayName}?',
         "It's been a minute!",
-        Scheduling.howLong(DateTime.now(), selectedValue),
+        Scheduling.howLong(DateTime.now(), Frequency.fromType(selectedValue)),
       );
     } else {
       cancelNotification(
@@ -81,7 +82,7 @@ class FriendSchedulerState extends State<FriendScheduler>
     if (selectedValue != 'Never') {
       var newFriend = Friend(
         contactIdentifier: contact.id,
-        frequency: selectedValue,
+        frequency: Frequency.fromType(selectedValue),
         notes: '',
         isContactable: true,
       );
@@ -111,7 +112,14 @@ class FriendSchedulerState extends State<FriendScheduler>
 
   Widget _contactChoices(Contact contact) {
     return SelectionChoiceGroup(
-      choices: const ['Weekly', 'Monthly', 'Quarterly', 'Yearly', 'Never'],
+      choices: const [
+        'Weekly',
+        'Monthly',
+        'Quarterly',
+        'Yearly',
+        'Custom',
+        'Never'
+      ],
       onSelect: (_, selectedValue) =>
           _handleSelectionTap(contact, selectedValue),
       selection: selection[contact.id] ?? '',
