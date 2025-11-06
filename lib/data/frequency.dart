@@ -7,7 +7,6 @@ class Frequency {
     required this.value,
   });
 
-  // Factory constructor to create Frequency from predefined types
   factory Frequency.fromType(String type) {
     switch (type) {
       case 'Weekly':
@@ -19,13 +18,15 @@ class Frequency {
       case 'Yearly':
         return Frequency(type: type, value: 365);
       case 'Custom':
-        return Frequency(type: type, value: 600);
+        return Frequency(
+            type: type,
+            value:
+                14); // Always overwritten by value from contact scheduling dialog
       default:
         return Frequency(type: 'Yearly', value: 365);
     }
   }
 
-  // Factory constructor for JSON deserialization
   factory Frequency.fromJson(Map<String, dynamic> json) {
     return Frequency(
       type: json['type'] ?? 'Weekly',
@@ -33,7 +34,6 @@ class Frequency {
     );
   }
 
-  // Factory constructor for backward compatibility with string
   factory Frequency.fromString(String frequencyString) {
     return Frequency.fromType(frequencyString);
   }

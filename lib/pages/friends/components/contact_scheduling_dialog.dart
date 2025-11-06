@@ -42,8 +42,10 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   List<Hangout> _contactHangouts = [];
   bool _isLoadingHangouts = true;
   final Storage _storage = Storage();
+  int? _customDays;
 
   TextEditingController notesController = TextEditingController(text: '');
+  TextEditingController customDaysController = TextEditingController(text: '');
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -62,12 +64,19 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     selection[notesLabel] = widget.friend?.notes ?? '';
     isContactable = widget.friend?.isContactable ?? false;
     notesController = TextEditingController(text: selection[notesLabel]);
+    if (widget.friend?.frequency.type == 'Custom') {
+      _customDays = widget.friend?.frequency.value;
+      customDaysController =
+          TextEditingController(text: _customDays?.toString() ?? '');
+    }
     _loadContactHangoutsAsync();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    notesController.dispose();
+    customDaysController.dispose();
     super.dispose();
   }
 
@@ -114,16 +123,25 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   }
 
   Friend _getFriendToSubmit() {
+    String freqType = selection[oftenLabel] ?? 'Weekly';
+    Frequency freq;
+    if (freqType == 'Custom') {
+      int customValue =
+          (_customDays != null && _customDays! >= 1) ? _customDays! : 14;
+      freq = Frequency(type: 'Custom', value: customValue);
+    } else {
+      freq = Frequency.fromType(freqType);
+    }
+
     if (widget.friend != null) {
       widget.friend!.notes = selection[notesLabel] ?? '';
-      widget.friend!.frequency =
-          Frequency.fromType(selection[oftenLabel] ?? 'Weekly');
+      widget.friend!.frequency = freq;
       widget.friend!.isContactable = isContactable;
       return widget.friend!;
     }
     return Friend(
       contactIdentifier: widget.contact!.id,
-      frequency: Frequency.fromType(selection[oftenLabel] ?? 'Weekly'),
+      frequency: freq,
       notes: selection[notesLabel] ?? '',
       isContactable: isContactable,
     );
@@ -197,6 +215,15 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
           leading:
               IconButton(icon: const Icon(Icons.close), onPressed: _closePage),
           title: Text(widget.contact?.displayName ?? 'Schedule'),
+          actions: widget.contact != null
+              ? [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: _editContactPressed,
+                    tooltip: 'Edit Contact',
+                  ),
+                ]
+              : null,
         ),
         body: SafeArea(
           child: Column(
@@ -218,11 +245,45 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                         label:
                             'How often do you want to contact ${ContactsHelper.getContactName(widget.contact)}?',
                       ),
-                      widget.contact == null
-                          ? Container()
-                          : TextButton(
-                              onPressed: _editContactPressed,
-                              child: const Text('Edit Contact')),
+                      if (selection[oftenLabel] == 'Custom')
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Every',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              const SizedBox(width: 12),
+                              SizedBox(
+                                width: 100,
+                                child: TextField(
+                                  controller: customDaysController,
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  decoration: const InputDecoration(
+                                    hintText: '14',
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 12),
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _customDays = int.tryParse(value);
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'days',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
                       Container(
                         padding: const EdgeInsets.all(16),
                         child: TextField(

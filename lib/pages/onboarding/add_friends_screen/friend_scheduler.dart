@@ -112,14 +112,7 @@ class FriendSchedulerState extends State<FriendScheduler>
 
   Widget _contactChoices(Contact contact) {
     return SelectionChoiceGroup(
-      choices: const [
-        'Weekly',
-        'Monthly',
-        'Quarterly',
-        'Yearly',
-        'Custom',
-        'Never'
-      ],
+      choices: const ['Weekly', 'Monthly', 'Quarterly', 'Yearly', 'Never'],
       onSelect: (_, selectedValue) =>
           _handleSelectionTap(contact, selectedValue),
       selection: selection[contact.id] ?? '',
