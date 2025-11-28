@@ -94,15 +94,7 @@ class DBProvider {
 
   Future<int> _insertFriend(Friend friend) async {
     final db = await database;
-    var raw = await db.rawInsert(
-        "INSERT INTO friends (contactIdentifier,frequency,notes,isContactable)"
-        " VALUES (?,?,?,?)",
-        [
-          friend.contactIdentifier,
-          friend.frequency,
-          friend.notes,
-          friend.isContactable ? 1 : 0
-        ]);
+    var raw = await db.insert("friends", friend.toMap());
     return raw;
   }
 
