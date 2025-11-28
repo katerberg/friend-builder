@@ -1,15 +1,10 @@
 import 'dart:collection';
-import 'dart:math';
 
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
+import 'package:friend_builder/utils/string_utils.dart';
 import 'package:test/test.dart';
-
-String getRandomString([int length = 10]) => String.fromCharCodes(List.generate(
-    length,
-    (index) => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-        .codeUnitAt(Random().nextInt(62))));
 
 void main() {
   group('getContactName', () {
@@ -42,8 +37,9 @@ void main() {
     test('sorts first 7 recent contacts first', () {
       List<Contact> contactsToSort = List.generate(
           20,
-          (index) =>
-              Contact(id: index.toString(), displayName: getRandomString()));
+          (index) => Contact(
+              id: index.toString(),
+              displayName: StringUtils.getRandomString()));
       var recentContacts = LinkedHashSet<EncodableContact>(
           equals: (o1, o2) => o1.identifier == o2.identifier,
           hashCode: (contact) => contact.identifier.hashCode);
@@ -60,8 +56,9 @@ void main() {
     test('prioritizes perfect matches', () {
       List<Contact> contactsToSort = List.generate(
           20,
-          (index) =>
-              Contact(id: index.toString(), displayName: getRandomString()));
+          (index) => Contact(
+              id: index.toString(),
+              displayName: StringUtils.getRandomString()));
       var recentContacts = LinkedHashSet<EncodableContact>(
           equals: (o1, o2) => o1.identifier == o2.identifier,
           hashCode: (contact) => contact.identifier.hashCode);
@@ -79,8 +76,9 @@ void main() {
         () {
       List<Contact> contactsToSort = List.generate(
           20,
-          (index) =>
-              Contact(id: index.toString(), displayName: getRandomString()));
+          (index) => Contact(
+              id: index.toString(),
+              displayName: StringUtils.getRandomString()));
       contactsToSort[9].displayName = 'Jane Dorsey';
       contactsToSort[10].displayName = 'Jane Thomas';
       var recentContacts = LinkedHashSet<EncodableContact>(
@@ -100,8 +98,9 @@ void main() {
     test('prioritizes perfect match over recent hang out', () {
       List<Contact> contactsToSort = List.generate(
           20,
-          (index) =>
-              Contact(id: index.toString(), displayName: getRandomString()));
+          (index) => Contact(
+              id: index.toString(),
+              displayName: StringUtils.getRandomString()));
       contactsToSort[9].displayName = 'Jane Dorsey';
       contactsToSort[10].displayName = 'Jan Thomas';
       var recentContacts = LinkedHashSet<EncodableContact>(

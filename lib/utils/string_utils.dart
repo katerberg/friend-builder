@@ -1,4 +1,13 @@
+import 'dart:math';
+
 class StringUtils {
+  static String getRandomString([int length = 10]) =>
+      String.fromCharCodes(List.generate(
+          length,
+          (index) =>
+              'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+                  .codeUnitAt(Random().nextInt(62))));
+
   static List<String?> _getBigrams(String str) {
     if (str.length < 2) {
       return [];

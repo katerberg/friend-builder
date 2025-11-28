@@ -3,17 +3,23 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/utils/string_utils.dart';
 
 /// Debug-only utility to populate fake contacts for testing
 /// This will only run in debug mode and will not create duplicates
 class DebugData {
-  static const List<Map<String, String>> _fakeContacts = [
-    {'firstName': 'Alice', 'lastName': 'Johnson', 'frequency': 'Weekly'},
-    {'firstName': 'Bob', 'lastName': 'Smith', 'frequency': 'Monthly'},
-    {'firstName': 'Charlie', 'lastName': 'Davis', 'frequency': 'Quarterly'},
-    {'firstName': 'Diana', 'lastName': 'Martinez', 'frequency': 'Weekly'},
-    {'firstName': 'Ethan', 'lastName': 'Wilson', 'frequency': 'Monthly'},
-  ];
+  static List<Map<String, String>> get _fakeContacts => [
+        {'firstName': 'Alice', 'lastName': 'Johnson', 'frequency': 'Weekly'},
+        {'firstName': 'Bob', 'lastName': 'Smith', 'frequency': 'Monthly'},
+        {'firstName': 'Charlie', 'lastName': 'Davis', 'frequency': 'Quarterly'},
+        {'firstName': 'Diana', 'lastName': 'Martinez', 'frequency': 'Weekly'},
+        {'firstName': 'Ethan', 'lastName': 'Wilson', 'frequency': 'Monthly'},
+        {
+          'firstName': 'Random',
+          'lastName': 'Name ${StringUtils.getRandomString(10)}',
+          'frequency': 'Monthly'
+        },
+      ];
 
   /// Creates fake device contacts and friends for testing if they don't already exist
   /// Only runs in debug mode
