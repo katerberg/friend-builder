@@ -90,11 +90,32 @@ class FriendsPageState extends State<FriendsPage> {
   }
 
   Future<void> _refreshHangouts() async {
-    var hangouts = await widget.storage.getHangouts();
+    var hangouts =
+        await widget.storage.getHangoutsPaginated(limit: 100, offset: 0);
     if (mounted) {
       setState(() {
-        _hangouts = hangouts ?? [];
+        _hangouts = hangouts;
       });
+    }
+
+    if (hangouts.length == 100) {
+      _loadRemainingHangouts(100);
+    }
+  }
+
+  void _loadRemainingHangouts(int offset) async {
+    const int pageSize = 100;
+    var moreHangouts = await widget.storage
+        .getHangoutsPaginated(limit: pageSize, offset: offset);
+
+    if (mounted && moreHangouts.isNotEmpty) {
+      setState(() {
+        _hangouts.addAll(moreHangouts);
+      });
+
+      if (moreHangouts.length == pageSize) {
+        _loadRemainingHangouts(offset + pageSize);
+      }
     }
   }
 
