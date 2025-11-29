@@ -116,4 +116,77 @@ void main() {
       expect(sortedContacts[0].id, '9');
     });
   });
+
+  group('filterContacts', () {
+    test('filters mixed list of Contacts and EncodableContacts', () {
+      List<Contact> contacts = [
+        Contact(id: '1', displayName: 'Alice'),
+        EncodableContact(
+            identifier: '2',
+            displayName: 'Bob',
+            givenName: 'Bob',
+            familyName: 'Jones',
+            middleName: ''),
+        Contact(id: '3', displayName: 'Charlie'),
+      ];
+      Contact toRemove = EncodableContact(
+          identifier: '2',
+          displayName: 'Bob',
+          givenName: 'Bob',
+          familyName: 'Jones',
+          middleName: '');
+
+      var filtered = ContactsHelper.filterContacts(contacts, toRemove);
+
+      expect(filtered.length, 2);
+      expect(filtered[0].id, '1');
+      expect(filtered[1].id, '3');
+    });
+
+    test('returns empty list when filtering last contact', () {
+      List<Contact> contacts = [
+        Contact(id: '1', displayName: 'Alice'),
+      ];
+      Contact toRemove = Contact(id: '1', displayName: 'Alice');
+
+      var filtered = ContactsHelper.filterContacts(contacts, toRemove);
+
+      expect(filtered.length, 0);
+    });
+
+    test('returns same list when contact to remove is not present', () {
+      List<Contact> contacts = [
+        Contact(id: '1', displayName: 'Alice'),
+        Contact(id: '2', displayName: 'Bob'),
+      ];
+      Contact toRemove = Contact(id: '3', displayName: 'Charlie');
+
+      var filtered = ContactsHelper.filterContacts(contacts, toRemove);
+
+      expect(filtered.length, 2);
+      expect(filtered[0].id, '1');
+      expect(filtered[1].id, '2');
+    });
+
+    test('handles EncodableContact with empty identifier falling back to id',
+        () {
+      List<Contact> contacts = [
+        EncodableContact(
+            identifier: '',
+            displayName: 'Alice',
+            givenName: 'Alice',
+            familyName: 'Smith',
+            middleName: ''),
+        Contact(id: '2', displayName: 'Bob'),
+      ];
+      contacts[0].id = '1'; // Set id on EncodableContact with empty identifier
+
+      Contact toRemove = Contact(id: '1', displayName: 'Alice');
+
+      var filtered = ContactsHelper.filterContacts(contacts, toRemove);
+
+      expect(filtered.length, 1);
+      expect(filtered[0].id, '2');
+    });
+  });
 }
