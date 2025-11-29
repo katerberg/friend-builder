@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts_permission.dart';
@@ -36,14 +37,37 @@ class LogPageState extends State<LogPage> {
     _refreshHangouts();
   }
 
-  void _refreshHangouts() {
-    widget.storage.getHangouts().then((hangouts) {
-      if (hangouts != null) {
-        setState(() {
-          _hangouts = hangouts;
-        });
+  void _refreshHangouts() async {
+    var hangouts =
+        await widget.storage.getHangoutsPaginated(limit: 100, offset: 0);
+    if (mounted) {
+      setState(() {
+        _hangouts = hangouts;
+      });
+    }
+
+    if (hangouts.length == 100) {
+      _loadRemainingHangouts(100);
+    }
+  }
+
+  void _loadRemainingHangouts(int offset) async {
+    const int pageSize = 100;
+    var moreHangouts = await widget.storage
+        .getHangoutsPaginated(limit: pageSize, offset: offset);
+
+    if (mounted && moreHangouts.isNotEmpty) {
+      setState(() {
+        _hangouts.addAll(moreHangouts);
+      });
+
+      if (moreHangouts.length == pageSize) {
+        if (kDebugMode) {
+          print('Loading more hangouts');
+        }
+        _loadRemainingHangouts(offset + pageSize);
       }
-    });
+    }
   }
 
   void _setFriend(Contact friend) {
