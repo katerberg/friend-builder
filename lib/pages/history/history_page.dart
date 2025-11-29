@@ -4,6 +4,7 @@ import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/result.dart';
 import 'package:friend_builder/pages/history/components/edit_dialog.dart';
+import 'package:friend_builder/utils/notification_helper.dart';
 
 class HistoryPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -45,6 +46,7 @@ class HistoryPageState extends State<HistoryPage> {
         _hangouts = _hangouts
           ..removeWhere((element) => element.id == hangout.id);
       });
+      scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
     });
   }
 

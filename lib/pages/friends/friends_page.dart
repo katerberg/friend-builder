@@ -190,13 +190,7 @@ class FriendsPageState extends State<FriendsPage> {
     if (result == null) {
       return;
     }
-    if (result.isContactable == true) {
-      upsertNotifications(
-          widget.flutterLocalNotificationsPlugin, _hangouts, result, contact);
-    } else {
-      cancelNotification(
-          widget.flutterLocalNotificationsPlugin, contact.id.hashCode);
-    }
+    scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
     if (friends != null) {
       var index = friends.indexWhere(
           (element) => element.contactIdentifier == result.contactIdentifier);

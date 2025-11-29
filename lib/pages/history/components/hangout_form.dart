@@ -1,9 +1,7 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
-import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/storage.dart';
@@ -70,19 +68,6 @@ class HangoutFormState extends State<HangoutForm> {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
-  Future<void> _handleNotificationScheduling(List<Hangout> hangouts) async {
-    List<Friend>? friends = await Storage.getFriends();
-    for (var contact in widget.selectedFriends) {
-      Friend? friend = friends?.firstWhereOrNull(
-        (element) => element.contactIdentifier == contact.id,
-      );
-      if (friend != null && friend.isContactable) {
-        upsertNotifications(
-            widget.flutterLocalNotificationsPlugin, hangouts, friend, contact);
-      }
-    }
-  }
-
   Future<void> _handleSubmitPress() async {
     if (!_submitting &&
         _formKey.currentState != null &&
@@ -98,12 +83,10 @@ class HangoutFormState extends State<HangoutForm> {
       var index = hangouts.indexWhere((element) => element.id == _data.id);
       if (index == -1) {
         await Storage().createHangout(_data);
-        hangouts.add(_data);
       } else {
         await Storage().updateHangout(_data);
-        hangouts[index] = _data;
       }
-      await _handleNotificationScheduling(hangouts);
+      await scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
       widget.onSubmit();
     }
   }

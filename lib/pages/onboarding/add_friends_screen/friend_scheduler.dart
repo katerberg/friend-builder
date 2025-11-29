@@ -3,14 +3,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/frequency.dart';
-import 'package:friend_builder/main.dart';
 import 'package:friend_builder/missing_permission.dart';
 import 'package:friend_builder/shared/selection_choice_group.dart';
 import 'package:friend_builder/permissions.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
-import 'package:friend_builder/utils/scheduling.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class FriendScheduler extends StatefulWidget {
@@ -60,22 +58,6 @@ class FriendSchedulerState extends State<FriendScheduler>
     super.dispose();
   }
 
-  void _updateNotification(Contact contact, String selectedValue) {
-    if (selectedValue != 'Never') {
-      requestIOSPermissions(flutterLocalNotificationsPlugin);
-      scheduleNotification(
-        widget.flutterLocalNotificationsPlugin,
-        contact.id.hashCode,
-        'Want to chat with ${contact.displayName}?',
-        "It's been a minute!",
-        Scheduling.howLong(DateTime.now(), Frequency.fromType(selectedValue)),
-      );
-    } else {
-      cancelNotification(
-          widget.flutterLocalNotificationsPlugin, contact.id.hashCode);
-    }
-  }
-
   Future<void> _handleSelectionTap(
       Contact contact, String selectedValue) async {
     List<Friend>? friends = await Storage.getFriends();
@@ -100,7 +82,7 @@ class FriendSchedulerState extends State<FriendScheduler>
       widget.storage.saveFriends(friends);
     }
 
-    _updateNotification(contact, selectedValue);
+    scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
     setState(() {
       selection[contact.id] = selectedValue;
     });
