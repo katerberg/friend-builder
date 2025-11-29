@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/router.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/debug_data.dart';
+import 'package:friend_builder/utils/avatar_sync.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -12,6 +13,8 @@ Future<void> main() async {
   await initNotifications(flutterLocalNotificationsPlugin);
 
   await DebugData.populateFakeContactsIfNeeded();
+
+  AvatarSync.syncAvatarsIfNeeded();
 
   runApp(const MainApp());
 }

@@ -1,0 +1,33 @@
+# Cursor Rules for Friend Builder
+
+## Dart/Flutter Conventions
+
+### Variable Naming
+
+- Never use abbreviated or shortened variable names
+- Use full, descriptive names that clearly convey the variable's purpose
+- Examples:
+  - ✅ `preferences` instead of ❌ `prefs`
+  - ✅ `configuration` instead of ❌ `config`
+  - ✅ `database` instead of ❌ `db`
+  - ✅ `repository` instead of ❌ `repo`
+  - ✅ `application` instead of ❌ `app`
+  - ✅ `temporaryValue` instead of ❌ `tempVal`
+- Exception: Well-established abbreviations in the domain (e.g., `id`, `url`, `html`)
+- Exception: Loop counters like `i`, `j`, `k` in simple loops
+- This improves code readability and maintainability
+
+### Print Statements
+
+- Never use bare `print()` statements in production code
+- Always wrap print statements in a debug-only check using `kDebugMode`
+- Import `package:flutter/foundation.dart` when using `kDebugMode`
+- Pattern to follow:
+
+  ```dart
+  if (kDebugMode) {
+    print('Debug message here');
+  }
+  ```
+
+- This ensures print statements are stripped out in release builds for better performance

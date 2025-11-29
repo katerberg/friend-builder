@@ -8,13 +8,13 @@ class StringUtils {
               'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
                   .codeUnitAt(Random().nextInt(62))));
 
-  static List<String?> _getBigrams(String str) {
-    if (str.length < 2) {
+  static List<String?> _getBigrams(String string) {
+    if (string.length < 2) {
       return [];
     }
     List<String?> bigrams = [];
-    for (var i = 0; i < str.length - 1; i++) {
-      bigrams.add(str.toLowerCase().substring(i, i + 2));
+    for (var i = 0; i < string.length - 1; i++) {
+      bigrams.add(string.toLowerCase().substring(i, i + 2));
     }
     return bigrams;
   }
