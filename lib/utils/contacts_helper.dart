@@ -25,9 +25,19 @@ class ContactsHelper {
 
   static List<Contact> filterContacts(
       List<Contact> contacts, Contact friendToRemove) {
-    return contacts
-        .where((element) => element.id != friendToRemove.id)
-        .toList();
+    // Handle both regular Contacts and EncodableContacts which may use identifier
+    String removeId = friendToRemove is EncodableContact &&
+            friendToRemove.identifier.isNotEmpty
+        ? friendToRemove.identifier
+        : friendToRemove.id;
+
+    return contacts.where((element) {
+      String elementId =
+          element is EncodableContact && element.identifier.isNotEmpty
+              ? element.identifier
+              : element.id;
+      return elementId != removeId;
+    }).toList();
   }
 
   static bool isPerfectSubsetMatch(String testString, String pattern) {
