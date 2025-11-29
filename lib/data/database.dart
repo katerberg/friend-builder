@@ -220,4 +220,46 @@ class DBProvider {
     }
     return hangoutList;
   }
+
+  Future<List<Hangout>> getHangoutsPaginated(
+      {required int limit, required int offset}) async {
+    final db = await database;
+    var dbHangouts = await db.query(
+      "hangouts",
+      orderBy: "whenOccurred DESC",
+      limit: limit,
+      offset: offset,
+    );
+
+    if (dbHangouts.isEmpty) {
+      return [];
+    }
+
+    var hangoutIds = dbHangouts.map((h) => h['id'] as String).toList();
+
+    var dbContacts = await db.query(
+      "contacts",
+      where: "hangoutId IN (${List.filled(hangoutIds.length, '?').join(',')})",
+      whereArgs: hangoutIds,
+    );
+
+    List<Hangout> hangoutList =
+        dbHangouts.map((c) => Hangout.fromMap(c)).toList();
+
+    if (dbContacts.isNotEmpty) {
+      for (var c in dbContacts) {
+        var hangout =
+            hangoutList.firstWhere((element) => element.id == c['hangoutId']);
+        hangout.contacts.add(EncodableContact.fromMap(c));
+      }
+    }
+
+    return hangoutList;
+  }
+
+  Future<int> getHangoutCount() async {
+    final db = await database;
+    var result = await db.rawQuery("SELECT COUNT(*) as count FROM hangouts");
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
 }

@@ -13,7 +13,8 @@ Future<void> main() async {
   await initNotifications(flutterLocalNotificationsPlugin);
 
   await DebugData.populateFakeContactsIfNeeded();
-  await DebugData.populateFakeHangoutsIfNeeded();
+  // Easily gets very large, so don't run this very often.
+  // await DebugData.populateFakeHangoutsIfNeeded();
 
   AvatarSync.syncAvatarsIfNeeded();
 

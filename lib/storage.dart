@@ -8,6 +8,15 @@ class Storage {
     return dbHangouts;
   }
 
+  Future<List<Hangout>> getHangoutsPaginated(
+      {required int limit, required int offset}) async {
+    return DBProvider.db.getHangoutsPaginated(limit: limit, offset: offset);
+  }
+
+  Future<int> getHangoutCount() async {
+    return DBProvider.db.getHangoutCount();
+  }
+
   Future updateHangout(Hangout hangout) async {
     return DBProvider.db.saveHangout(hangout);
   }
