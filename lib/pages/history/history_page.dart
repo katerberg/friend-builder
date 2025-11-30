@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/result.dart';
@@ -11,11 +12,13 @@ class HistoryPage extends StatefulWidget {
   final Storage storage = Storage();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   final Hangout? initialHangout;
+  final Function(Contact)? onNavigateToFriend;
 
   HistoryPage({
     super.key,
     required this.flutterLocalNotificationsPlugin,
     this.initialHangout,
+    this.onNavigateToFriend,
   });
 
   @override
@@ -142,6 +145,7 @@ class HistoryPageState extends State<HistoryPage> {
           hangout: hangout,
           onDelete: _onDelete,
           onEdit: _onEdit,
+          onNavigateToFriend: widget.onNavigateToFriend,
           initiallyOpen: widget.initialHangout?.id == hangout.id,
         );
       },

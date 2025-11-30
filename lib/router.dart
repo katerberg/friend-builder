@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/pages/friends/friends_page.dart';
 import 'package:friend_builder/pages/log/log_page.dart';
 import 'package:friend_builder/pages/history/history_page.dart';
@@ -27,6 +28,7 @@ class _FriendRouterState extends State<FriendRouter> {
   var selectedIndex = 1;
   var onboardingStepper = 0;
   Hangout? _initialHangout;
+  Contact? _initialContact;
 
   bool? firstTime;
   late Future _googleFontsPending;
@@ -61,10 +63,12 @@ class _FriendRouterState extends State<FriendRouter> {
     super.initState();
   }
 
-  void _changeTab(int tabIndex, {Hangout? initialHangout}) async {
+  void _changeTab(int tabIndex,
+      {Hangout? initialHangout, Contact? initialContact}) async {
     setState(() {
       selectedIndex = tabIndex;
-      _initialHangout = initialHangout;
+      _initialHangout = tabIndex == 0 ? initialHangout : null;
+      _initialContact = tabIndex == 2 ? initialContact : null;
     });
   }
 
@@ -124,7 +128,9 @@ class _FriendRouterState extends State<FriendRouter> {
           page = HistoryPage(
               flutterLocalNotificationsPlugin:
                   widget.flutterLocalNotificationsPlugin,
-              initialHangout: _initialHangout);
+              initialHangout: _initialHangout,
+              onNavigateToFriend: (contact) =>
+                  _changeTab(2, initialContact: contact));
         case 1:
           page = LogPage(
               onSubmit: () => _changeTab(0),
@@ -135,7 +141,8 @@ class _FriendRouterState extends State<FriendRouter> {
               flutterLocalNotificationsPlugin:
                   widget.flutterLocalNotificationsPlugin,
               onNavigateToHistory: (hangout) =>
-                  _changeTab(0, initialHangout: hangout));
+                  _changeTab(0, initialHangout: hangout),
+              initialContact: _initialContact);
         default:
           throw UnimplementedError('no widget for $selectedIndex');
       }

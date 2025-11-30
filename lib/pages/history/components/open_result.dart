@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/pages/history/components/result_bubbles.dart';
@@ -9,12 +10,14 @@ class OpenResult extends StatelessWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
+  final Function(Contact)? onNavigateToFriend;
 
   const OpenResult({
     super.key,
     required this.hangout,
     required this.onDelete,
     required this.onEdit,
+    this.onNavigateToFriend,
   });
 
   @override
@@ -58,9 +61,10 @@ class OpenResult extends StatelessWidget {
                     ? ResultExpansionItem(
                         iconItem: Icons.note, text: hangout.notes)
                     : const SizedBox.shrink(),
-              ...(hangout.contacts.toList().map((c) => ContactTile(
-                    contact: c,
-                  ))),
+                ...(hangout.contacts.toList().map((c) => ContactTile(
+                      contact: c,
+                      onPressed: onNavigateToFriend,
+                    ))),
               ],
             ),
           ),

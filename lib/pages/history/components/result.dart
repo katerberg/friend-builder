@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/open_result.dart';
 import 'package:friend_builder/pages/history/components/closed_result.dart';
@@ -8,6 +9,7 @@ class Result extends StatefulWidget {
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
   final bool initiallyOpen;
+  final Function(Contact)? onNavigateToFriend;
 
   const Result({
     super.key,
@@ -15,6 +17,7 @@ class Result extends StatefulWidget {
     required this.onDelete,
     required this.onEdit,
     this.initiallyOpen = false,
+    this.onNavigateToFriend,
   });
 
   @override
@@ -45,6 +48,7 @@ class ResultState extends State<Result> {
               hangout: widget.hangout,
               onDelete: widget.onDelete,
               onEdit: widget.onEdit,
+              onNavigateToFriend: widget.onNavigateToFriend,
             )
           : ClosedResult(
               hangout: widget.hangout,

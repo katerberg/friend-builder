@@ -187,7 +187,6 @@ Future<void> scheduleNextNotification(
       DateTime nextNotificationTime =
           Scheduling.howLong(latestHangoutTime, friend.frequency);
 
-      // Only consider notification times in the future
       if (nextNotificationTime.isAfter(DateTime.now())) {
         if (earliestTime == null ||
             nextNotificationTime.isBefore(earliestTime)) {

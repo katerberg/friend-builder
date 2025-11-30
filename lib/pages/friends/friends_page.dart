@@ -18,11 +18,13 @@ class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   final Function(Hangout)? onNavigateToHistory;
+  final Contact? initialContact;
 
   FriendsPage({
     super.key,
     required this.flutterLocalNotificationsPlugin,
     this.onNavigateToHistory,
+    this.initialContact,
   });
 
   @override
@@ -86,6 +88,12 @@ class FriendsPageState extends State<FriendsPage> {
 
     if (mounted) {
       _sortContacts();
+
+      if (widget.initialContact != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _handleContactPress(widget.initialContact);
+        });
+      }
     }
   }
 
