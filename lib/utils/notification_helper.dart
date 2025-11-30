@@ -8,6 +8,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:friend_builder/data/reminder_notification.dart';
 import 'package:collection/collection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final BehaviorSubject<ReminderNotification> didReceiveLocalNotificationSubject =
     BehaviorSubject<ReminderNotification>();
@@ -17,6 +18,9 @@ final BehaviorSubject<String> selectNotificationSubject =
 
 const int _nextNotificationId =
     999999; // Use a fixed ID for the rolling notification
+const int _inactivityNotificationId =
+    999998; // Use a fixed ID for the inactivity notification
+const String _lastLoginKey = 'last_login_time';
 
 Future<void> initNotifications(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
@@ -34,10 +38,13 @@ Future<void> initNotifications(
     initializationSettings,
     onDidReceiveNotificationResponse: (NotificationResponse response) async {
       await scheduleNextNotification(flutterLocalNotificationsPlugin);
+      await scheduleInactivityNotification(flutterLocalNotificationsPlugin);
     },
   );
 
+  await updateLastLoginTime();
   await scheduleNextNotification(flutterLocalNotificationsPlugin);
+  await scheduleInactivityNotification(flutterLocalNotificationsPlugin);
 }
 
 void requestIOSPermissions(
@@ -82,6 +89,53 @@ Future<void> _scheduleNotification(
       platformChannelSpecifics,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.wallClockTime);
+}
+
+Future<void> updateLastLoginTime() async {
+  try {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(
+        _lastLoginKey, DateTime.now().toIso8601String());
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error updating last login time: $e');
+    }
+  }
+}
+
+Future<void> scheduleInactivityNotification(
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+  try {
+    final preferences = await SharedPreferences.getInstance();
+    final lastLoginString = preferences.getString(_lastLoginKey);
+
+    if (lastLoginString == null) {
+      return;
+    }
+
+    final lastLoginTime = DateTime.parse(lastLoginString);
+    final notificationTime = lastLoginTime.add(const Duration(days: 7));
+
+    if (notificationTime.isAfter(DateTime.now())) {
+      await _cancelNotification(
+          flutterLocalNotificationsPlugin, _inactivityNotificationId);
+
+      await _scheduleNotification(
+        flutterLocalNotificationsPlugin,
+        _inactivityNotificationId,
+        'We miss you!',
+        "It's been a while since you checked in. Time to catch up with friends?",
+        notificationTime,
+      );
+    } else {
+      await _cancelNotification(
+          flutterLocalNotificationsPlugin, _inactivityNotificationId);
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error scheduling inactivity notification: $e');
+    }
+  }
 }
 
 Future<void> scheduleNextNotification(
