@@ -1,59 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   final Future<dynamic> googleFontsPending;
 
   const SplashScreen({super.key, required this.googleFontsPending});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  late Future<void> _assetsLoading;
-
-  @override
-  void initState() {
-    super.initState();
-    _assetsLoading = _loadAssets();
-  }
-
-  Future<void> _loadAssets() async {
-    await Future.wait([
-      widget.googleFontsPending,
-      _precacheAssets(),
-    ]);
-  }
-
-  Future<void> _precacheAssets() async {
-    await precacheImage(
-      const AssetImage('logo/splash.png'),
-      context,
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
-    var titleStyle = GoogleFonts.londrinaSketch(
+    var titleStyle = GoogleFonts.getFont(
+      'Londrina Sketch',
       fontSize: 60,
       fontWeight: FontWeight.w900,
       backgroundColor: colorScheme.primary,
     );
 
     return FutureBuilder(
-        future: _assetsLoading,
+        future: googleFontsPending,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return ColoredBox(
-              color: colorScheme.primary,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
-              ),
-            );
+            return const SizedBox();
           }
 
           return ColoredBox(

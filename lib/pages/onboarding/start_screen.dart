@@ -1,46 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class StartScreen extends StatefulWidget {
+class StartScreen extends StatelessWidget {
   final void Function(bool) onSubmit;
   final Future<dynamic> googleFontsPending;
 
   const StartScreen(
       {super.key, required this.onSubmit, required this.googleFontsPending});
 
-  @override
-  State<StartScreen> createState() => _StartScreenState();
-}
-
-class _StartScreenState extends State<StartScreen> {
-  late Future<void> _assetsLoading;
-
-  @override
-  void initState() {
-    super.initState();
-    _assetsLoading = _loadAssets();
-  }
-
-  Future<void> _loadAssets() async {
-    await Future.wait([
-      widget.googleFontsPending,
-      _precacheAssets(),
-    ]);
-  }
-
-  Future<void> _precacheAssets() async {
-    await precacheImage(
-      const AssetImage('logo/splash.png'),
-      context,
-    );
-  }
-
   void _startAddingFriends() {
-    widget.onSubmit(true);
+    onSubmit(true);
   }
 
   void _skipSetup() {
-    widget.onSubmit(false);
+    onSubmit(false);
   }
 
   @override
@@ -48,19 +21,13 @@ class _StartScreenState extends State<StartScreen> {
     var colorScheme = Theme.of(context).colorScheme;
 
     return FutureBuilder(
-      future: _assetsLoading,
+      future: googleFontsPending,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return ColoredBox(
-            color: colorScheme.primary,
-            child: const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            ),
-          );
+          return const SizedBox();
         }
-        var titleStyle = GoogleFonts.londrinaSketch(
+        var titleStyle = GoogleFonts.getFont(
+          'Londrina Sketch',
           fontSize: 60,
           fontWeight: FontWeight.w900,
           color: colorScheme.surface,
