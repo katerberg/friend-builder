@@ -67,8 +67,17 @@ class _FriendRouterState extends State<FriendRouter> {
       {Hangout? initialHangout, Contact? initialContact}) async {
     setState(() {
       selectedIndex = tabIndex;
-      _initialHangout = tabIndex == 0 ? initialHangout : null;
-      _initialContact = tabIndex == 2 ? initialContact : null;
+      if (tabIndex == 0) {
+        _initialHangout = initialHangout;
+      } else {
+        _initialHangout = null;
+      }
+
+      if (tabIndex == 2) {
+        _initialContact = initialContact;
+      } else {
+        _initialContact = null;
+      }
     });
   }
 
@@ -190,9 +199,7 @@ class _FriendRouterState extends State<FriendRouter> {
                     ? Theme.of(context).textTheme.bodySmall!.color
                     : Colors.white70,
                 onTap: (value) {
-                  setState(() {
-                    selectedIndex = value;
-                  });
+                  _changeTab(value);
                 },
               ),
       );

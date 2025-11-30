@@ -91,7 +91,12 @@ class FriendsPageState extends State<FriendsPage> {
 
       if (widget.initialContact != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _handleContactPress(widget.initialContact);
+          final matchingContact = _contacts.firstWhereOrNull(
+            (c) => c.id == widget.initialContact!.id,
+          );
+          if (matchingContact != null) {
+            _handleContactPress(matchingContact);
+          }
         });
       }
     }

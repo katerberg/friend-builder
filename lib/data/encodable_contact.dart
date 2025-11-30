@@ -19,7 +19,9 @@ class EncodableContact extends Contact {
     required this.identifier,
     required this.familyName,
     this.avatar,
-  });
+  }) {
+    id = identifier;
+  }
 
   EncodableContact.fromContact(Contact contact) {
     if (contact is EncodableContact) {
@@ -38,6 +40,7 @@ class EncodableContact extends Contact {
       middleName = contact.name.middle;
       givenName = contact.name.first;
       identifier = contact.id;
+      id = contact.id;
       familyName = contact.name.last;
       avatar = contact.photo;
     }
@@ -65,7 +68,7 @@ class EncodableContact extends Contact {
   }
 
   factory EncodableContact.fromJson(Map<String, dynamic> parsedJson) {
-    return EncodableContact(
+    final contact = EncodableContact(
       displayName: parsedJson['displayName'] ?? "",
       middleName: parsedJson['middleName'] ?? "",
       givenName: parsedJson['givenName'] ?? "",
@@ -75,10 +78,12 @@ class EncodableContact extends Contact {
           ? null
           : Uint8List.fromList(parsedJson['avatar'].cast<int>()),
     );
+    contact.id = contact.identifier;
+    return contact;
   }
 
   factory EncodableContact.fromMap(Map<String, dynamic> parsedJson) {
-    return EncodableContact(
+    final contact = EncodableContact(
       displayName: parsedJson['displayName'] ?? "",
       middleName: parsedJson['middleName'] ?? "",
       givenName: parsedJson['givenName'] ?? "",
@@ -88,6 +93,8 @@ class EncodableContact extends Contact {
           ? null
           : Uint8List.fromList(parsedJson['avatar'].cast<int>()),
     );
+    contact.id = contact.identifier;
+    return contact;
   }
 
   @override

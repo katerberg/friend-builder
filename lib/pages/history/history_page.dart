@@ -28,16 +28,57 @@ class HistoryPage extends StatefulWidget {
 class HistoryPageState extends State<HistoryPage> {
   final List<Hangout> _hangouts = [];
   final ScrollController _scrollController = ScrollController();
+  final Map<int, GlobalKey> _itemKeys = {};
   static const int _pageSize = 20;
   int _currentOffset = 0;
   bool _isLoading = false;
   bool _hasMore = true;
+  bool _hasScrolledToInitial = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _loadMoreHangouts();
+    _loadMoreHangouts().then((_) {
+      if (widget.initialHangout != null) {
+        _scrollToInitialHangout();
+      }
+    });
+  }
+
+  void _scrollToInitialHangout() {
+    if (_hasScrolledToInitial) return;
+
+    final index =
+        _hangouts.indexWhere((h) => h.id == widget.initialHangout?.id);
+
+    if (index != -1) {
+      _hasScrolledToInitial = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients && mounted) {
+          final key = _itemKeys[index];
+          if (key?.currentContext != null) {
+            Scrollable.ensureVisible(
+              key!.currentContext!,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              alignment: 0.1,
+            );
+          } else {
+            const estimatedItemHeight = 90.0;
+            final targetPosition = index * estimatedItemHeight;
+
+            _scrollController.animateTo(
+              targetPosition,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          }
+        }
+      });
+    } else if (_hasMore && !_isLoading) {
+      _loadMoreHangouts().then((_) => _scrollToInitialHangout());
+    }
   }
 
   @override
@@ -141,12 +182,21 @@ class HistoryPageState extends State<HistoryPage> {
         }
 
         final hangout = _hangouts[index];
-        return Result(
-          hangout: hangout,
-          onDelete: _onDelete,
-          onEdit: _onEdit,
-          onNavigateToFriend: widget.onNavigateToFriend,
-          initiallyOpen: widget.initialHangout?.id == hangout.id,
+        final isInitial = widget.initialHangout?.id == hangout.id;
+
+        if (isInitial && !_itemKeys.containsKey(index)) {
+          _itemKeys[index] = GlobalKey();
+        }
+
+        return Container(
+          key: _itemKeys[index],
+          child: Result(
+            hangout: hangout,
+            onDelete: _onDelete,
+            onEdit: _onEdit,
+            onNavigateToFriend: widget.onNavigateToFriend,
+            initiallyOpen: isInitial,
+          ),
         );
       },
     );
