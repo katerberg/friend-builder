@@ -129,6 +129,9 @@ class DebugData {
 
   /// Creates 1000 fake hangouts with semi-random distribution of friends (1-5 per hangout)
   static Future<void> populateFakeHangoutsIfNeeded() async {
+    if (!kDebugMode) {
+      return;
+    }
     try {
       // Get all existing friends
       final allFriends = await Storage.getFriends();
