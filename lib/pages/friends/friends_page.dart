@@ -36,24 +36,14 @@ class FriendsPageContact {
   Frequency? frequency;
   Hangout? latestHangout;
 
-  FriendsPageContact(
-      this.contact, List<Hangout> hangouts, List<Friend> friends) {
-    Friend? friend = friends
-        .firstWhereOrNull((element) => element.contactIdentifier == contact.id);
+  FriendsPageContact({
+    required this.contact,
+    required Map<String, Hangout?> latestHangoutMap,
+    required Map<String, Friend?> friendMap,
+  }) {
+    Friend? friend = friendMap[contact.id];
     frequency = friend?.isContactable == true ? friend?.frequency : null;
-    latestHangout = hangouts.isEmpty
-        ? null
-        : hangouts.reduce((value, hangout) {
-            if (hangout.hasContact(contact) &&
-                (value.when.compareTo(hangout.when) < 0 ||
-                    !value.hasContact(contact))) {
-              return hangout;
-            }
-            return value;
-          });
-    latestHangout = latestHangout != null && latestHangout!.hasContact(contact)
-        ? latestHangout
-        : null;
+    latestHangout = latestHangoutMap[contact.id];
   }
 }
 
@@ -62,12 +52,15 @@ class FriendsPageState extends State<FriendsPage> {
   Iterable<Contact> _visibleContacts = [];
   List<Contact> _hangoutContacts = [];
   List<Contact> _unusedContacts = [];
-  List<Hangout> _hangouts = [];
   List<Friend> _friends = [];
   bool _missingPermission = false;
   bool _isLoading = true;
   final TextEditingController typeaheadController =
       TextEditingController(text: '');
+
+  Map<String, Hangout?> _latestHangoutMap = {};
+  Map<String, Friend?> _friendMap = {};
+  Map<String, FriendsPageContact> _contactCache = {};
 
   @override
   void initState() {
@@ -102,32 +95,66 @@ class FriendsPageState extends State<FriendsPage> {
     }
   }
 
+  void _buildLatestHangoutMap(List<Hangout> hangouts) {
+    final Map<String, Hangout?> newMap = {};
+
+    for (final hangout in hangouts) {
+      for (final contact in hangout.contacts) {
+        final existingHangout = newMap[contact.identifier];
+        if (existingHangout == null ||
+            hangout.when.isAfter(existingHangout.when)) {
+          newMap[contact.identifier] = hangout;
+        }
+      }
+    }
+
+    _latestHangoutMap = newMap;
+    _contactCache.clear();
+  }
+
+  void _buildFriendMap(List<Friend> friends) {
+    _friendMap = {for (var friend in friends) friend.contactIdentifier: friend};
+    _contactCache.clear();
+  }
+
+  FriendsPageContact _getOrCreateContactData(Contact contact) {
+    return _contactCache.putIfAbsent(
+      contact.id,
+      () => FriendsPageContact(
+        contact: contact,
+        latestHangoutMap: _latestHangoutMap,
+        friendMap: _friendMap,
+      ),
+    );
+  }
+
   Future<void> _refreshHangouts() async {
     var hangouts =
         await widget.storage.getHangoutsPaginated(limit: 100, offset: 0);
     if (mounted) {
       setState(() {
-        _hangouts = hangouts;
+        _buildLatestHangoutMap(hangouts);
       });
     }
 
     if (hangouts.length == 100) {
-      _loadRemainingHangouts(100);
+      _loadRemainingHangouts(100, hangouts);
     }
   }
 
-  void _loadRemainingHangouts(int offset) async {
+  void _loadRemainingHangouts(int offset, List<Hangout> accumulatedHangouts) async {
     const int pageSize = 100;
     var moreHangouts = await widget.storage
         .getHangoutsPaginated(limit: pageSize, offset: offset);
 
     if (mounted && moreHangouts.isNotEmpty) {
+      accumulatedHangouts.addAll(moreHangouts);
       setState(() {
-        _hangouts.addAll(moreHangouts);
+        _buildLatestHangoutMap(accumulatedHangouts);
       });
 
       if (moreHangouts.length == pageSize) {
-        _loadRemainingHangouts(offset + pageSize);
+        _loadRemainingHangouts(offset + pageSize, accumulatedHangouts);
       }
     }
   }
@@ -137,6 +164,7 @@ class FriendsPageState extends State<FriendsPage> {
     if (mounted) {
       setState(() {
         _friends = friends ?? [];
+        _buildFriendMap(_friends);
       });
     }
   }
@@ -164,8 +192,8 @@ class FriendsPageState extends State<FriendsPage> {
   }
 
   int _compareContactsByTimeAndName(Contact c1, Contact c2) {
-    var cOne = FriendsPageContact(c1, _hangouts, _friends);
-    var cTwo = FriendsPageContact(c2, _hangouts, _friends);
+    var cOne = _getOrCreateContactData(c1);
+    var cTwo = _getOrCreateContactData(c2);
     int days1 = Scheduling.daysLeft(
         cOne.frequency ?? Frequency.fromType('Weekly'),
         cOne.latestHangout?.when);
@@ -180,15 +208,17 @@ class FriendsPageState extends State<FriendsPage> {
   void _sortContacts() {
     setState(() {
       _hangoutContacts = _visibleContacts
-          .toList()
-          .where((c) => _friends.any((element) =>
-              element.contactIdentifier == c.id && element.isContactable))
+          .where((c) {
+            final friend = _friendMap[c.id];
+            return friend != null && friend.isContactable;
+          })
           .toList()
         ..sort(_compareContactsByTimeAndName);
       _unusedContacts = _visibleContacts
-          .toList()
-          .where((c) => !_friends.any((element) =>
-              element.contactIdentifier == c.id && element.isContactable))
+          .where((c) {
+            final friend = _friendMap[c.id];
+            return friend == null || !friend.isContactable;
+          })
           .toList()
         ..sort(_compareContactsByName);
     });
@@ -297,15 +327,15 @@ class FriendsPageState extends State<FriendsPage> {
               onChanged: _handleContactChange,
             ),
           ),
-          ...(safeHangoutContacts
-              .map((c) => FriendsPageContact(c, _hangouts, _friends))
-              .toList()
-              .map((c) => ContactTile(
-                    contact: c.contact,
-                    onPressed: _handleContactPress,
-                    frequency: c.frequency,
-                    latestHangout: c.latestHangout,
-                  ))),
+          ...(safeHangoutContacts.map((c) {
+            final contactData = _getOrCreateContactData(c);
+            return ContactTile(
+              contact: contactData.contact,
+              onPressed: _handleContactPress,
+              frequency: contactData.frequency,
+              latestHangout: contactData.latestHangout,
+            );
+          })),
           safeHangoutContacts.isNotEmpty
               ? const Divider()
               : const SizedBox.shrink(),
