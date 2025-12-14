@@ -221,11 +221,20 @@ class DBProvider {
     return hangoutList;
   }
 
-  Future<List<Hangout>> getHangoutsPaginated(
-      {required int limit, required int offset}) async {
+  Future<List<Hangout>> getHangoutsPaginated({
+    required int limit,
+    required int offset,
+    bool filterOldHangouts = true,
+  }) async {
     final db = await database;
+
+    final oneYearAgo =
+        DateTime.now().subtract(const Duration(days: 365)).toIso8601String();
+
     var dbHangouts = await db.query(
       "hangouts",
+      where: filterOldHangouts ? "whenOccurred >= ?" : null,
+      whereArgs: filterOldHangouts ? [oneYearAgo] : null,
       orderBy: "whenOccurred DESC",
       limit: limit,
       offset: offset,
@@ -255,11 +264,5 @@ class DBProvider {
     }
 
     return hangoutList;
-  }
-
-  Future<int> getHangoutCount() async {
-    final db = await database;
-    var result = await db.rawQuery("SELECT COUNT(*) as count FROM hangouts");
-    return Sqflite.firstIntValue(result) ?? 0;
   }
 }
