@@ -286,6 +286,34 @@ class FriendsPageState extends State<FriendsPage> {
     _handleContactsFilter(matchingLevel.isNotEmpty ? matchingLevel : _contacts);
   }
 
+  Widget _buildSearchField() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        textCapitalization: TextCapitalization.sentences,
+        autocorrect: false,
+        decoration: const InputDecoration(
+          prefixIcon: Icon(Icons.search),
+        ),
+        controller: typeaheadController,
+        onChanged: _handleContactChange,
+      ),
+    );
+  }
+
+  Widget _buildContactTile(Contact contact, {bool withFrequency = false}) {
+    if (withFrequency) {
+      final contactData = _getOrCreateContactData(contact);
+      return ContactTile(
+        contact: contactData.contact,
+        onPressed: _handleContactPress,
+        frequency: contactData.frequency,
+        latestHangout: contactData.latestHangout,
+      );
+    }
+    return ContactTile(contact: contact, onPressed: _handleContactPress);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget body;
@@ -294,54 +322,48 @@ class FriendsPageState extends State<FriendsPage> {
         isWhite: true,
       );
     } else if (_isLoading) {
-      body = ListView(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              textCapitalization: TextCapitalization.sentences,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-              ),
-              controller: typeaheadController,
-              onChanged: _handleContactChange,
-            ),
-          ),
-          ...List.generate(10, (index) => const SkeletonContactTile()),
-        ],
+      body = ListView.builder(
+        itemCount: 11,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return _buildSearchField();
+          }
+          return const SkeletonContactTile();
+        },
       );
     } else {
-      var safeHangoutContacts = _hangoutContacts;
-      body = ListView(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              textCapitalization: TextCapitalization.sentences,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-              ),
-              controller: typeaheadController,
-              onChanged: _handleContactChange,
-            ),
-          ),
-          ...(safeHangoutContacts.map((c) {
-            final contactData = _getOrCreateContactData(c);
-            return ContactTile(
-              contact: contactData.contact,
-              onPressed: _handleContactPress,
-              frequency: contactData.frequency,
-              latestHangout: contactData.latestHangout,
+      final filteredUnusedContacts =
+          _unusedContacts.where((c) => c.displayName != '').toList();
+      final hasDivider = _hangoutContacts.isNotEmpty;
+
+      final totalItems = 1 +
+          _hangoutContacts.length +
+          (hasDivider ? 1 : 0) +
+          filteredUnusedContacts.length;
+
+      body = ListView.builder(
+        itemCount: totalItems,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return _buildSearchField();
+          }
+
+          final hangoutIndex = index - 1;
+          if (hangoutIndex < _hangoutContacts.length) {
+            return _buildContactTile(
+              _hangoutContacts[hangoutIndex],
+              withFrequency: true,
             );
-          })),
-          safeHangoutContacts.isNotEmpty
-              ? const Divider()
-              : const SizedBox.shrink(),
-          ...(_unusedContacts).whereNot((c) => c.displayName == '').map(
-              (c) => ContactTile(contact: c, onPressed: _handleContactPress)),
-        ],
+          }
+
+          if (hasDivider && hangoutIndex == _hangoutContacts.length) {
+            return const Divider();
+          }
+
+          final unusedIndex =
+              hangoutIndex - _hangoutContacts.length - (hasDivider ? 1 : 0);
+          return _buildContactTile(filteredUnusedContacts[unusedIndex]);
+        },
       );
     }
 
