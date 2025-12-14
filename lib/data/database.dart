@@ -20,6 +20,8 @@ class DBProvider {
     notes TEXT,
     whenOccurred TEXT
 )''');
+    batch.execute(
+        'CREATE INDEX IF NOT EXISTS idx_hangouts_when ON hangouts(whenOccurred)');
   }
 
   void _createContactsTable(batch) {
@@ -49,6 +51,11 @@ class DBProvider {
     _createHangoutsTable(batch);
   }
 
+  void _updateV2ToV3(Batch batch) {
+    batch.execute(
+        'CREATE INDEX IF NOT EXISTS idx_hangouts_when ON hangouts(whenOccurred)');
+  }
+
   _initDB() async {
     return await openDatabase(
       join(await getDatabasesPath(), 'friend-builder.db'),
@@ -62,13 +69,16 @@ class DBProvider {
       onConfigure: _onConfigure,
       onUpgrade: (Database db, int oldVersion, int newVersion) async {
         var batch = db.batch();
-        if (oldVersion == 1) {
+        if (oldVersion < 2) {
           _updateV1ToV2(batch);
+        }
+        if (oldVersion < 3) {
+          _updateV2ToV3(batch);
         }
         await batch.commit();
       },
       onDowngrade: onDatabaseDowngradeDelete,
-      version: 2,
+      version: 3,
     );
   }
 
