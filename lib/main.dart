@@ -12,9 +12,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initNotifications(flutterLocalNotificationsPlugin);
 
-  await DebugData.populateFakeContactsIfNeeded();
-  // Easily gets very large, so don't run this very often.
-  await DebugData.populateFakeHangoutsIfNeeded();
+  await DebugData.removeDebugHangouts();
+  await DebugData.removeDebugContacts();
+  // await DebugData.populateFakeContactsIfNeeded();
+  // await DebugData.populateFakeHangoutsIfNeeded();
 
   AvatarSync.syncAvatarsIfNeeded();
 

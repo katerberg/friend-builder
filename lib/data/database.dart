@@ -123,6 +123,12 @@ class DBProvider {
     return list;
   }
 
+  Future<int> deleteFriend(Friend friend) async {
+    final db = await database;
+    return db.delete('friends',
+        where: 'contactIdentifier = ?', whereArgs: [friend.contactIdentifier]);
+  }
+
   Future<int> deleteHangout(Hangout hangout) async {
     final db = await database;
     return db.delete('hangouts', where: 'id = ?', whereArgs: [hangout.id]);

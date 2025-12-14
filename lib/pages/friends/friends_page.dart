@@ -14,7 +14,6 @@ import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/pages/friends/components/skeleton_contact_tile.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/contact_sorting.dart';
-import 'package:friend_builder/utils/debug_data.dart';
 
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -283,37 +282,6 @@ class FriendsPageState extends State<FriendsPage> {
     _handleContactsFilter(matchingLevel.isNotEmpty ? matchingLevel : _contacts);
   }
 
-  Future<void> _handleDebugCleanup() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Debug Hangouts?'),
-        content: const Text(
-            'This will delete all hangouts with [DEBUG] in their notes.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Remove'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-
-    final count = await DebugData.removeDebugHangouts();
-    if (mounted && count > 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Removed $count debug hangouts')),
-      );
-      await _refreshHangouts();
-    }
-  }
-
   Widget _buildSearchField() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -398,10 +366,7 @@ class FriendsPageState extends State<FriendsPage> {
     return GestureDetector(
       child: Scaffold(
         appBar: AppBar(
-          title: GestureDetector(
-            onLongPress: kDebugMode ? _handleDebugCleanup : null,
-            child: const Text('Contacts'),
-          ),
+          title: const Text('Contacts'),
         ),
         body: body,
       ),

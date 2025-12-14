@@ -8,8 +8,6 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/utils/string_utils.dart';
 
-/// Debug-only utility to populate fake contacts for testing
-/// This will only run in debug mode and will not create duplicates
 class DebugData {
   static List<Map<String, String>> get _fakeContacts => [
         {'firstName': 'Alice', 'lastName': 'Johnson', 'frequency': 'Weekly'},
@@ -24,26 +22,22 @@ class DebugData {
         },
       ];
 
-  /// Creates fake device contacts and friends for testing if they don't already exist
-  /// Only runs in debug mode
+  // Creates fake device contacts and friends for testing if they don't already exist
   static Future<void> populateFakeContactsIfNeeded() async {
     if (!kDebugMode) {
       return;
     }
 
     try {
-      // Check if we have permission to access contacts
       if (!await FlutterContacts.requestPermission()) {
         debugPrint('⚠️  Contact permission denied, skipping debug contacts');
         return;
       }
 
-      // Get existing device contacts
       final existingContacts = await FlutterContacts.getContacts(
         withProperties: true,
       );
 
-      // Get existing friends from database
       final existingFriends = await Storage.getFriends();
       final existingIdentifiers =
           existingFriends?.map((f) => f.contactIdentifier).toSet() ?? {};
@@ -52,13 +46,11 @@ class DebugData {
       int friendsCreated = 0;
       final List<Friend> friendsToAdd = [];
 
-      // Check each fake contact and create if needed
       for (final fakeContact in _fakeContacts) {
         final firstName = fakeContact['firstName']!;
         final lastName = fakeContact['lastName']!;
         final fullName = '$firstName $lastName';
 
-        // Check if this contact already exists on the device (with or without DEBUG prefix)
         Contact? existingContact = existingContacts.firstWhere(
           (c) => c.name.first == firstName && c.name.last == lastName,
           orElse: () => Contact(),
@@ -67,7 +59,6 @@ class DebugData {
         String contactId;
         bool isDebugContact = existingContact.displayName.contains('DEBUG');
 
-        // Create device contact only if no contact with that name exists
         if (existingContact.id.isEmpty) {
           final newContact = Contact()
             ..name.first = firstName
@@ -95,7 +86,6 @@ class DebugData {
           }
         }
 
-        // Create Friend record if it doesn't exist
         if (!existingIdentifiers.contains(contactId)) {
           final friend = Friend(
             contactIdentifier: contactId,
@@ -109,13 +99,11 @@ class DebugData {
         }
       }
 
-      // Save all new friends to database
       if (friendsToAdd.isNotEmpty) {
         final storage = Storage();
         await storage.saveFriends(friendsToAdd);
       }
 
-      // Summary
       if (contactsCreated > 0 || friendsCreated > 0) {
         debugPrint(
             '✅ Debug data created: $contactsCreated device contacts, $friendsCreated friend records');
@@ -133,19 +121,16 @@ class DebugData {
       return;
     }
     try {
-      // Get all existing friends
       final allFriends = await Storage.getFriends();
       if (allFriends == null || allFriends.isEmpty) {
         debugPrint('⚠️  No friends found, cannot create hangouts');
         return;
       }
 
-      // Get all contacts to create EncodableContacts
       final contacts = await FlutterContacts.getContacts(
         withProperties: true,
       );
 
-      // Create a map of contactIdentifier -> Contact for quick lookup
       final contactMap = <String, Contact>{};
       for (final contact in contacts) {
         contactMap[contact.id] = contact;
@@ -156,8 +141,6 @@ class DebugData {
       final List<Hangout> hangoutsToCreate = [];
       final now = DateTime.now();
 
-      // Distribution weights for number of friends per hangout
-      // Weighted towards smaller groups: 40% single, 30% pairs, 20% triplets, 7% quads, 3% five
       int getRandomFriendCount() {
         final roll = random.nextInt(100);
         if (roll < 40) return 1; // 40%
@@ -168,10 +151,8 @@ class DebugData {
       }
 
       for (int i = 0; i < 1000; i++) {
-        // Determine how many friends for this hangout
         final friendCount = getRandomFriendCount();
 
-        // Randomly select friends (without replacement for this hangout)
         final selectedFriendIndices = <int>[];
         while (selectedFriendIndices.length < friendCount &&
             selectedFriendIndices.length < allFriends.length) {
@@ -181,7 +162,6 @@ class DebugData {
           }
         }
 
-        // Convert to EncodableContacts
         final hangoutContacts = <EncodableContact>[];
         for (final index in selectedFriendIndices) {
           final friend = allFriends[index];
@@ -191,16 +171,13 @@ class DebugData {
           }
         }
 
-        // Skip if we couldn't find any contacts
         if (hangoutContacts.isEmpty) {
           continue;
         }
 
-        // Generate a random date within the past 2 years
         final daysAgo = random.nextInt(730); // 0-730 days
         final hangoutDate = now.subtract(Duration(days: daysAgo));
 
-        // Generate notes
         final notesOptions = [
           'Coffee catch-up',
           'Lunch meeting',
@@ -235,7 +212,6 @@ class DebugData {
         hangoutsToCreate.add(hangout);
       }
 
-      // Save all hangouts
       for (final hangout in hangoutsToCreate) {
         await storage.createHangout(hangout);
       }
@@ -247,8 +223,6 @@ class DebugData {
     }
   }
 
-  /// Removes all hangouts that have [DEBUG] in their notes
-  /// Only runs in debug mode
   static Future<int> removeDebugHangouts() async {
     if (!kDebugMode) {
       return 0;
@@ -279,6 +253,57 @@ class DebugData {
       return debugHangouts.length;
     } catch (e) {
       debugPrint('❌ Error removing debug hangouts: $e');
+      return 0;
+    }
+  }
+
+  static Future<int> removeDebugContacts() async {
+    if (!kDebugMode) {
+      return 0;
+    }
+
+    try {
+      if (!await FlutterContacts.requestPermission()) {
+        debugPrint(
+            '⚠️  Contact permission denied, cannot remove debug contacts');
+        return 0;
+      }
+
+      final contacts = await FlutterContacts.getContacts(withProperties: true);
+      debugPrint('📱 Found ${contacts.length} total contacts on device');
+
+      final debugContacts =
+          contacts.where((c) => c.displayName.contains('[DEBUG]')).toList();
+
+      if (debugContacts.isEmpty) {
+        debugPrint('ℹ️  No debug contacts found');
+        return 0;
+      }
+
+      debugPrint('🔍 Found ${debugContacts.length} debug contacts to remove');
+
+      final storage = Storage();
+      final friends = await Storage.getFriends();
+      final debugContactIds = debugContacts.map((c) => c.id).toSet();
+
+      final debugFriends = friends
+              ?.where((f) => debugContactIds.contains(f.contactIdentifier))
+              .toList() ??
+          [];
+
+      for (final friend in debugFriends) {
+        await storage.deleteFriend(friend);
+      }
+
+      for (final contact in debugContacts) {
+        await contact.delete();
+      }
+
+      debugPrint(
+          '🗑️  Removed ${debugContacts.length} debug contacts and ${debugFriends.length} friend records');
+      return debugContacts.length;
+    } catch (e) {
+      debugPrint('❌ Error removing debug contacts: $e');
       return 0;
     }
   }

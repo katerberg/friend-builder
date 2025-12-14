@@ -37,6 +37,10 @@ class Storage {
     return dbFriends;
   }
 
+  Future deleteFriend(Friend friend) async {
+    return DBProvider.db.deleteFriend(friend);
+  }
+
   Future saveFriends(List<Friend> friends) async {
     var futureMap = friends.map((friend) {
       return DBProvider.db.saveFriend(friend);
