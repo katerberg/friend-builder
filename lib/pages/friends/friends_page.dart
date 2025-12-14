@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/contacts_permission.dart';
@@ -12,7 +13,7 @@ import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/pages/friends/components/skeleton_contact_tile.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
-import 'package:friend_builder/utils/scheduling.dart';
+import 'package:friend_builder/utils/contact_sorting.dart';
 
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -60,7 +61,7 @@ class FriendsPageState extends State<FriendsPage> {
 
   Map<String, Hangout?> _latestHangoutMap = {};
   Map<String, Friend?> _friendMap = {};
-  Map<String, FriendsPageContact> _contactCache = {};
+  final Map<String, FriendsPageContact> _contactCache = {};
 
   @override
   void initState() {
@@ -80,7 +81,7 @@ class FriendsPageState extends State<FriendsPage> {
     await Future.wait([_refreshFriends(), _refreshHangouts()]);
 
     if (mounted) {
-      _sortContacts();
+      await _sortContacts();
 
       if (widget.initialContact != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -142,7 +143,8 @@ class FriendsPageState extends State<FriendsPage> {
     }
   }
 
-  void _loadRemainingHangouts(int offset, List<Hangout> accumulatedHangouts) async {
+  void _loadRemainingHangouts(
+      int offset, List<Hangout> accumulatedHangouts) async {
     const int pageSize = 100;
     var moreHangouts = await widget.storage
         .getHangoutsPaginated(limit: pageSize, offset: offset);
@@ -184,43 +186,37 @@ class FriendsPageState extends State<FriendsPage> {
     setState(() {
       _visibleContacts = contacts;
     });
-    _sortContacts();
+    _sortContacts(); // Fire and forget - UI will update when sort completes
   }
 
-  int _compareContactsByName(Contact? c1, Contact? c2) {
-    return (c1?.displayName ?? '').compareTo(c2?.displayName ?? '');
-  }
+  Future<void> _sortContacts() async {
+    final sortableContacts = _visibleContacts.map((c) {
+      final friend = _friendMap[c.id];
+      final hangout = _latestHangoutMap[c.id];
+      return SortableContact(
+        id: c.id,
+        displayName: c.displayName,
+        frequencyValue: friend?.frequency.value,
+        lastHangoutDate: hangout?.when,
+        isContactable: friend?.isContactable ?? false,
+      );
+    }).toList();
 
-  int _compareContactsByTimeAndName(Contact c1, Contact c2) {
-    var cOne = _getOrCreateContactData(c1);
-    var cTwo = _getOrCreateContactData(c2);
-    int days1 = Scheduling.daysLeft(
-        cOne.frequency ?? Frequency.fromType('Weekly'),
-        cOne.latestHangout?.when);
-    int days2 = Scheduling.daysLeft(
-        cTwo.frequency ?? Frequency.fromType('Weekly'),
-        cTwo.latestHangout?.when);
-    return days1 - days2 == 0
-        ? (c1.displayName).compareTo(c2.displayName)
-        : days1 - days2;
-  }
+    final result = await compute(sortContactsForDisplay, sortableContacts);
 
-  void _sortContacts() {
+    if (!mounted) return;
+
+    final contactMap = {for (var c in _visibleContacts) c.id: c};
+
     setState(() {
-      _hangoutContacts = _visibleContacts
-          .where((c) {
-            final friend = _friendMap[c.id];
-            return friend != null && friend.isContactable;
-          })
-          .toList()
-        ..sort(_compareContactsByTimeAndName);
-      _unusedContacts = _visibleContacts
-          .where((c) {
-            final friend = _friendMap[c.id];
-            return friend == null || !friend.isContactable;
-          })
-          .toList()
-        ..sort(_compareContactsByName);
+      _hangoutContacts = result.hangoutContactIds
+          .map((id) => contactMap[id])
+          .whereType<Contact>()
+          .toList();
+      _unusedContacts = result.unusedContactIds
+          .map((id) => contactMap[id])
+          .whereType<Contact>()
+          .toList();
     });
   }
 

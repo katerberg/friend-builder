@@ -38,6 +38,10 @@ class Frequency {
     return Frequency.fromType(frequencyString);
   }
 
+  factory Frequency.fromValue(int value) {
+    return Frequency(type: 'Custom', value: value);
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'type': type,

@@ -14,7 +14,7 @@ Future<void> main() async {
 
   await DebugData.populateFakeContactsIfNeeded();
   // Easily gets very large, so don't run this very often.
-  // await DebugData.populateFakeHangoutsIfNeeded();
+  await DebugData.populateFakeHangoutsIfNeeded();
 
   AvatarSync.syncAvatarsIfNeeded();
 
