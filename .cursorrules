@@ -31,3 +31,19 @@
   ```
 
 - This ensures print statements are stripped out in release builds for better performance
+
+### Comments
+
+- Minimize comments in code - let the code speak for itself
+- Only add comments when logic is truly complicated or unintuitive
+- Never add comments that simply restate what the code does
+- Avoid:
+  - ❌ `// Loop through the list`
+  - ❌ `// Return the result`
+  - ❌ `// Set the value to true`
+  - ❌ `// Initialize the controller`
+- Acceptable:
+  - ✅ Explaining *why* something non-obvious is done
+  - ✅ Documenting workarounds for known issues or bugs
+  - ✅ Clarifying complex algorithms or business logic
+- Good variable/function names eliminate the need for most comments

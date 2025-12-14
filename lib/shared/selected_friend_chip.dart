@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts_permission.dart';
-import 'package:friend_builder/data/encodable_contact.dart';
+import 'package:friend_builder/shared/lazy_contact_avatar.dart';
 
 class SelectedFriendChip extends StatelessWidget {
   final Contact selectedFriend;
@@ -18,8 +18,7 @@ class SelectedFriendChip extends StatelessWidget {
   Widget build(BuildContext context) {
     handleDelete() => onPressed(selectedFriend);
     return InputChip(
-      avatar:
-          EncodableContact.fromContact(selectedFriend).getAvatar(context, 12),
+      avatar: LazyContactAvatar(contact: selectedFriend, radius: 12),
       backgroundColor:
           isWhite ? Colors.white : Theme.of(context).chipTheme.backgroundColor,
       onDeleted: handleDelete,

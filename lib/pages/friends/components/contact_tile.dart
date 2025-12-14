@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts_permission.dart';
-import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/utils/scheduling.dart';
 import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/shared/lazy_contact_avatar.dart';
 
 class ContactTile extends StatelessWidget {
   final Contact contact;
@@ -43,7 +43,7 @@ class ContactTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 18),
-      leading: EncodableContact.fromContact(contact).getAvatar(context),
+      leading: LazyContactAvatar(contact: contact),
       onTap: () => onPressed?.call(contact),
       title: Text(
         contact.displayName,

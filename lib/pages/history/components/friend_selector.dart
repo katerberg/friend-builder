@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/shared/no_items_found.dart';
-import 'package:friend_builder/data/encodable_contact.dart';
+import 'package:friend_builder/shared/lazy_contact_avatar.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
@@ -48,7 +48,7 @@ class FriendSelector extends StatelessWidget {
           ContactsHelper.getSuggestions(selectedFriends, pattern),
       itemBuilder: (context, Contact suggestion) {
         return ListTile(
-          leading: EncodableContact.fromContact(suggestion).getAvatar(context),
+          leading: LazyContactAvatar(contact: suggestion),
           title: Text(suggestion.displayName),
         );
       },
