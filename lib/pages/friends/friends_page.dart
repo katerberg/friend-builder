@@ -14,6 +14,7 @@ import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/pages/friends/components/skeleton_contact_tile.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/contact_sorting.dart';
+import 'package:friend_builder/utils/debug_data.dart';
 
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -282,6 +283,16 @@ class FriendsPageState extends State<FriendsPage> {
     _handleContactsFilter(matchingLevel.isNotEmpty ? matchingLevel : _contacts);
   }
 
+  Future<void> _handleDebugCleanup() async {
+    final count = await DebugData.removeDebugHangouts();
+    if (mounted && count > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Removed $count debug hangouts')),
+      );
+      await _refreshHangouts();
+    }
+  }
+
   Widget _buildSearchField() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -366,7 +377,10 @@ class FriendsPageState extends State<FriendsPage> {
     return GestureDetector(
       child: Scaffold(
         appBar: AppBar(
-          title: (const Text('Contacts')),
+          title: GestureDetector(
+            onLongPress: kDebugMode ? _handleDebugCleanup : null,
+            child: const Text('Contacts'),
+          ),
         ),
         body: body,
       ),

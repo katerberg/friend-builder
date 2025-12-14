@@ -246,4 +246,40 @@ class DebugData {
       debugPrint('❌ Error creating fake hangouts: $e');
     }
   }
+
+  /// Removes all hangouts that have [DEBUG] in their notes
+  /// Only runs in debug mode
+  static Future<int> removeDebugHangouts() async {
+    if (!kDebugMode) {
+      return 0;
+    }
+
+    try {
+      final storage = Storage();
+      final hangouts = await storage.getHangouts();
+
+      if (hangouts == null || hangouts.isEmpty) {
+        debugPrint('ℹ️  No hangouts found to clean up');
+        return 0;
+      }
+
+      final debugHangouts =
+          hangouts.where((h) => h.notes.contains('[DEBUG]')).toList();
+
+      if (debugHangouts.isEmpty) {
+        debugPrint('ℹ️  No debug hangouts found');
+        return 0;
+      }
+
+      for (final hangout in debugHangouts) {
+        await storage.deleteHangout(hangout);
+      }
+
+      debugPrint('🗑️  Removed ${debugHangouts.length} debug hangouts');
+      return debugHangouts.length;
+    } catch (e) {
+      debugPrint('❌ Error removing debug hangouts: $e');
+      return 0;
+    }
+  }
 }
