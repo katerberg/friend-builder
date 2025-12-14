@@ -284,6 +284,27 @@ class FriendsPageState extends State<FriendsPage> {
   }
 
   Future<void> _handleDebugCleanup() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Debug Hangouts?'),
+        content: const Text(
+            'This will delete all hangouts with [DEBUG] in their notes.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
     final count = await DebugData.removeDebugHangouts();
     if (mounted && count > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
