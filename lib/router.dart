@@ -12,6 +12,8 @@ import 'package:friend_builder/pages/log/log_page.dart';
 import 'package:friend_builder/pages/history/history_page.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:friend_builder/main.dart' show backgroundFetchFailed;
+import 'package:permission_handler/permission_handler.dart';
 
 class FriendRouter extends StatefulWidget {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -50,6 +52,7 @@ class _FriendRouterState extends State<FriendRouter> {
           setState(() {
             firstTime = false;
           });
+          _checkBackgroundFetchStatus();
         }
       },
     );
@@ -61,6 +64,38 @@ class _FriendRouterState extends State<FriendRouter> {
         GoogleFonts.pendingFonts([GoogleFonts.londrinaSketch]);
     _handleFirstLoad();
     super.initState();
+  }
+
+  void _checkBackgroundFetchStatus() {
+    if (!backgroundFetchFailed) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Background Sync Disabled'),
+          content: const Text(
+            'Background App Refresh is disabled for this app. '
+            'Calendar sync will only run when you open the app.\n\n'
+            'To enable automatic syncing, please enable Background App Refresh in Settings.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Later'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                openAppSettings();
+              },
+              child: const Text('Open Settings'),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   void _changeTab(int tabIndex,

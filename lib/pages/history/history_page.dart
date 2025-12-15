@@ -7,6 +7,7 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/result.dart';
 import 'package:friend_builder/pages/history/components/edit_dialog.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
+import 'package:friend_builder/shared/settings_modal.dart';
 
 class HistoryPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -230,7 +231,21 @@ class HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: (const Text('Hangouts')),
+        title: const Text('Hangouts'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => SettingsModal(
+                  flutterLocalNotificationsPlugin:
+                      widget.flutterLocalNotificationsPlugin,
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: _getResults(),

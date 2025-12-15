@@ -14,6 +14,7 @@ import 'package:friend_builder/pages/friends/components/contact_tile.dart';
 import 'package:friend_builder/pages/friends/components/skeleton_contact_tile.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/contact_sorting.dart';
+import 'package:friend_builder/shared/settings_modal.dart';
 
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -367,6 +368,20 @@ class FriendsPageState extends State<FriendsPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Contacts'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => SettingsModal(
+                    flutterLocalNotificationsPlugin:
+                        widget.flutterLocalNotificationsPlugin,
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         body: body,
       ),

@@ -32,6 +32,14 @@
 	<true/>
 	<key>NSContactsUsageDescription</key>
 	<string>Contacts are needed to know who you might be hanging out with</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Calendar access is used to automatically log hangouts with friends from your calendar events</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Calendar access is used to automatically log hangouts with friends from your calendar events</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 	<key>PermissionGroupNotification</key>
 	<string>Notifications are needed to remind you about hanging out</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

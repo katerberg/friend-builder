@@ -46,6 +46,14 @@ class DBProvider {
     );
   }
 
+  void _createSyncedEventsTable(batch) {
+    batch.execute('DROP TABLE IF EXISTS synced_events');
+    batch.execute('''CREATE TABLE synced_events (
+    eventId TEXT PRIMARY KEY,
+    syncedAt TEXT
+)''');
+  }
+
   void _updateV1ToV2(Batch batch) {
     _createContactsTable(batch);
     _createHangoutsTable(batch);
@@ -56,6 +64,10 @@ class DBProvider {
         'CREATE INDEX IF NOT EXISTS idx_hangouts_when ON hangouts(whenOccurred)');
   }
 
+  void _updateV3ToV4(Batch batch) {
+    _createSyncedEventsTable(batch);
+  }
+
   _initDB() async {
     return await openDatabase(
       join(await getDatabasesPath(), 'friend-builder.db'),
@@ -64,6 +76,7 @@ class DBProvider {
         _createFriendsTable(batch);
         _createContactsTable(batch);
         _createHangoutsTable(batch);
+        _createSyncedEventsTable(batch);
         await batch.commit();
       },
       onConfigure: _onConfigure,
@@ -75,10 +88,13 @@ class DBProvider {
         if (oldVersion < 3) {
           _updateV2ToV3(batch);
         }
+        if (oldVersion < 4) {
+          _updateV3ToV4(batch);
+        }
         await batch.commit();
       },
       onDowngrade: onDatabaseDowngradeDelete,
-      version: 3,
+      version: 4,
     );
   }
 
@@ -280,5 +296,27 @@ class DBProvider {
     }
 
     return hangoutList;
+  }
+
+  Future<bool> isEventSynced(String eventId) async {
+    final db = await database;
+    var result = await db.query(
+      'synced_events',
+      where: 'eventId = ?',
+      whereArgs: [eventId],
+    );
+    return result.isNotEmpty;
+  }
+
+  Future<void> markEventAsSynced(String eventId) async {
+    final db = await database;
+    await db.insert(
+      'synced_events',
+      {
+        'eventId': eventId,
+        'syncedAt': DateTime.now().toIso8601String(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/shared/selection_choice_group.dart';
+import 'package:friend_builder/shared/settings_modal.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/data/hangout.dart';
@@ -43,6 +44,8 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   bool _isLoadingHangouts = true;
   final Storage _storage = Storage();
   int? _customDays;
+  bool _isExcludedFromCalendarSync = false;
+  bool _calendarSyncEnabled = false;
 
   TextEditingController notesController = TextEditingController(text: '');
   TextEditingController customDaysController = TextEditingController(text: '');
@@ -70,6 +73,49 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
           TextEditingController(text: _customDays?.toString() ?? '');
     }
     _loadContactHangoutsAsync();
+    _loadCalendarSyncSettings();
+  }
+
+  Future<void> _loadCalendarSyncSettings() async {
+    final calendarSyncEnabled = await SettingsModal.isCalendarSyncEnabled();
+    if (!calendarSyncEnabled) {
+      if (mounted) {
+        setState(() {
+          _calendarSyncEnabled = false;
+        });
+      }
+      return;
+    }
+
+    final excludedContacts = await SettingsModal.getExcludedContacts();
+    final isExcluded =
+        widget.contact != null && excludedContacts.contains(widget.contact!.id);
+
+    if (mounted) {
+      setState(() {
+        _calendarSyncEnabled = true;
+        _isExcludedFromCalendarSync = isExcluded;
+      });
+    }
+  }
+
+  Future<void> _toggleCalendarSyncExclusion(bool exclude) async {
+    if (widget.contact == null) return;
+
+    final excludedContacts = await SettingsModal.getExcludedContacts();
+    List<String> newExcludedContacts;
+
+    if (exclude) {
+      newExcludedContacts = [...excludedContacts, widget.contact!.id];
+    } else {
+      newExcludedContacts =
+          excludedContacts.where((id) => id != widget.contact!.id).toList();
+    }
+
+    await SettingsModal.setExcludedContacts(newExcludedContacts);
+    setState(() {
+      _isExcludedFromCalendarSync = exclude;
+    });
   }
 
   @override
@@ -347,6 +393,15 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                               ],
                             ),
                           ),
+                        ),
+                      if (_calendarSyncEnabled)
+                        SwitchListTile(
+                          title: const Text('Exclude from Calendar Sync'),
+                          subtitle: const Text(
+                            'Prevent automatic hangouts from calendar events',
+                          ),
+                          value: _isExcludedFromCalendarSync,
+                          onChanged: _toggleCalendarSyncExclusion,
                         ),
                     ],
                   ),
