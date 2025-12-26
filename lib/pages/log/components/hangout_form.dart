@@ -85,7 +85,11 @@ class HangoutFormState extends State<HangoutForm> {
       } else {
         await Storage().updateHangout(_data);
       }
-      await scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
+
+      final contactIdentifiers =
+          _data.contacts.map((c) => c.identifier).toList();
+      await clearSnoozeRemindersForContacts(
+          contactIdentifiers, widget.flutterLocalNotificationsPlugin);
       widget.onSubmit();
     }
   }

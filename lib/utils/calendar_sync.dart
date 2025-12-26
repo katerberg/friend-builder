@@ -13,6 +13,7 @@ const String _calendarSyncEnabledKey = 'calendar_sync_enabled';
 class CalendarSync {
   static final DeviceCalendarPlugin _deviceCalendarPlugin =
       DeviceCalendarPlugin();
+  static bool _isSyncing = false;
 
   static Future<bool> checkCalendarPermission() async {
     var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
@@ -48,6 +49,14 @@ class CalendarSync {
   static Future<void> syncCalendarEvents(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   ) async {
+    if (_isSyncing) {
+      if (kDebugMode) {
+        print('Calendar sync already in progress, skipping');
+      }
+      return;
+    }
+
+    _isSyncing = true;
     try {
       final isEnabled = await isCalendarSyncEnabled();
       if (!isEnabled) {
@@ -148,6 +157,16 @@ class CalendarSync {
             continue;
           }
 
+          final stillNotSynced =
+              !await DBProvider.db.isEventSynced(event.eventId!);
+          if (!stillNotSynced) {
+            if (kDebugMode) {
+              print(
+                  'Event ${event.eventId} was synced by another process, skipping');
+            }
+            continue;
+          }
+
           final hangout = Hangout(
             contacts: matchedFriendContacts
                 .map((c) => EncodableContact.fromContact(c))
@@ -177,6 +196,8 @@ class CalendarSync {
       if (kDebugMode) {
         print('Error syncing calendar events: $e');
       }
+    } finally {
+      _isSyncing = false;
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/data/snooze_reminder.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:path/path.dart';
@@ -54,6 +55,17 @@ class DBProvider {
 )''');
   }
 
+  void _createSnoozeRemindersTable(batch) {
+    batch.execute('DROP TABLE IF EXISTS snooze_reminders');
+    batch.execute('''CREATE TABLE snooze_reminders (
+    id TEXT PRIMARY KEY,
+    contactIdentifier TEXT,
+    snoozeUntil TEXT
+)''');
+    batch.execute(
+        'CREATE INDEX IF NOT EXISTS idx_snooze_reminders_contact ON snooze_reminders(contactIdentifier)');
+  }
+
   void _updateV1ToV2(Batch batch) {
     _createContactsTable(batch);
     _createHangoutsTable(batch);
@@ -68,6 +80,10 @@ class DBProvider {
     _createSyncedEventsTable(batch);
   }
 
+  void _updateV4ToV5(Batch batch) {
+    _createSnoozeRemindersTable(batch);
+  }
+
   _initDB() async {
     return await openDatabase(
       join(await getDatabasesPath(), 'friend-builder.db'),
@@ -77,6 +93,7 @@ class DBProvider {
         _createContactsTable(batch);
         _createHangoutsTable(batch);
         _createSyncedEventsTable(batch);
+        _createSnoozeRemindersTable(batch);
         await batch.commit();
       },
       onConfigure: _onConfigure,
@@ -91,10 +108,13 @@ class DBProvider {
         if (oldVersion < 4) {
           _updateV3ToV4(batch);
         }
+        if (oldVersion < 5) {
+          _updateV4ToV5(batch);
+        }
         await batch.commit();
       },
       onDowngrade: onDatabaseDowngradeDelete,
-      version: 4,
+      version: 5,
     );
   }
 
@@ -317,6 +337,45 @@ class DBProvider {
         'syncedAt': DateTime.now().toIso8601String(),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> saveSnoozeReminder(SnoozeReminder reminder) async {
+    final db = await database;
+    await db.insert(
+      'snooze_reminders',
+      reminder.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<SnoozeReminder>> getActiveSnoozeReminders() async {
+    final db = await database;
+    final now = DateTime.now().toIso8601String();
+    final result = await db.query(
+      'snooze_reminders',
+      where: 'snoozeUntil > ?',
+      whereArgs: [now],
+    );
+    return result.map((map) => SnoozeReminder.fromMap(map)).toList();
+  }
+
+  Future<void> deleteSnoozeRemindersForContact(String contactIdentifier) async {
+    final db = await database;
+    await db.delete(
+      'snooze_reminders',
+      where: 'contactIdentifier = ?',
+      whereArgs: [contactIdentifier],
+    );
+  }
+
+  Future<void> deleteExpiredSnoozeReminders() async {
+    final db = await database;
+    final now = DateTime.now().toIso8601String();
+    await db.delete(
+      'snooze_reminders',
+      where: 'snoozeUntil <= ?',
+      whereArgs: [now],
     );
   }
 }

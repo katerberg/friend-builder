@@ -38,6 +38,8 @@ class Storage {
   }
 
   Future deleteFriend(Friend friend) async {
+    await DBProvider.db
+        .deleteSnoozeRemindersForContact(friend.contactIdentifier);
     return DBProvider.db.deleteFriend(friend);
   }
 

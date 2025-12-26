@@ -15,6 +15,7 @@ import 'package:friend_builder/pages/friends/components/skeleton_contact_tile.da
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/contact_sorting.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
+import 'package:friend_builder/shared/debug_notification_menu.dart';
 
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
@@ -368,6 +369,12 @@ class FriendsPageState extends State<FriendsPage> {
     return GestureDetector(
       child: Scaffold(
         appBar: AppBar(
+          leading: kDebugMode
+              ? DebugNotificationMenu(
+                  flutterLocalNotificationsPlugin:
+                      widget.flutterLocalNotificationsPlugin,
+                )
+              : null,
           title: const Text('Contacts'),
           actions: [
             IconButton(
