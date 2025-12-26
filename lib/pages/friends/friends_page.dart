@@ -155,6 +155,7 @@ class FriendsPageState extends State<FriendsPage> {
       setState(() {
         _buildLatestHangoutMap(accumulatedHangouts);
       });
+      _sortContacts();
 
       if (moreHangouts.length == pageSize) {
         _loadRemainingHangouts(offset + pageSize, accumulatedHangouts);
