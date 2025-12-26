@@ -143,29 +143,27 @@ class HistoryPageState extends State<HistoryPage> {
       _hangouts.removeWhere((element) => element.id == hangout.id);
     });
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-          SnackBar(
-            content: const Text('Hangout deleted'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {
-                setState(() {
-                  _hangouts.insert(hangoutIndex, hangout);
-                });
-              },
-            ),
-            duration: const Duration(seconds: 15),
-          ),
-        )
-        .closed
-        .then((reason) {
-      if (reason != SnackBarClosedReason.action) {
-        widget.storage.deleteHangout(hangout).then((_) {
-          scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
-        });
-      }
+    widget.storage.deleteHangout(hangout).then((_) {
+      scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Hangout deleted'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            widget.storage.createHangout(hangout).then((_) {
+              setState(() {
+                _hangouts.insert(hangoutIndex, hangout);
+              });
+              scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
+            });
+          },
+        ),
+        duration: const Duration(seconds: 5),
+      ),
+    );
   }
 
   void _onEdit(Hangout hangout) {
