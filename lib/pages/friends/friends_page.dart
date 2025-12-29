@@ -16,16 +16,19 @@ import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/contact_sorting.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
 import 'package:friend_builder/shared/debug_notification_menu.dart';
+import 'package:friend_builder/theme_notifier.dart';
 
 class FriendsPage extends StatefulWidget {
   final Storage storage = Storage();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final ThemeNotifier themeNotifier;
   final Function(Hangout)? onNavigateToHistory;
   final Contact? initialContact;
 
   FriendsPage({
     super.key,
     required this.flutterLocalNotificationsPlugin,
+    required this.themeNotifier,
     this.onNavigateToHistory,
     this.initialContact,
   });
@@ -385,6 +388,7 @@ class FriendsPageState extends State<FriendsPage> {
                   builder: (context) => SettingsModal(
                     flutterLocalNotificationsPlugin:
                         widget.flutterLocalNotificationsPlugin,
+                    themeNotifier: widget.themeNotifier,
                   ),
                 );
               },

@@ -8,6 +8,7 @@ import 'package:friend_builder/utils/debug_data.dart';
 import 'package:friend_builder/utils/avatar_sync.dart';
 import 'package:friend_builder/utils/calendar_sync.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
+import 'package:friend_builder/theme_notifier.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -99,13 +100,37 @@ Future<void> main() async {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
   static const String _title = 'Friend Crafter';
+  final ThemeNotifier _themeNotifier = ThemeNotifier();
+
+  @override
+  void initState() {
+    super.initState();
+    _themeNotifier.addListener(_onThemeChanged);
+  }
+
+  @override
+  void dispose() {
+    _themeNotifier.removeListener(_onThemeChanged);
+    _themeNotifier.dispose();
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    const color = Color(0xFF2898D5);
+    final color = _themeNotifier.themeColor;
     return MaterialApp(
         title: _title,
         debugShowCheckedModeBanner: false,
@@ -118,6 +143,7 @@ class MainApp extends StatelessWidget {
         ),
         home: FriendRouter(
           flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+          themeNotifier: _themeNotifier,
         ));
   }
 }

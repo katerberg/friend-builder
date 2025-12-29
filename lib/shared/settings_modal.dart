@@ -5,16 +5,19 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:friend_builder/utils/calendar_sync.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:friend_builder/theme_notifier.dart';
 
 const String calendarSyncEnabledKey = 'calendar_sync_enabled';
 const String excludedContactsKey = 'excluded_calendar_contacts';
 
 class SettingsModal extends StatefulWidget {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final ThemeNotifier themeNotifier;
 
   const SettingsModal({
     super.key,
     required this.flutterLocalNotificationsPlugin,
+    required this.themeNotifier,
   });
 
   static Future<bool> isCalendarSyncEnabled() async {
@@ -215,44 +218,146 @@ class _SettingsModalState extends State<SettingsModal> {
     );
   }
 
+  Widget _buildThemeColorPicker() {
+    final currentColor = widget.themeNotifier.themeColor;
+    final colorNames = [
+      'Soft Sky Blue',
+      'Mint Green',
+      'Blush Pink',
+      'Peach',
+      'Lavender',
+      'Golden Yellow',
+      'Black',
+      'Coral',
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          'App Theme Color',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: List.generate(ThemeNotifier.pastelColors.length, (index) {
+            final color = ThemeNotifier.pastelColors[index];
+            final colorName = colorNames[index];
+            final isSelected = currentColor.toARGB32() == color.toARGB32();
+
+            return Semantics(
+              label: colorName,
+              hint: isSelected ? 'Currently selected' : 'Tap to select',
+              selected: isSelected,
+              button: true,
+              child: InkWell(
+                onTap: () {
+                  widget.themeNotifier.setThemeColor(color);
+                  setState(() {});
+                },
+                borderRadius: BorderRadius.circular(22),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Colors.grey.shade300,
+                      width: isSelected ? 3 : 1.5,
+                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: color.withValues(alpha: 0.5),
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                            )
+                          ]
+                        : null,
+                  ),
+                  child: isSelected
+                      ? Icon(
+                          Icons.check,
+                          color: _contrastingColor(color),
+                          size: 22,
+                        )
+                      : null,
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Color _contrastingColor(Color color) {
+    final luminance = color.computeLuminance();
+    return luminance > 0.5 ? Colors.black87 : Colors.white;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Settings',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (_isLoading)
-              const Center(child: CircularProgressIndicator())
-            else ...[
-              SwitchListTile(
-                title: const Text('Calendar Sync'),
-                subtitle: const Text(
-                  'Automatically create hangouts from calendar events with friends',
-                ),
-                value: _calendarSyncEnabled,
-                onChanged: _handleCalendarSyncToggle,
-                contentPadding: EdgeInsets.zero,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Settings',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
               ),
-              if (_calendarSyncEnabled) _buildExcludedContactsSection(),
+              const SizedBox(height: 16),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildThemeColorPicker(),
+                        const Divider(),
+                        SwitchListTile(
+                          title: const Text('Calendar Sync'),
+                          subtitle: const Text(
+                            'Automatically create hangouts from calendar events with friends',
+                          ),
+                          value: _calendarSyncEnabled,
+                          onChanged: _handleCalendarSyncToggle,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        if (_calendarSyncEnabled)
+                          _buildExcludedContactsSection(),
+                      ],
+                    ),
+                  ),
+                ),
             ],
-          ],
+          ),
         ),
       ),
     );

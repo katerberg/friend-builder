@@ -14,12 +14,15 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:friend_builder/main.dart' show backgroundFetchFailed;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:friend_builder/theme_notifier.dart';
 
 class FriendRouter extends StatefulWidget {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final ThemeNotifier themeNotifier;
   const FriendRouter({
     super.key,
     required this.flutterLocalNotificationsPlugin,
+    required this.themeNotifier,
   });
 
   @override
@@ -172,6 +175,7 @@ class _FriendRouterState extends State<FriendRouter> {
           page = HistoryPage(
               flutterLocalNotificationsPlugin:
                   widget.flutterLocalNotificationsPlugin,
+              themeNotifier: widget.themeNotifier,
               initialHangout: _initialHangout,
               onNavigateToFriend: (contact) =>
                   _changeTab(2, initialContact: contact));
@@ -184,6 +188,7 @@ class _FriendRouterState extends State<FriendRouter> {
           page = FriendsPage(
               flutterLocalNotificationsPlugin:
                   widget.flutterLocalNotificationsPlugin,
+              themeNotifier: widget.themeNotifier,
               onNavigateToHistory: (hangout) =>
                   _changeTab(0, initialHangout: hangout),
               initialContact: _initialContact);

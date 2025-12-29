@@ -9,16 +9,19 @@ import 'package:friend_builder/pages/history/components/edit_dialog.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
 import 'package:friend_builder/shared/debug_notification_menu.dart';
+import 'package:friend_builder/theme_notifier.dart';
 
 class HistoryPage extends StatefulWidget {
   final Storage storage = Storage();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  final ThemeNotifier themeNotifier;
   final Hangout? initialHangout;
   final Function(Contact)? onNavigateToFriend;
 
   HistoryPage({
     super.key,
     required this.flutterLocalNotificationsPlugin,
+    required this.themeNotifier,
     this.initialHangout,
     this.onNavigateToFriend,
   });
@@ -246,6 +249,7 @@ class HistoryPageState extends State<HistoryPage> {
                 builder: (context) => SettingsModal(
                   flutterLocalNotificationsPlugin:
                       widget.flutterLocalNotificationsPlugin,
+                  themeNotifier: widget.themeNotifier,
                 ),
               );
             },
