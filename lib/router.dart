@@ -3,7 +3,6 @@ import 'package:friend_builder/pages/onboarding/add_friends_screen/add_friends_s
 import 'package:friend_builder/pages/onboarding/calendar_sync_recommendation_screen.dart';
 import 'package:friend_builder/pages/onboarding/start_screen.dart';
 import 'package:friend_builder/pages/splash_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -37,7 +36,6 @@ class _FriendRouterState extends State<FriendRouter> {
   Contact? _initialContact;
 
   bool? firstTime;
-  late Future _googleFontsPending;
 
   void navigationPageHome() {}
 
@@ -64,8 +62,6 @@ class _FriendRouterState extends State<FriendRouter> {
 
   @override
   void initState() {
-    _googleFontsPending =
-        GoogleFonts.pendingFonts([GoogleFonts.londrinaSketch]);
     _handleFirstLoad();
     super.initState();
   }
@@ -124,9 +120,7 @@ class _FriendRouterState extends State<FriendRouter> {
   Widget build(BuildContext context) {
     Widget content;
     if (firstTime == null) {
-      content = SplashScreen(
-        googleFontsPending: _googleFontsPending,
-      );
+      content = const SplashScreen();
     } else if (firstTime == true) {
       switch (onboardingStepper) {
         case 0:
@@ -134,7 +128,6 @@ class _FriendRouterState extends State<FriendRouter> {
             children: [
               Expanded(
                 child: StartScreen(
-                  googleFontsPending: _googleFontsPending,
                   onSubmit: (bool moveToNextStep) {
                     if (moveToNextStep) {
                       setState(() {
@@ -189,7 +182,8 @@ class _FriendRouterState extends State<FriendRouter> {
             ],
           );
         default:
-          throw UnimplementedError('no onboarding widget for $onboardingStepper');
+          throw UnimplementedError(
+              'no onboarding widget for $onboardingStepper');
       }
     } else {
       var colorScheme = Theme.of(context).colorScheme;
