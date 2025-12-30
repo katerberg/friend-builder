@@ -41,6 +41,11 @@ class CalendarSync {
     return preferences.getBool(_calendarSyncEnabledKey) ?? false;
   }
 
+  static Future<void> setCalendarSyncEnabled(bool enabled) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_calendarSyncEnabledKey, enabled);
+  }
+
   static Future<List<String>> _getExcludedContacts() async {
     final preferences = await SharedPreferences.getInstance();
     return preferences.getStringList('excluded_calendar_contacts') ?? [];

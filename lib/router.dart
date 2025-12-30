@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:friend_builder/pages/onboarding/add_friends_screen/add_friends_screen.dart';
+import 'package:friend_builder/pages/onboarding/calendar_sync_recommendation_screen.dart';
 import 'package:friend_builder/pages/onboarding/start_screen.dart';
 import 'package:friend_builder/pages/splash_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -156,16 +157,39 @@ class _FriendRouterState extends State<FriendRouter> {
               Expanded(
                 child: AddFriendsScreen(onSubmit: () {
                   setState(() {
+                    onboardingStepper = 2;
+                  });
+                }),
+              ),
+            ],
+          );
+        case 2:
+          content = Column(
+            children: [
+              Expanded(
+                child: CalendarSyncRecommendationScreen(onSubmit: () {
+                  setState(() {
                     onboardingStepper = 0;
                     firstTime = false;
                   });
                   _changeTab(1);
+
+                  // Show the reminders set snackbar after transitioning to main app
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      const snackBar = SnackBar(
+                        content: Text('Reminders set. Happy checking in!'),
+                        behavior: SnackBarBehavior.floating,
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+                  });
                 }),
               ),
             ],
           );
         default:
-          throw UnimplementedError('no onboarding widget for $selectedIndex');
+          throw UnimplementedError('no onboarding widget for $onboardingStepper');
       }
     } else {
       var colorScheme = Theme.of(context).colorScheme;

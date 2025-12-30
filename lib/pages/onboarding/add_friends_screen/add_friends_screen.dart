@@ -85,12 +85,6 @@ class _AddFriendsScreenState extends State<AddFriendsScreen> {
       if (_isSelectingFriends) {
         _isSelectingFriends = false;
       } else {
-        const snackBar = SnackBar(
-          content: Text('Reminders set. Happy checking in!'),
-          behavior: SnackBarBehavior.floating,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
         widget.onSubmit();
       }
     });

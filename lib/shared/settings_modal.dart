@@ -311,28 +311,28 @@ class _SettingsModalState extends State<SettingsModal> {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Settings',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator())
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Settings',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
               else
                 Flexible(
                   child: SingleChildScrollView(
@@ -341,22 +341,22 @@ class _SettingsModalState extends State<SettingsModal> {
                       children: [
                         _buildThemeColorPicker(),
                         const Divider(),
-                        SwitchListTile(
-                          title: const Text('Calendar Sync'),
-                          subtitle: const Text(
-                            'Automatically create hangouts from calendar events with friends',
-                          ),
-                          value: _calendarSyncEnabled,
-                          onChanged: _handleCalendarSyncToggle,
-                          contentPadding: EdgeInsets.zero,
-                        ),
+              SwitchListTile(
+                title: const Text('Calendar Sync'),
+                subtitle: const Text(
+                  'Automatically create hangouts from calendar events with friends',
+                ),
+                value: _calendarSyncEnabled,
+                onChanged: _handleCalendarSyncToggle,
+                contentPadding: EdgeInsets.zero,
+              ),
                         if (_calendarSyncEnabled)
                           _buildExcludedContactsSection(),
-                      ],
+            ],
                     ),
                   ),
                 ),
-            ],
+          ],
           ),
         ),
       ),
