@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -7,11 +6,13 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
-    var titleStyle = GoogleFonts.londrinaSketch(
+    var titleStyle = TextStyle(
+      fontFamily: 'Londrina Sketch',
       fontSize: 60,
-      fontWeight: FontWeight.w900,
+      fontWeight: FontWeight.w400,
       backgroundColor: colorScheme.primary,
     );
+    // Note: Using fallback font until correct TTF files are downloaded
 
     return ColoredBox(
       color: colorScheme.primary,
@@ -27,13 +28,9 @@ class SplashScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
-              height: 120,
-              width: 120,
-              child: Image.asset(
-                'logo/splash.png',
-                fit: BoxFit.contain,
-              ),
+            Image.asset(
+              'logo/splash.png',
+              fit: BoxFit.cover,
             ),
             Expanded(
               child: Center(

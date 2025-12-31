@@ -2,7 +2,6 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:friend_builder/router.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/debug_data.dart';
@@ -82,10 +81,6 @@ Future<bool> initBackgroundFetch() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initNotifications(flutterLocalNotificationsPlugin);
-
-  await GoogleFonts.pendingFonts([
-    GoogleFonts.londrinaSketch(),
-  ]);
 
   await DebugData.removeDebugHangouts();
   await DebugData.removeDebugContacts();

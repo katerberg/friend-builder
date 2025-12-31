@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class StartScreen extends StatelessWidget {
   final void Function(bool) onSubmit;
@@ -18,9 +17,10 @@ class StartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
 
-    var titleStyle = GoogleFonts.londrinaSketch(
+    var titleStyle = TextStyle(
+      fontFamily: 'Londrina Sketch',
       fontSize: 60,
-      fontWeight: FontWeight.w900,
+      fontWeight: FontWeight.w400,
       color: colorScheme.surface,
     );
     return Scaffold(
@@ -35,13 +35,11 @@ class StartScreen extends StatelessWidget {
                 style: titleStyle,
               ),
             ),
-            SizedBox(
-              height: 120,
-              width: 120,
+            Expanded(
               child: Center(
                 child: Image.asset(
                   'logo/splash.png',
-                  fit: BoxFit.contain,
+                  fit: BoxFit.fitWidth,
                 ),
               ),
             ),
