@@ -9,6 +9,7 @@ import 'package:friend_builder/data/hangout.dart';
 
 class HangoutForm extends StatefulWidget {
   final void Function() onSubmit;
+  final void Function()? onDelete;
   final List<Contact> selectedFriends;
   final Hangout hangout;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -16,6 +17,7 @@ class HangoutForm extends StatefulWidget {
   const HangoutForm({
     super.key,
     required this.onSubmit,
+    this.onDelete,
     required this.selectedFriends,
     required this.flutterLocalNotificationsPlugin,
     required this.hangout,
@@ -152,8 +154,17 @@ class HangoutFormState extends State<HangoutForm> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  if (widget.onDelete != null)
+                    TextButton.icon(
+                      onPressed: widget.onDelete,
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      label: const Text('Delete', style: TextStyle(color: Colors.red)),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                      ),
+                    ),
                   ElevatedButton(
                     onPressed: _submitting ? null : _handleSubmitPress,
                     child: Text(_submitting ? 'Submitting...' : 'Save'),

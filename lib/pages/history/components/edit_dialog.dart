@@ -11,6 +11,7 @@ class EditDialog extends StatefulWidget {
   final List<Contact> selectedFriends;
   final Hangout hangout;
   final void Function() onSubmit;
+  final void Function()? onDelete;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   const EditDialog({
@@ -18,6 +19,7 @@ class EditDialog extends StatefulWidget {
     required this.selectedFriends,
     required this.hangout,
     required this.onSubmit,
+    this.onDelete,
     required this.flutterLocalNotificationsPlugin,
   });
 
@@ -47,6 +49,38 @@ class EditDialogState extends State<EditDialog> {
       _selectedFriends =
           ContactsHelper.filterContacts(_selectedFriends, friendToRemove);
     });
+  }
+
+  void _handleDelete() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Hangout'),
+          content: const Text(
+              'Are you sure you want to delete this hangout? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                if (widget.onDelete != null) {
+                  widget.onDelete!();
+                }
+                Navigator.of(context).pop(); // Close the edit dialog
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -84,7 +118,8 @@ class EditDialogState extends State<EditDialog> {
                   onSubmit: () {
                     widget.onSubmit();
                     Navigator.pop(context);
-                  }),
+                  },
+                  onDelete: widget.onDelete != null ? _handleDelete : null),
             ],
           ),
         ),
