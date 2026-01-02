@@ -10,7 +10,7 @@ class ResultBubble extends StatelessWidget {
     return Container(
         padding: const EdgeInsets.only(left: 8),
         child: CircleAvatar(
-          backgroundColor: Theme.of(context).primaryColorDark,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           child: Text(text),
         ));
   }
