@@ -9,7 +9,7 @@ class SplashScreen extends StatelessWidget {
     var titleStyle = TextStyle(
       fontFamily: 'Londrina Sketch',
       fontSize: 60,
-      fontWeight: FontWeight.w400,
+      fontWeight: FontWeight.w900,
       backgroundColor: colorScheme.primary,
     );
     // Note: Using fallback font until correct TTF files are downloaded

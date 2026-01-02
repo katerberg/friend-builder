@@ -20,7 +20,7 @@ class StartScreen extends StatelessWidget {
     var titleStyle = TextStyle(
       fontFamily: 'Londrina Sketch',
       fontSize: 60,
-      fontWeight: FontWeight.w400,
+      fontWeight: FontWeight.w900,
       color: colorScheme.surface,
     );
     return Scaffold(
