@@ -39,13 +39,15 @@ class HistoryPageState extends State<HistoryPage> {
   bool _isLoading = false;
   bool _hasMore = true;
   bool _hasScrolledToInitial = false;
+  Hangout? _initialHangout;
 
   @override
   void initState() {
     super.initState();
+    _initialHangout = widget.initialHangout;
     _scrollController.addListener(_onScroll);
     _loadMoreHangouts().then((_) {
-      if (widget.initialHangout != null) {
+      if (_initialHangout != null) {
         _scrollToInitialHangout();
       }
     });
@@ -54,8 +56,7 @@ class HistoryPageState extends State<HistoryPage> {
   void _scrollToInitialHangout() {
     if (_hasScrolledToInitial) return;
 
-    final index =
-        _hangouts.indexWhere((h) => h.id == widget.initialHangout?.id);
+    final index = _hangouts.indexWhere((h) => h.id == _initialHangout?.id);
 
     if (index != -1) {
       _hasScrolledToInitial = true;
@@ -186,6 +187,33 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
+  void _onRepeat(Hangout originalHangout) async {
+    // Create a new hangout with today's date, same participants and notes
+    final repeatedHangout = Hangout(
+      contacts: List.from(originalHangout.contacts),
+      notes: originalHangout.notes,
+      when: DateTime.now(),
+    );
+
+    await widget.storage.createHangout(repeatedHangout);
+
+    // Open the edit dialog for the newly created hangout
+    if (!mounted) return;
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditDialog(
+          flutterLocalNotificationsPlugin:
+              widget.flutterLocalNotificationsPlugin,
+          hangout: repeatedHangout,
+          selectedFriends: repeatedHangout.contacts,
+          onSubmit: _refreshHangouts,
+        ),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
   Widget _getResults() {
     if (_hangouts.isEmpty && !_isLoading) {
       return const Center(child: Text('No results yet!'));
@@ -209,7 +237,7 @@ class HistoryPageState extends State<HistoryPage> {
         }
 
         final hangout = _hangouts[index];
-        final isInitial = widget.initialHangout?.id == hangout.id;
+        final isInitial = _initialHangout?.id == hangout.id;
 
         if (isInitial && !_itemKeys.containsKey(index)) {
           _itemKeys[index] = GlobalKey();
@@ -221,6 +249,7 @@ class HistoryPageState extends State<HistoryPage> {
             hangout: hangout,
             onDelete: _onDelete,
             onEdit: _onEdit,
+            onRepeat: _onRepeat,
             onNavigateToFriend: widget.onNavigateToFriend,
             initiallyOpen: isInitial,
           ),

@@ -8,6 +8,7 @@ class Result extends StatefulWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
+  final void Function(Hangout) onRepeat;
   final bool initiallyOpen;
   final Function(Contact)? onNavigateToFriend;
 
@@ -16,6 +17,7 @@ class Result extends StatefulWidget {
     required this.hangout,
     required this.onDelete,
     required this.onEdit,
+    required this.onRepeat,
     this.initiallyOpen = false,
     this.onNavigateToFriend,
   });
@@ -48,12 +50,14 @@ class ResultState extends State<Result> {
               hangout: widget.hangout,
               onDelete: widget.onDelete,
               onEdit: widget.onEdit,
+              onRepeat: widget.onRepeat,
               onNavigateToFriend: widget.onNavigateToFriend,
             )
           : ClosedResult(
               hangout: widget.hangout,
               onDelete: widget.onDelete,
               onEdit: widget.onEdit,
+              onRepeat: widget.onRepeat,
             ),
     );
   }

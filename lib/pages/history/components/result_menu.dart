@@ -5,12 +5,14 @@ class ResultMenu extends StatelessWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
+  final void Function(Hangout) onRepeat;
 
   const ResultMenu({
     super.key,
     required this.hangout,
     required this.onDelete,
     required this.onEdit,
+    required this.onRepeat,
   });
 
   @override
@@ -25,6 +27,9 @@ class ResultMenu extends StatelessWidget {
           case 'Edit':
             onEdit(hangout);
             break;
+          case 'Repeat':
+            onRepeat(hangout);
+            break;
         }
       },
       itemBuilder: (context) => <PopupMenuEntry<String>>[
@@ -33,6 +38,13 @@ class ResultMenu extends StatelessWidget {
           child: ListTile(
             leading: Icon(Icons.edit),
             title: Text('Edit'),
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'Repeat',
+          child: ListTile(
+            leading: Icon(Icons.repeat),
+            title: Text('Repeat Hangout'),
           ),
         ),
         const PopupMenuItem<String>(

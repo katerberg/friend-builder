@@ -10,6 +10,7 @@ class OpenResult extends StatelessWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
+  final void Function(Hangout) onRepeat;
   final Function(Contact)? onNavigateToFriend;
 
   const OpenResult({
@@ -17,6 +18,7 @@ class OpenResult extends StatelessWidget {
     required this.hangout,
     required this.onDelete,
     required this.onEdit,
+    required this.onRepeat,
     this.onNavigateToFriend,
   });
 
@@ -51,6 +53,7 @@ class OpenResult extends StatelessWidget {
                             hangout: hangout,
                             onEdit: onEdit,
                             onDelete: onDelete,
+                            onRepeat: onRepeat,
                           ),
                         ),
                       )

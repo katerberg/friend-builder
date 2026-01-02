@@ -7,12 +7,14 @@ class ClosedResult extends StatelessWidget {
   final Hangout hangout;
   final void Function(Hangout) onDelete;
   final void Function(Hangout) onEdit;
+  final void Function(Hangout) onRepeat;
 
   const ClosedResult({
     super.key,
     required this.hangout,
     required this.onDelete,
     required this.onEdit,
+    required this.onRepeat,
   });
 
   @override
@@ -44,6 +46,7 @@ class ClosedResult extends StatelessWidget {
                             hangout: hangout,
                             onEdit: onEdit,
                             onDelete: onDelete,
+                            onRepeat: onRepeat,
                           ),
                         ),
                       )
