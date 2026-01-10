@@ -9,6 +9,7 @@ import 'package:friend_builder/utils/avatar_sync.dart';
 import 'package:friend_builder/utils/calendar_sync.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
 import 'package:friend_builder/theme_notifier.dart';
+import 'package:friend_builder/services/cloud_sync_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -27,6 +28,15 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   final notificationsPlugin = FlutterLocalNotificationsPlugin();
   await CalendarSync.syncCalendarEvents(notificationsPlugin);
+
+  try {
+    await CloudSyncService().initialize();
+    await CloudSyncService().performFullSync();
+  } catch (e) {
+    if (kDebugMode) {
+      print('Failed to sync to cloud in background: $e');
+    }
+  }
 
   BackgroundFetch.finish(taskId);
 }
@@ -50,6 +60,16 @@ Future<bool> initBackgroundFetch() async {
           print('Background fetch event received: $taskId');
         }
         await CalendarSync.syncCalendarEvents(flutterLocalNotificationsPlugin);
+
+        try {
+          await CloudSyncService().initialize();
+          await CloudSyncService().performFullSync();
+        } catch (e) {
+          if (kDebugMode) {
+            print('Failed to sync to cloud in background: $e');
+          }
+        }
+
         BackgroundFetch.finish(taskId);
       },
       (String taskId) async {
@@ -80,6 +100,24 @@ Future<bool> initBackgroundFetch() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await CloudSyncService().initialize();
+
+    if (CloudSyncService().isInitialized &&
+        await CloudSyncService().shouldRestoreFromCloud()) {
+      if (kDebugMode) {
+        print('Restoring data from cloud');
+      }
+      await CloudSyncService().restoreFromCloud();
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Cloud sync not available: $e');
+      print('App will continue without cloud backup.');
+    }
+  }
+
   await initNotifications(flutterLocalNotificationsPlugin);
 
   await DebugData.removeDebugHangouts();

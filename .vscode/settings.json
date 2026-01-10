@@ -1,9 +1,12 @@
 {
     "cSpell.words": [
+        "allprojects",
         "autocorrect",
         "autofocus",
         "AUTOINCREMENT",
         "bigrams",
+        "buildscript",
+        "Firestore",
         "MMMMEEE",
         "prefs",
         "rxdart",

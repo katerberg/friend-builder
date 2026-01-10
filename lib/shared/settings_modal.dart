@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:friend_builder/utils/calendar_sync.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/theme_notifier.dart';
+import 'package:friend_builder/services/cloud_sync_service.dart';
 
 const String calendarSyncEnabledKey = 'calendar_sync_enabled';
 const String excludedContactsKey = 'excluded_calendar_contacts';
@@ -28,6 +29,15 @@ class SettingsModal extends StatefulWidget {
   static Future<void> setCalendarSyncEnabled(bool enabled) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool(calendarSyncEnabledKey, enabled);
+
+    if (CloudSyncService().isInitialized) {
+      CloudSyncService().syncSettings({
+        'theme_color': preferences.getInt('theme_color'),
+        'calendar_sync_enabled': enabled,
+        'excluded_contacts': preferences.getStringList(excludedContactsKey),
+        'first_time': preferences.getBool('first_time'),
+      });
+    }
   }
 
   static Future<List<String>> getExcludedContacts() async {
@@ -38,6 +48,15 @@ class SettingsModal extends StatefulWidget {
   static Future<void> setExcludedContacts(List<String> contactIds) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setStringList(excludedContactsKey, contactIds);
+
+    if (CloudSyncService().isInitialized) {
+      CloudSyncService().syncSettings({
+        'theme_color': preferences.getInt('theme_color'),
+        'calendar_sync_enabled': preferences.getBool(calendarSyncEnabledKey),
+        'excluded_contacts': contactIds,
+        'first_time': preferences.getBool('first_time'),
+      });
+    }
   }
 
   @override
@@ -49,11 +68,14 @@ class _SettingsModalState extends State<SettingsModal> {
   bool _isLoading = true;
   List<String> _excludedContactIds = [];
   Map<String, String> _excludedContactNames = {};
+  DateTime? _lastSyncTime;
+  bool _isSyncing = false;
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
+    _loadSyncStatus();
   }
 
   Future<void> _loadSettings() async {
@@ -101,6 +123,77 @@ class _SettingsModalState extends State<SettingsModal> {
         _excludedContactNames = contactNames;
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _loadSyncStatus() async {
+    if (!CloudSyncService().isInitialized) {
+      return;
+    }
+
+    try {
+      final lastSync = await CloudSyncService().getLastSyncTimestamp();
+      if (mounted) {
+        setState(() {
+          _lastSyncTime = lastSync;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to load sync status: $e');
+      }
+    }
+  }
+
+  Future<void> _performManualSync() async {
+    if (!CloudSyncService().isInitialized) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Cloud backup is not configured. Please follow FIREBASE_SETUP.md to set up Firebase.'),
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isSyncing = true;
+    });
+
+    try {
+      await CloudSyncService().performFullSync();
+      await _loadSyncStatus();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Successfully synced to cloud'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Manual sync failed: $e');
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Sync failed. Please check your connection.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSyncing = false;
+        });
+      }
     }
   }
 
@@ -304,6 +397,107 @@ class _SettingsModalState extends State<SettingsModal> {
     return luminance > 0.5 ? Colors.black87 : Colors.white;
   }
 
+  Widget _buildCloudSyncSection() {
+    final isConfigured = CloudSyncService().isInitialized;
+
+    String syncStatusText = 'Never synced';
+    if (_lastSyncTime != null) {
+      final now = DateTime.now();
+      final difference = now.difference(_lastSyncTime!);
+
+      if (difference.inMinutes < 1) {
+        syncStatusText = 'Just now';
+      } else if (difference.inMinutes < 60) {
+        syncStatusText =
+            '${difference.inMinutes} minute${difference.inMinutes == 1 ? '' : 's'} ago';
+      } else if (difference.inHours < 24) {
+        syncStatusText =
+            '${difference.inHours} hour${difference.inHours == 1 ? '' : 's'} ago';
+      } else {
+        syncStatusText =
+            '${difference.inDays} day${difference.inDays == 1 ? '' : 's'} ago';
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          'Cloud Backup',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        const SizedBox(height: 8),
+        if (!isConfigured)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.orange.shade50,
+              border: Border.all(color: Colors.orange.shade300),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.warning_amber, color: Colors.orange.shade700),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Cloud backup not configured. Follow FIREBASE_SETUP.md to enable.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.orange.shade900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          Text(
+            'Your data is automatically backed up to the cloud',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey[600],
+                ),
+          ),
+        const SizedBox(height: 12),
+        if (isConfigured)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Last sync',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    syncStatusText,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ],
+              ),
+              ElevatedButton.icon(
+                onPressed: _isSyncing ? null : _performManualSync,
+                icon: _isSyncing
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.cloud_upload),
+                label: Text(_isSyncing ? 'Syncing…' : 'Sync Now'),
+              ),
+            ],
+          ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -340,6 +534,8 @@ class _SettingsModalState extends State<SettingsModal> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildThemeColorPicker(),
+                        const Divider(),
+                        _buildCloudSyncSection(),
                         const Divider(),
                         SwitchListTile(
                           title: const Text('Calendar Sync'),
