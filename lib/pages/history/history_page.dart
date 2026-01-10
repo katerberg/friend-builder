@@ -182,6 +182,7 @@ class HistoryPageState extends State<HistoryPage> {
           selectedFriends: hangout.contacts,
           onSubmit: _refreshHangouts,
           onDelete: () => _onDelete(hangout),
+          isNewHangout: false,
         ),
         fullscreenDialog: true,
       ),
@@ -196,9 +197,8 @@ class HistoryPageState extends State<HistoryPage> {
       when: DateTime.now(),
     );
 
-    await widget.storage.createHangout(repeatedHangout);
-
     // Open the edit dialog for the newly created hangout
+    // Note: Don't save to database until user explicitly saves
     if (!mounted) return;
     Navigator.push<void>(
       context,
@@ -209,7 +209,9 @@ class HistoryPageState extends State<HistoryPage> {
           hangout: repeatedHangout,
           selectedFriends: repeatedHangout.contacts,
           onSubmit: _refreshHangouts,
-          onDelete: () => _onDelete(repeatedHangout),
+          onDelete: () =>
+              {}, // No-op for repeat - hangout doesn't exist in DB yet
+          isNewHangout: true,
         ),
         fullscreenDialog: true,
       ),
