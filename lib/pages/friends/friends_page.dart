@@ -277,6 +277,7 @@ class FriendsPageState extends State<FriendsPage> {
   }
 
   void _handleContactChange(String pattern) {
+    pattern = pattern.trim();
     var exactMatches = _contacts.where((element) =>
         (element.displayName).toLowerCase().contains(pattern.toLowerCase()));
     if (exactMatches.isNotEmpty) {
