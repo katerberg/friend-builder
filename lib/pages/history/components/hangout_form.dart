@@ -160,14 +160,15 @@ class HangoutFormState extends State<HangoutForm> {
                     TextButton.icon(
                       onPressed: widget.onDelete,
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      label: const Text('Delete', style: TextStyle(color: Colors.red)),
+                      label: const Text('Delete',
+                          style: TextStyle(color: Colors.red)),
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.red,
                       ),
                     ),
                   ElevatedButton(
                     onPressed: _submitting ? null : _handleSubmitPress,
-                    child: Text(_submitting ? 'Submitting...' : 'Save'),
+                    child: Text(_submitting ? 'Submitting…' : 'Save'),
                   ),
                 ],
               ),

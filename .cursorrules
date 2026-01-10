@@ -43,7 +43,12 @@
   - ❌ `// Set the value to true`
   - ❌ `// Initialize the controller`
 - Acceptable:
-  - ✅ Explaining *why* something non-obvious is done
+  - ✅ Explaining _why_ something non-obvious is done
   - ✅ Documenting workarounds for known issues or bugs
   - ✅ Clarifying complex algorithms or business logic
 - Good variable/function names eliminate the need for most comments
+
+### String Literals
+
+- Use ellipsis (…) instead of three dots (...) for truncation or continuation in strings
+- This provides better typography and follows proper punctuation standards

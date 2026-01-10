@@ -173,7 +173,7 @@ class HangoutFormState extends State<HangoutForm> {
                 children: [
                   ElevatedButton(
                     onPressed: _submitting ? null : _handleSubmitPress,
-                    child: Text(_submitting ? 'Submitting...' : 'Save'),
+                    child: Text(_submitting ? 'Submitting…' : 'Save'),
                   ),
                 ],
               ),

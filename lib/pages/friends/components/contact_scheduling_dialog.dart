@@ -360,7 +360,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                               ),
                               SizedBox(width: 8),
                               Text(
-                                'Loading hangout history...',
+                                'Loading hangout history…',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey,
