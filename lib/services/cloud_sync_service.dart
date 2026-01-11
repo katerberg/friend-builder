@@ -100,6 +100,28 @@ class CloudSyncService {
     );
   }
 
+  bool _shouldSyncBasedOnThrottle(
+      DateTime? lastSync, Duration throttleDuration) {
+    if (lastSync == null) return true;
+    final timeSinceLastSync = DateTime.now().difference(lastSync);
+    return timeSinceLastSync >= throttleDuration;
+  }
+
+  Future<bool> shouldSyncOnStartup() async {
+    final lastSync = await getLastSyncTimestamp();
+    return _shouldSyncBasedOnThrottle(lastSync, const Duration(days: 1));
+  }
+
+  Future<bool> shouldSyncManually() async {
+    final lastSync = await getLastSyncTimestamp();
+    return _shouldSyncBasedOnThrottle(lastSync, const Duration(hours: 1));
+  }
+
+  Future<bool> shouldSyncWeekly() async {
+    final lastSync = await getLastSyncTimestamp();
+    return _shouldSyncBasedOnThrottle(lastSync, const Duration(days: 7));
+  }
+
   Future<void> syncFriends(List<Friend> friends) async {
     if (!_isInitialized || _userId == null) {
       return;
@@ -255,7 +277,21 @@ class CloudSyncService {
     }
   }
 
-  Future<void> performFullSync() async {
+  Future<void> performFullSync({bool forceSync = false}) async {
+    if (!forceSync) {
+      final lastSync = await getLastSyncTimestamp();
+      if (lastSync != null) {
+        final timeSinceLastSync = DateTime.now().difference(lastSync);
+        if (timeSinceLastSync < const Duration(hours: 1)) {
+          if (kDebugMode) {
+            print(
+                'Sync throttled: Last sync was ${timeSinceLastSync.inMinutes} minutes ago');
+          }
+          return;
+        }
+      }
+    }
+
     if (_isSyncing) {
       if (kDebugMode) {
         print('Sync already in progress, skipping');

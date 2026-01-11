@@ -1,7 +1,6 @@
 import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
-import 'package:friend_builder/services/cloud_sync_service.dart';
 
 class Storage {
   Future<List<Hangout>?> getHangouts() async {
@@ -22,21 +21,15 @@ class Storage {
   }
 
   Future updateHangout(Hangout hangout) async {
-    final result = await DBProvider.db.saveHangout(hangout);
-    CloudSyncService().syncHangouts([hangout]);
-    return result;
+    return DBProvider.db.saveHangout(hangout);
   }
 
   Future createHangout(Hangout hangout) async {
-    final result = await DBProvider.db.saveHangout(hangout);
-    CloudSyncService().syncHangouts([hangout]);
-    return result;
+    return DBProvider.db.saveHangout(hangout);
   }
 
   Future deleteHangout(Hangout hangout) async {
-    final result = await DBProvider.db.deleteHangout(hangout);
-    CloudSyncService().deleteHangoutFromCloud(hangout.id);
-    return result;
+    return DBProvider.db.deleteHangout(hangout);
   }
 
   static Future<List<Friend>?> getFriends() async {
@@ -47,17 +40,13 @@ class Storage {
   Future deleteFriend(Friend friend) async {
     await DBProvider.db
         .deleteSnoozeRemindersForContact(friend.contactIdentifier);
-    final result = await DBProvider.db.deleteFriend(friend);
-    CloudSyncService().deleteFriendFromCloud(friend.contactIdentifier);
-    return result;
+    return DBProvider.db.deleteFriend(friend);
   }
 
   Future saveFriends(List<Friend> friends) async {
     var futureMap = friends.map((friend) {
       return DBProvider.db.saveFriend(friend);
     });
-    final result = await Future.wait(futureMap);
-    CloudSyncService().syncFriends(friends);
-    return result;
+    return Future.wait(futureMap);
   }
 }

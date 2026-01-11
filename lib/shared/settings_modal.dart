@@ -29,15 +29,6 @@ class SettingsModal extends StatefulWidget {
   static Future<void> setCalendarSyncEnabled(bool enabled) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool(calendarSyncEnabledKey, enabled);
-
-    if (CloudSyncService().isInitialized) {
-      CloudSyncService().syncSettings({
-        'theme_color': preferences.getInt('theme_color'),
-        'calendar_sync_enabled': enabled,
-        'excluded_contacts': preferences.getStringList(excludedContactsKey),
-        'first_time': preferences.getBool('first_time'),
-      });
-    }
   }
 
   static Future<List<String>> getExcludedContacts() async {
@@ -48,15 +39,6 @@ class SettingsModal extends StatefulWidget {
   static Future<void> setExcludedContacts(List<String> contactIds) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setStringList(excludedContactsKey, contactIds);
-
-    if (CloudSyncService().isInitialized) {
-      CloudSyncService().syncSettings({
-        'theme_color': preferences.getInt('theme_color'),
-        'calendar_sync_enabled': preferences.getBool(calendarSyncEnabledKey),
-        'excluded_contacts': contactIds,
-        'first_time': preferences.getBool('first_time'),
-      });
-    }
   }
 
   @override
@@ -159,12 +141,29 @@ class _SettingsModalState extends State<SettingsModal> {
       return;
     }
 
+    final canSync = await CloudSyncService().shouldSyncManually();
+    if (!canSync) {
+      final lastSync = await CloudSyncService().getLastSyncTimestamp();
+      if (lastSync != null && mounted) {
+        final minutesAgo = DateTime.now().difference(lastSync).inMinutes;
+        final minutesRemaining = 60 - minutesAgo;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Sync is throttled. Please wait $minutesRemaining more minute${minutesRemaining == 1 ? '' : 's'}.'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      return;
+    }
+
     setState(() {
       _isSyncing = true;
     });
 
     try {
-      await CloudSyncService().performFullSync();
+      await CloudSyncService().performFullSync(forceSync: true);
       await _loadSyncStatus();
 
       if (mounted) {

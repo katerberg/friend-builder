@@ -4,7 +4,6 @@ import 'package:friend_builder/data/snooze_reminder.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:path/path.dart';
-import 'package:friend_builder/services/cloud_sync_service.dart';
 
 class DBProvider {
   DBProvider._();
@@ -348,7 +347,6 @@ class DBProvider {
       reminder.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    CloudSyncService().syncSnoozeReminders([reminder]);
   }
 
   Future<List<SnoozeReminder>> getActiveSnoozeReminders() async {

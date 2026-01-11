@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:friend_builder/services/cloud_sync_service.dart';
 
 const String themeColorKey = 'theme_color';
 
@@ -43,16 +42,6 @@ class ThemeNotifier extends ChangeNotifier {
 
     final preferences = await SharedPreferences.getInstance();
     await preferences.setInt(themeColorKey, color.toARGB32());
-
-    if (CloudSyncService().isInitialized) {
-      CloudSyncService().syncSettings({
-        'theme_color': color.toARGB32(),
-        'calendar_sync_enabled': preferences.getBool('calendar_sync_enabled'),
-        'excluded_contacts':
-            preferences.getStringList('excluded_calendar_contacts'),
-        'first_time': preferences.getBool('first_time'),
-      });
-    }
   }
 
   static Future<Color> getSavedColor() async {

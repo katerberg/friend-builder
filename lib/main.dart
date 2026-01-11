@@ -31,7 +31,16 @@ void backgroundFetchHeadlessTask(HeadlessTask task) async {
 
   try {
     await CloudSyncService().initialize();
-    await CloudSyncService().performFullSync();
+    if (await CloudSyncService().shouldSyncWeekly()) {
+      if (kDebugMode) {
+        print('Background: Performing weekly sync');
+      }
+      await CloudSyncService().performFullSync(forceSync: true);
+    } else {
+      if (kDebugMode) {
+        print('Background: Skipping sync (not time yet)');
+      }
+    }
   } catch (e) {
     if (kDebugMode) {
       print('Failed to sync to cloud in background: $e');
@@ -63,7 +72,16 @@ Future<bool> initBackgroundFetch() async {
 
         try {
           await CloudSyncService().initialize();
-          await CloudSyncService().performFullSync();
+          if (await CloudSyncService().shouldSyncWeekly()) {
+            if (kDebugMode) {
+              print('Background: Performing weekly sync');
+            }
+            await CloudSyncService().performFullSync(forceSync: true);
+          } else {
+            if (kDebugMode) {
+              print('Background: Skipping sync (not time yet)');
+            }
+          }
         } catch (e) {
           if (kDebugMode) {
             print('Failed to sync to cloud in background: $e');
@@ -104,12 +122,18 @@ Future<void> main() async {
   try {
     await CloudSyncService().initialize();
 
-    if (CloudSyncService().isInitialized &&
-        await CloudSyncService().shouldRestoreFromCloud()) {
-      if (kDebugMode) {
-        print('Restoring data from cloud');
+    if (CloudSyncService().isInitialized) {
+      if (await CloudSyncService().shouldRestoreFromCloud()) {
+        if (kDebugMode) {
+          print('Restoring data from cloud');
+        }
+        await CloudSyncService().restoreFromCloud();
+      } else if (await CloudSyncService().shouldSyncOnStartup()) {
+        if (kDebugMode) {
+          print('Performing startup sync (last sync was over 24 hours ago)');
+        }
+        await CloudSyncService().performFullSync(forceSync: true);
       }
-      await CloudSyncService().restoreFromCloud();
     }
   } catch (e) {
     if (kDebugMode) {
