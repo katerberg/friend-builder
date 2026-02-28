@@ -119,28 +119,32 @@ Future<bool> initBackgroundFetch() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    await CloudSyncService().initialize();
-
+  CloudSyncService().initialize().then((_) {
     if (CloudSyncService().isInitialized) {
-      if (await CloudSyncService().shouldRestoreFromCloud()) {
-        if (kDebugMode) {
-          print('Restoring data from cloud');
+      CloudSyncService().shouldRestoreFromCloud().then((shouldRestore) {
+        if (shouldRestore) {
+          if (kDebugMode) {
+            print('Restoring data from cloud in background');
+          }
+          CloudSyncService().restoreFromCloud();
+        } else {
+          CloudSyncService().shouldSyncOnStartup().then((shouldSync) {
+            if (shouldSync) {
+              if (kDebugMode) {
+                print('Performing startup sync in background (last sync was over 24 hours ago)');
+              }
+              CloudSyncService().performFullSync(forceSync: true);
+            }
+          });
         }
-        await CloudSyncService().restoreFromCloud();
-      } else if (await CloudSyncService().shouldSyncOnStartup()) {
-        if (kDebugMode) {
-          print('Performing startup sync (last sync was over 24 hours ago)');
-        }
-        await CloudSyncService().performFullSync(forceSync: true);
-      }
+      });
     }
-  } catch (e) {
+  }).catchError((e) {
     if (kDebugMode) {
       print('Cloud sync not available: $e');
       print('App will continue without cloud backup.');
     }
-  }
+  });
 
   await initNotifications(flutterLocalNotificationsPlugin);
 
