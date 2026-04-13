@@ -1,8 +1,6 @@
-import 'dart:collection';
-
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
-import 'package:friend_builder/utils/string_utils.dart';
+import 'package:friend_builder/utils/contact_search.dart';
 import 'package:friend_builder/data/hangout.dart';
 
 class ContactsHelper {
@@ -40,83 +38,87 @@ class ContactsHelper {
     }).toList();
   }
 
-  static bool isPerfectSubsetMatch(String testString, String pattern) {
-    var lowerTestString = testString.toLowerCase();
-    var lowerPattern = pattern.toLowerCase();
-    return lowerTestString.startsWith(lowerPattern) ||
-        lowerTestString.split(' ').any((part) => part.startsWith(lowerPattern));
-  }
+  static const int _minimumQueryLengthBeforeFiltering = 2;
 
-  static List<Contact> sortRecentContactsFirst(List<Contact> contactsToSort,
-      LinkedHashSet<EncodableContact> recentContacts, String pattern) {
-    const maxResults = 7;
-    var sorted = contactsToSort
-      ..sort((a, b) {
-        if (isPerfectSubsetMatch(a.displayName, pattern)) {
-          if (isPerfectSubsetMatch(b.displayName, pattern) &&
-              recentContacts.any((c) => c.identifier == b.id)) {
-            return 1;
-          }
-          return -1;
-        }
-        if (isPerfectSubsetMatch(b.displayName, pattern)) {
-          if (isPerfectSubsetMatch(a.displayName, pattern) &&
-              recentContacts.any((c) => c.identifier == a.id)) {
-            return -1;
-          }
-          return 1;
-        }
-        if (recentContacts.any((c) => c.identifier == a.id)) {
-          return -1;
-        }
-        if (recentContacts.any((c) => c.identifier == b.id)) {
-          return 1;
-        }
-        return 0;
-      });
-    return sorted.sublist(
-        0,
-        contactsToSort.length > maxResults
-            ? maxResults
-            : contactsToSort.length);
-  }
-
+  /// Load contacts (or use [contacts]), exclude selected, filter by query match,
+  /// then rank and cap. Sort: [ContactSearch.tierForContact] (stronger name match
+  /// wins) → recent hangout (60d) → [ContactSearch.bigramScoreForContact] → name.
   static Future<List<Contact>> getSuggestions(
     List<Contact> excludedContacts,
     String pattern, {
     Iterable<Contact>? contacts,
     Iterable<Hangout>? previousHangouts,
   }) async {
-    Iterable<Contact> contactsFromWhichToSuggest;
-    if (contacts == null) {
-      ContactPermission contactPermission =
-          await ContactPermissionService().getContacts();
-      if (contactPermission.missingPermission) {
-        return Future.value([]);
-      }
-      contactsFromWhichToSuggest =
-          await Future.value(contactPermission.contacts);
-    } else {
-      contactsFromWhichToSuggest = contacts;
+    final contactsFromWhichToSuggest =
+        await _fetchContactsUnlessProvided(contacts);
+    if (contactsFromWhichToSuggest == null) {
+      return [];
     }
-    var listOfFriends = contactsFromWhichToSuggest
+    final suggestionCandidates = _filteredSuggestionCandidates(
+      contactsFromWhichToSuggest,
+      excludedContacts,
+      pattern,
+    );
+    final recentContactIdentifiers =
+        _identifiersForRecentHangoutContacts(previousHangouts);
+    return ContactSearch.sortAndLimitSuggestions(
+      suggestionCandidates,
+      pattern,
+      recentContactIdentifiers,
+    );
+  }
+
+  static Future<Iterable<Contact>?> _fetchContactsUnlessProvided(
+    Iterable<Contact>? contacts,
+  ) async {
+    if (contacts != null) {
+      return contacts;
+    }
+    final contactPermission =
+        await ContactPermissionService().getContacts();
+    if (contactPermission.missingPermission) {
+      return null;
+    }
+    return contactPermission.contacts;
+  }
+
+  static List<Contact> _filteredSuggestionCandidates(
+    Iterable<Contact> contactsFromWhichToSuggest,
+    List<Contact> excludedContacts,
+    String pattern,
+  ) {
+    return contactsFromWhichToSuggest
         .where((element) =>
             !excludedContacts.any((selected) => selected.id == element.id) &&
-            (pattern.length < 2 ||
-                StringUtils.getComparison(element.displayName, pattern) > 0.1))
+            ContactSearch.passesSuggestionFilter(
+              element,
+              pattern,
+              minimumPatternLengthForMatch: _minimumQueryLengthBeforeFiltering,
+            ))
         .toList();
-    var recentContacts = LinkedHashSet<EncodableContact>(
-        equals: (o1, o2) => o1.identifier == o2.identifier,
-        hashCode: (contact) => contact.identifier.hashCode);
+  }
+
+  static Set<String> _identifiersForRecentHangoutContacts(
+    Iterable<Hangout>? previousHangouts,
+  ) {
+    final recentContactIdentifiers = <String>{};
     previousHangouts?.forEach((hangout) {
-      if (hangout.when
-              .compareTo(DateTime.now().subtract(const Duration(days: 60))) ==
-          1) {
-        for (var contact in hangout.contacts) {
-          recentContacts.add(contact);
+      final isWithinRecencyWindow = hangout.when.compareTo(
+            DateTime.now().subtract(const Duration(days: 60)),
+          ) ==
+          1;
+      if (!isWithinRecencyWindow) {
+        return;
+      }
+      for (final contact in hangout.contacts) {
+        if (contact.identifier.isNotEmpty) {
+          recentContactIdentifiers.add(contact.identifier);
+        }
+        if (contact.id.isNotEmpty) {
+          recentContactIdentifiers.add(contact.id);
         }
       }
     });
-    return sortRecentContactsFirst(listOfFriends, recentContacts, pattern);
+    return recentContactIdentifiers;
   }
 }

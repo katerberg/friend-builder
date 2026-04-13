@@ -1,7 +1,6 @@
-import 'dart:collection';
-
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
+import 'package:friend_builder/utils/contact_search.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:friend_builder/utils/string_utils.dart';
 import 'package:test/test.dart';
@@ -33,21 +32,21 @@ void main() {
     });
   });
 
-  group('sortRecentContactsFirst', () {
+  group('sortAndLimitSuggestions', () {
     test('sorts first 7 recent contacts first', () {
       List<Contact> contactsToSort = List.generate(
           20,
           (index) => Contact(
               id: index.toString(),
               displayName: StringUtils.getRandomString()));
-      var recentContacts = LinkedHashSet<EncodableContact>(
-          equals: (o1, o2) => o1.identifier == o2.identifier,
-          hashCode: (contact) => contact.identifier.hashCode);
-      recentContacts
-          .add(EncodableContact.fromContact(contactsToSort.elementAt(7)));
+      final recentContact = contactsToSort.elementAt(7);
+      final recentIdentifiers = <String>{
+        EncodableContact.fromContact(recentContact).identifier,
+        recentContact.id,
+      };
 
-      var sortedContacts = ContactsHelper.sortRecentContactsFirst(
-          contactsToSort, recentContacts, '');
+      var sortedContacts = ContactSearch.sortAndLimitSuggestions(
+          contactsToSort, '', recentIdentifiers);
 
       expect(sortedContacts.length, 7);
       expect(sortedContacts[0].id, '7');
@@ -59,14 +58,12 @@ void main() {
           (index) => Contact(
               id: index.toString(),
               displayName: StringUtils.getRandomString()));
-      var recentContacts = LinkedHashSet<EncodableContact>(
-          equals: (o1, o2) => o1.identifier == o2.identifier,
-          hashCode: (contact) => contact.identifier.hashCode);
+      const recentIdentifiers = <String>{};
 
-      var sortedContacts = ContactsHelper.sortRecentContactsFirst(
+      var sortedContacts = ContactSearch.sortAndLimitSuggestions(
           contactsToSort,
-          recentContacts,
-          contactsToSort.elementAt(9).displayName.substring(0, 3));
+          contactsToSort.elementAt(9).displayName.substring(0, 3),
+          recentIdentifiers);
 
       expect(sortedContacts.length, 7);
       expect(sortedContacts[0].id, '9');
@@ -81,14 +78,14 @@ void main() {
               displayName: StringUtils.getRandomString()));
       contactsToSort[9].displayName = 'Jane Dorsey';
       contactsToSort[10].displayName = 'Jane Thomas';
-      var recentContacts = LinkedHashSet<EncodableContact>(
-          equals: (o1, o2) => o1.identifier == o2.identifier,
-          hashCode: (contact) => contact.identifier.hashCode);
-      recentContacts
-          .add(EncodableContact.fromContact(contactsToSort.elementAt(10)));
+      final recentContact = contactsToSort.elementAt(10);
+      final recentIdentifiers = <String>{
+        EncodableContact.fromContact(recentContact).identifier,
+        recentContact.id,
+      };
 
-      var sortedContacts = ContactsHelper.sortRecentContactsFirst(
-          contactsToSort, recentContacts, 'Jane');
+      var sortedContacts = ContactSearch.sortAndLimitSuggestions(
+          contactsToSort, 'Jane', recentIdentifiers);
 
       expect(sortedContacts.length, 7);
       expect(sortedContacts[0].id, '10');
@@ -103,14 +100,14 @@ void main() {
               displayName: StringUtils.getRandomString()));
       contactsToSort[9].displayName = 'Jane Dorsey';
       contactsToSort[10].displayName = 'Jan Thomas';
-      var recentContacts = LinkedHashSet<EncodableContact>(
-          equals: (o1, o2) => o1.identifier == o2.identifier,
-          hashCode: (contact) => contact.identifier.hashCode);
-      recentContacts
-          .add(EncodableContact.fromContact(contactsToSort.elementAt(10)));
+      final recentContact = contactsToSort.elementAt(10);
+      final recentIdentifiers = <String>{
+        EncodableContact.fromContact(recentContact).identifier,
+        recentContact.id,
+      };
 
-      var sortedContacts = ContactsHelper.sortRecentContactsFirst(
-          contactsToSort, recentContacts, 'Jane');
+      var sortedContacts = ContactSearch.sortAndLimitSuggestions(
+          contactsToSort, 'Jane', recentIdentifiers);
 
       expect(sortedContacts.length, 7);
       expect(sortedContacts[0].id, '9');
