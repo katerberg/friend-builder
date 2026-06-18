@@ -1,6 +1,8 @@
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/snooze_reminder.dart';
+import 'package:friend_builder/data/top_friend_row.dart';
+import 'package:friend_builder/utils/calendar_year.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:path/path.dart';
@@ -271,6 +273,55 @@ class DBProvider {
       }
     }
     return hangoutList;
+  }
+
+  Future<List<TopFriendRow>> getTopFriendsForCalendarYear({int limit = 5}) async {
+    final database = await this.database;
+    final bounds = calendarYearBounds();
+
+    final results = await database.rawQuery(
+      '''
+      SELECT c.identifier, MAX(c.displayName) AS displayName, COUNT(*) AS hangoutCount
+      FROM contacts c
+      INNER JOIN hangouts h ON c.hangoutId = h.id
+      WHERE h.whenOccurred >= ? AND h.whenOccurred < ?
+      GROUP BY c.identifier
+      ORDER BY hangoutCount DESC, displayName ASC
+      LIMIT ?
+      ''',
+      [
+        bounds.start.toIso8601String(),
+        bounds.end.toIso8601String(),
+        limit,
+      ],
+    );
+
+    return results.map((row) {
+      return TopFriendRow.fromMap({
+        'identifier': row['identifier'],
+        'displayName': row['displayName'],
+        'hangoutCount': row['hangoutCount'] as int,
+      });
+    }).toList();
+  }
+
+  Future<int> getHangoutCountForCalendarYear() async {
+    final database = await this.database;
+    final bounds = calendarYearBounds();
+
+    final result = await database.rawQuery(
+      '''
+      SELECT COUNT(*) AS hangoutCount
+      FROM hangouts
+      WHERE whenOccurred >= ? AND whenOccurred < ?
+      ''',
+      [
+        bounds.start.toIso8601String(),
+        bounds.end.toIso8601String(),
+      ],
+    );
+
+    return Sqflite.firstIntValue(result) ?? 0;
   }
 
   Future<List<Hangout>> getHangoutsPaginated({

@@ -1,6 +1,7 @@
 import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/data/top_friend_row.dart';
 
 class Storage {
   Future<List<Hangout>?> getHangouts() async {
@@ -30,6 +31,14 @@ class Storage {
 
   Future deleteHangout(Hangout hangout) async {
     return DBProvider.db.deleteHangout(hangout);
+  }
+
+  Future<List<TopFriendRow>> getTopFriendsForCalendarYear({int limit = 5}) {
+    return DBProvider.db.getTopFriendsForCalendarYear(limit: limit);
+  }
+
+  Future<int> getHangoutCountForCalendarYear() {
+    return DBProvider.db.getHangoutCountForCalendarYear();
   }
 
   static Future<List<Friend>?> getFriends() async {

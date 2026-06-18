@@ -35,4 +35,7 @@ fi
 # Install CocoaPods dependencies.
 cd ios && pod install # run `pod install` in the `ios` directory.
 
+cd "$CI_PRIMARY_REPOSITORY_PATH"
+flutter build ios --config-only --release
+
 exit 0

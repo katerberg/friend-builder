@@ -8,6 +8,7 @@ import 'package:friend_builder/pages/history/components/result.dart';
 import 'package:friend_builder/pages/history/components/edit_dialog.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
+import 'package:friend_builder/shared/stats_modal.dart';
 import 'package:friend_builder/shared/debug_notification_menu.dart';
 import 'package:friend_builder/theme_notifier.dart';
 
@@ -262,16 +263,42 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
+  void _openStatsModal() {
+    showDialog(
+      context: context,
+      builder: (context) => StatsModal(storage: widget.storage),
+    );
+  }
+
+  Widget? _buildLeading() {
+    final statsButton = IconButton(
+      icon: const Icon(Icons.bar_chart),
+      tooltip: 'Top Friends',
+      onPressed: _openStatsModal,
+    );
+
+    if (kDebugMode) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          statsButton,
+          DebugNotificationMenu(
+            flutterLocalNotificationsPlugin:
+                widget.flutterLocalNotificationsPlugin,
+          ),
+        ],
+      );
+    }
+
+    return statsButton;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: kDebugMode
-            ? DebugNotificationMenu(
-                flutterLocalNotificationsPlugin:
-                    widget.flutterLocalNotificationsPlugin,
-              )
-            : null,
+        leading: _buildLeading(),
+        leadingWidth: kDebugMode ? 96 : null,
         title: const Text('Hangouts'),
         actions: [
           IconButton(
