@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Runs immediately before xcodebuild archive. Ensures Flutter iOS config and
-# CocoaPods are in sync so native plugins (e.g. background_fetch) are available.
+# Runs immediately before xcodebuild archive. Re-syncs pods after clone setup.
 set -e
 
 export LANG="${LANG:-en_US.UTF-8}"
@@ -12,7 +11,6 @@ cd "$CI_PRIMARY_REPOSITORY_PATH"
 export PATH="$PATH:$HOME/flutter/bin"
 
 flutter pub get
-flutter build ios --config-only --release
 
 cd ios && pod install
 
