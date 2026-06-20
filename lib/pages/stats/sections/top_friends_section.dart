@@ -6,19 +6,19 @@ import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/shared/lazy_contact_avatar.dart';
 import 'package:friend_builder/utils/calendar_year.dart';
 
-class StatsModal extends StatefulWidget {
+class TopFriendsSection extends StatefulWidget {
   final Storage storage;
 
-  const StatsModal({
+  const TopFriendsSection({
     super.key,
     required this.storage,
   });
 
   @override
-  State<StatsModal> createState() => _StatsModalState();
+  State<TopFriendsSection> createState() => _TopFriendsSectionState();
 }
 
-class _StatsModalState extends State<StatsModal> {
+class _TopFriendsSectionState extends State<TopFriendsSection> {
   bool _isLoading = true;
   List<TopFriendRow> _topFriends = [];
   int _hangoutCount = 0;
@@ -99,7 +99,9 @@ class _StatsModalState extends State<StatsModal> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              row.displayName.isNotEmpty ? row.displayName : contact.displayName,
+              row.displayName.isNotEmpty
+                  ? row.displayName
+                  : contact.displayName,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -112,18 +114,26 @@ class _StatsModalState extends State<StatsModal> {
     );
   }
 
-  Widget _buildContent() {
-    if (_topFriends.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 32),
-          child: Text(
-            '🏆: Yourself',
-            style: Theme.of(context).textTheme.titleLarge,
+  Widget _buildEmptyState() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 16),
+      child: Column(
+        children: [
+          Text(
+            'No hangouts yet this year. Log one to see who you spend the most time with.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).hintColor,
+                ),
             textAlign: TextAlign.center,
           ),
-        ),
-      );
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeaderboard() {
+    if (_topFriends.isEmpty) {
+      return _buildEmptyState();
     }
 
     return Column(
@@ -139,49 +149,21 @@ class _StatsModalState extends State<StatsModal> {
     final year = calendarYearBounds().year;
     final subtitle = formatHangoutCountSubtitle(year, _hangoutCount);
 
-    return Dialog(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Top Friends',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          subtitle,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).hintColor,
               ),
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).hintColor,
-                    ),
-              ),
-              const SizedBox(height: 16),
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator())
-              else
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: _buildContent(),
-                  ),
-                ),
-            ],
-          ),
         ),
-      ),
+        const SizedBox(height: 16),
+        if (_isLoading)
+          const Center(child: CircularProgressIndicator())
+        else
+          _buildLeaderboard(),
+      ],
     );
   }
 }

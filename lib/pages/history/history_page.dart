@@ -7,8 +7,8 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/result.dart';
 import 'package:friend_builder/pages/history/components/edit_dialog.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
+import 'package:friend_builder/pages/stats/stats_page.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
-import 'package:friend_builder/shared/stats_modal.dart';
 import 'package:friend_builder/shared/debug_notification_menu.dart';
 import 'package:friend_builder/theme_notifier.dart';
 
@@ -40,6 +40,7 @@ class HistoryPageState extends State<HistoryPage> {
   bool _isLoading = false;
   bool _hasMore = true;
   bool _hasScrolledToInitial = false;
+  bool _showingStats = false;
   Hangout? _initialHangout;
 
   @override
@@ -263,18 +264,31 @@ class HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  void _openStatsModal() {
-    showDialog(
-      context: context,
-      builder: (context) => StatsModal(storage: widget.storage),
-    );
+  void _openStats() {
+    setState(() {
+      _showingStats = true;
+    });
+  }
+
+  void _closeStats() {
+    setState(() {
+      _showingStats = false;
+    });
   }
 
   Widget? _buildLeading() {
+    if (_showingStats) {
+      return IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: 'Back to hangouts',
+        onPressed: _closeStats,
+      );
+    }
+
     final statsButton = IconButton(
       icon: const Icon(Icons.bar_chart),
-      tooltip: 'Top Friends',
-      onPressed: _openStatsModal,
+      tooltip: 'Stats',
+      onPressed: _openStats,
     );
 
     if (kDebugMode) {
@@ -298,26 +312,30 @@ class HistoryPageState extends State<HistoryPage> {
     return Scaffold(
       appBar: AppBar(
         leading: _buildLeading(),
-        leadingWidth: kDebugMode ? 96 : null,
-        title: const Text('Hangouts'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => SettingsModal(
-                  flutterLocalNotificationsPlugin:
-                      widget.flutterLocalNotificationsPlugin,
-                  themeNotifier: widget.themeNotifier,
+        leadingWidth: _showingStats ? null : (kDebugMode ? 96 : null),
+        title: Text(_showingStats ? 'Top Friends' : 'Hangouts'),
+        actions: _showingStats
+            ? null
+            : [
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => SettingsModal(
+                        flutterLocalNotificationsPlugin:
+                            widget.flutterLocalNotificationsPlugin,
+                        themeNotifier: widget.themeNotifier,
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ],
+              ],
       ),
       body: SafeArea(
-        child: _getResults(),
+        child: _showingStats
+            ? StatsPage(storage: widget.storage)
+            : _getResults(),
       ),
     );
   }
