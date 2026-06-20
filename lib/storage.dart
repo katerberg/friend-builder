@@ -1,3 +1,4 @@
+import 'package:friend_builder/data/calendar_year_stats.dart';
 import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
@@ -39,6 +40,18 @@ class Storage {
 
   Future<int> getHangoutCountForCalendarYear() {
     return DBProvider.db.getHangoutCountForCalendarYear();
+  }
+
+  Future<List<int>> getHangoutCountByMonthForCalendarYear() {
+    return DBProvider.db.getHangoutCountByMonthForCalendarYear();
+  }
+
+  Future<GroupSoloCounts> getGroupVsSoloCountsForCalendarYear() {
+    return DBProvider.db.getGroupVsSoloCountsForCalendarYear();
+  }
+
+  Future<List<int>> getHangoutCountByWeekdayForCalendarYear() {
+    return DBProvider.db.getHangoutCountByWeekdayForCalendarYear();
   }
 
   static Future<List<Friend>?> getFriends() async {

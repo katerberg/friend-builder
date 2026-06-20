@@ -313,7 +313,7 @@ class HistoryPageState extends State<HistoryPage> {
       appBar: AppBar(
         leading: _buildLeading(),
         leadingWidth: _showingStats ? null : (kDebugMode ? 96 : null),
-        title: Text(_showingStats ? 'Top Friends' : 'Hangouts'),
+        title: Text(_showingStats ? 'Stats' : 'Hangouts'),
         actions: _showingStats
             ? null
             : [

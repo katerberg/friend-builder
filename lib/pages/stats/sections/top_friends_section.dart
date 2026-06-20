@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/top_friend_row.dart';
+import 'package:friend_builder/pages/stats/components/stats_section_card.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/shared/lazy_contact_avatar.dart';
-import 'package:friend_builder/utils/calendar_year.dart';
 
 class TopFriendsSection extends StatefulWidget {
   final Storage storage;
@@ -21,7 +21,6 @@ class TopFriendsSection extends StatefulWidget {
 class _TopFriendsSectionState extends State<TopFriendsSection> {
   bool _isLoading = true;
   List<TopFriendRow> _topFriends = [];
-  int _hangoutCount = 0;
   Map<String, Contact> _contactByIdentifier = {};
 
   @override
@@ -33,18 +32,15 @@ class _TopFriendsSectionState extends State<TopFriendsSection> {
   Future<void> _loadStats() async {
     final topFriendsFuture =
         widget.storage.getTopFriendsForCalendarYear(limit: 5);
-    final hangoutCountFuture = widget.storage.getHangoutCountForCalendarYear();
     final contactPermissionFuture = ContactPermissionService().getContacts();
 
     final topFriends = await topFriendsFuture;
-    final hangoutCount = await hangoutCountFuture;
     final contactPermission = await contactPermissionFuture;
 
     if (!mounted) return;
 
     setState(() {
       _topFriends = topFriends;
-      _hangoutCount = hangoutCount;
       _contactByIdentifier = {
         for (final contact in contactPermission.contacts) contact.id: contact,
       };
@@ -114,26 +110,12 @@ class _TopFriendsSectionState extends State<TopFriendsSection> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 16),
-      child: Column(
-        children: [
-          Text(
-            'No hangouts yet this year. Log one to see who you spend the most time with.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).hintColor,
-                ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLeaderboard() {
+  Widget _buildContent() {
     if (_topFriends.isEmpty) {
-      return _buildEmptyState();
+      return const StatsEmptyMessage(
+        message:
+            'No hangouts yet this year. Log one to see who you spend the most time with.',
+      );
     }
 
     return Column(
@@ -146,24 +128,11 @@ class _TopFriendsSectionState extends State<TopFriendsSection> {
 
   @override
   Widget build(BuildContext context) {
-    final year = calendarYearBounds().year;
-    final subtitle = formatHangoutCountSubtitle(year, _hangoutCount);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          subtitle,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).hintColor,
-              ),
-        ),
-        const SizedBox(height: 16),
-        if (_isLoading)
-          const Center(child: CircularProgressIndicator())
-        else
-          _buildLeaderboard(),
-      ],
+    return StatsSectionCard(
+      title: 'Top Friends',
+      child: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _buildContent(),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:friend_builder/data/calendar_year_stats.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/snooze_reminder.dart';
@@ -322,6 +323,76 @@ class DBProvider {
     );
 
     return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  Future<List<int>> getHangoutCountByMonthForCalendarYear() async {
+    final database = await this.database;
+    final bounds = calendarYearBounds();
+
+    final results = await database.rawQuery(
+      '''
+      SELECT strftime('%m', whenOccurred) AS month, COUNT(*) AS hangoutCount
+      FROM hangouts
+      WHERE whenOccurred >= ? AND whenOccurred < ?
+      GROUP BY month
+      ''',
+      [
+        bounds.start.toIso8601String(),
+        bounds.end.toIso8601String(),
+      ],
+    );
+
+    return buildMonthlyCountsFromQueryRows(results);
+  }
+
+  Future<GroupSoloCounts> getGroupVsSoloCountsForCalendarYear() async {
+    final database = await this.database;
+    final bounds = calendarYearBounds();
+
+    final result = await database.rawQuery(
+      '''
+      SELECT
+        SUM(CASE WHEN contactCount = 1 THEN 1 ELSE 0 END) AS soloCount,
+        SUM(CASE WHEN contactCount > 1 THEN 1 ELSE 0 END) AS groupCount
+      FROM (
+        SELECT h.id, COUNT(c.id) AS contactCount
+        FROM hangouts h
+        INNER JOIN contacts c ON c.hangoutId = h.id
+        WHERE h.whenOccurred >= ? AND h.whenOccurred < ?
+        GROUP BY h.id
+      )
+      ''',
+      [
+        bounds.start.toIso8601String(),
+        bounds.end.toIso8601String(),
+      ],
+    );
+
+    if (result.isEmpty) {
+      return const GroupSoloCounts(soloCount: 0, groupCount: 0);
+    }
+
+    return GroupSoloCounts.fromMap(result.first);
+  }
+
+  Future<List<int>> getHangoutCountByWeekdayForCalendarYear() async {
+    final database = await this.database;
+    final bounds = calendarYearBounds();
+
+    final results = await database.rawQuery(
+      '''
+      SELECT strftime('%w', whenOccurred) AS weekday, COUNT(*) AS hangoutCount
+      FROM hangouts
+      WHERE whenOccurred >= ? AND whenOccurred < ?
+      GROUP BY weekday
+      ''',
+      [
+        bounds.start.toIso8601String(),
+        bounds.end.toIso8601String(),
+      ],
+    );
+
+    return buildWeekdayCountsFromQueryRows(results);
   }
 
   Future<List<Hangout>> getHangoutsPaginated({
