@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:friend_builder/data/frequency.dart';
+import 'package:friend_builder/utils/local_date.dart';
 
 class Scheduling {
   static int daysFromFrequency(Frequency frequency) {
@@ -7,9 +8,9 @@ class Scheduling {
   }
 
   static int daysLeft(Frequency frequency, DateTime? latestHangoutTime) {
-    int daysAgo =
-        DateTime.now().difference(latestHangoutTime ?? DateTime(2200)).inDays;
-    int howOften = daysFromFrequency(frequency);
+    final daysAgo =
+        calendarDaysBetween(latestHangoutTime ?? DateTime(2200), DateTime.now());
+    final howOften = daysFromFrequency(frequency);
     return howOften - daysAgo;
   }
 

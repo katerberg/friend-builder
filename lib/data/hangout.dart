@@ -1,5 +1,6 @@
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/contacts_permission.dart';
+import 'package:friend_builder/utils/local_date.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -7,14 +8,15 @@ class Hangout {
   List<EncodableContact> contacts = [];
   final String id;
   String notes = '';
-  DateTime when = DateTime.now();
+  DateTime when;
 
   Hangout(
       {String? id,
       required this.contacts,
       required this.notes,
-      required this.when})
-      : id = id ?? const Uuid().v4();
+      required DateTime when})
+      : id = id ?? const Uuid().v4(),
+        when = normalizeToHangoutDate(when);
 
   String dateWithYear() => DateFormat.yMMMMd().format(when);
   String dateWithoutYear() => DateFormat.MMMMd().format(when);
@@ -48,7 +50,7 @@ class Hangout {
       "id": id,
       "contacts": contacts,
       "notes": notes,
-      "when": when.toIso8601String(),
+      "when": normalizeToHangoutDate(when).toIso8601String(),
     };
   }
 
@@ -56,7 +58,7 @@ class Hangout {
     return {
       "id": id,
       "notes": notes,
-      "when": when.toIso8601String(),
+      "when": normalizeToHangoutDate(when).toIso8601String(),
     };
   }
 }
