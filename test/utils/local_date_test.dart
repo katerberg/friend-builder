@@ -1,6 +1,7 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friend_builder/utils/local_date.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 void main() {
@@ -54,7 +55,7 @@ void main() {
 
   group('hangoutDateFromCalendarEvent', () {
     setUpAll(() {
-      tz.initializeTimeZones();
+      tzdata.initializeTimeZones();
     });
 
     test('iOS all-day UTC midnight keeps the UTC calendar day', () {
