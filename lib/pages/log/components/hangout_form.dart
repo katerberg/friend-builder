@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:friend_builder/utils/local_date.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
 import 'package:friend_builder/contacts_permission.dart';
@@ -31,12 +32,12 @@ class HangoutFormState extends State<HangoutForm> {
   bool _submitting = false;
   Hangout _data = Hangout(
     contacts: [],
-    when: DateTime.now(),
+    when: hangoutDateToday(),
     notes: '',
   );
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = hangoutDateToday();
   TextEditingController dateController =
-      TextEditingController(text: Scheduling.formatDate(DateTime.now()));
+      TextEditingController(text: Scheduling.formatDate(hangoutDateToday()));
 
   @override
   void initState() {
@@ -44,8 +45,9 @@ class HangoutFormState extends State<HangoutForm> {
     if (widget.hangout != null) {
       _data = widget.hangout!;
     }
-    selectedDate =
-        widget.hangout != null ? widget.hangout!.when : DateTime.now();
+    selectedDate = widget.hangout != null
+        ? normalizeToHangoutDate(widget.hangout!.when)
+        : hangoutDateToday();
     dateController =
         TextEditingController(text: Scheduling.formatDate(selectedDate));
   }
@@ -55,14 +57,16 @@ class HangoutFormState extends State<HangoutForm> {
             context: context,
             initialDate: selectedDate,
             firstDate: DateTime(2018, 8),
-            lastDate: DateTime.now()) ??
-        DateTime.now();
-    if (picked != selectedDate) {
+            lastDate: hangoutDateToday()) ??
+        hangoutDateToday();
+    final normalizedPicked = normalizeToHangoutDate(picked);
+    if (!isSameHangoutDate(normalizedPicked, selectedDate)) {
       setState(() {
-        selectedDate = picked;
+        selectedDate = normalizedPicked;
+        _data.when = normalizedPicked;
       });
 
-      dateController.text = Scheduling.formatDate(picked);
+      dateController.text = Scheduling.formatDate(normalizedPicked);
     }
     _unfocus();
   }

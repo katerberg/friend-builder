@@ -6,6 +6,7 @@ import 'package:friend_builder/storage.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/result.dart';
 import 'package:friend_builder/pages/history/components/edit_dialog.dart';
+import 'package:friend_builder/utils/local_date.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/pages/stats/stats_page.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
@@ -196,7 +197,7 @@ class HistoryPageState extends State<HistoryPage> {
     final repeatedHangout = Hangout(
       contacts: List.from(originalHangout.contacts),
       notes: originalHangout.notes,
-      when: DateTime.now(),
+      when: hangoutDateToday(),
     );
 
     // Open the edit dialog for the newly created hangout
