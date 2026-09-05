@@ -67,6 +67,37 @@ void main() {
       expect(hangout.isAllDay, isFalse);
     });
 
+    test('fromMap accepts boolean true for isAllDay', () {
+      final hangout = Hangout.fromMap({
+        'id': 'hangout-1',
+        'notes': 'notes',
+        'whenOccurred': DateTime(2024, 8, 22).toIso8601String(),
+        'isAllDay': true,
+      });
+
+      expect(hangout.isAllDay, isTrue);
+    });
+
+    test('fromJson accepts integer 1 for isAllDay', () {
+      final hangout = Hangout.fromJson({
+        'id': 'hangout-1',
+        'contacts': [],
+        'notes': 'notes',
+        'when': DateTime(2024, 8, 22).toIso8601String(),
+        'isAllDay': 1,
+      });
+
+      expect(hangout.isAllDay, isTrue);
+    });
+
+    test('parseIsAllDay accepts true and 1 only', () {
+      expect(parseIsAllDay(true), isTrue);
+      expect(parseIsAllDay(1), isTrue);
+      expect(parseIsAllDay(false), isFalse);
+      expect(parseIsAllDay(0), isFalse);
+      expect(parseIsAllDay(null), isFalse);
+    });
+
     test('toJson and fromJson round-trip preserve the instant and isAllDay', () {
       final evening = DateTime(2024, 8, 22, 18, 45, 30);
       final original = Hangout(

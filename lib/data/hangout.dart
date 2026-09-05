@@ -3,6 +3,8 @@ import 'package:friend_builder/contacts_permission.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+bool parseIsAllDay(Object? value) => value == true || value == 1;
+
 class Hangout {
   List<EncodableContact> contacts = [];
   final String id;
@@ -30,10 +32,8 @@ class Hangout {
 
   /// Hidden inspect copy: local and UTC representations of [when].
   String debugLocalAndUtc() {
-    final local = when.isUtc ? when.toLocal() : when;
-    final utc = when.toUtc();
     final formatter = DateFormat.yMMMMd().add_jms();
-    return 'Local: ${formatter.format(local)}\nUTC: ${formatter.format(utc)}';
+    return 'Local: ${formatter.format(when)}\nUTC: ${formatter.format(when.toUtc())}';
   }
 
   bool hasContact(Contact contact) {
@@ -48,7 +48,7 @@ class Hangout {
           .toList(),
       notes: parsedJson['notes'] ?? parsedJson['where'] ?? "",
       when: DateTime.parse(parsedJson['when']),
-      isAllDay: parsedJson['isAllDay'] as bool? ?? false,
+      isAllDay: parseIsAllDay(parsedJson['isAllDay']),
     );
   }
 
@@ -58,7 +58,7 @@ class Hangout {
       contacts: [],
       notes: parsed['notes'] ?? "",
       when: DateTime.parse(parsed['whenOccurred']),
-      isAllDay: parsed['isAllDay'] == 1,
+      isAllDay: parseIsAllDay(parsed['isAllDay']),
     );
   }
 

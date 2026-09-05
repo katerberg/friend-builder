@@ -436,7 +436,7 @@ class CloudSyncService {
           notes: data['notes'] as String? ?? '',
           when: (data['when'] as Timestamp).toDate(),
           contacts: contacts,
-          isAllDay: data['isAllDay'] as bool? ?? false,
+          isAllDay: parseIsAllDay(data['isAllDay']),
         );
 
         await DBProvider.db.saveHangout(hangout);

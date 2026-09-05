@@ -17,6 +17,17 @@ class DBProvider {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
+  void _createHangoutsTableV2(batch) {
+    batch.execute('DROP TABLE IF EXISTS hangouts');
+    batch.execute('''CREATE TABLE hangouts (
+    id TEXT PRIMARY KEY,
+    notes TEXT,
+    whenOccurred TEXT
+)''');
+    batch.execute(
+        'CREATE INDEX IF NOT EXISTS idx_hangouts_when ON hangouts(whenOccurred)');
+  }
+
   void _createHangoutsTable(batch) {
     batch.execute('DROP TABLE IF EXISTS hangouts');
     batch.execute('''CREATE TABLE hangouts (
@@ -72,7 +83,7 @@ class DBProvider {
 
   void _updateV1ToV2(Batch batch) {
     _createContactsTable(batch);
-    _createHangoutsTable(batch);
+    _createHangoutsTableV2(batch);
   }
 
   void _updateV2ToV3(Batch batch) {

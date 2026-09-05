@@ -39,25 +39,22 @@ class OpenResult extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     children: [
-                      HangoutWhenLabel(
-                        hangout: hangout,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      Expanded(
+                        child: HangoutWhenLabel(
+                          hangout: hangout,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
                       ),
                       ResultBubbles(
                           contacts: hangout.contacts
                             ..sort((a, b) =>
                                 a.displayName.compareTo(b.displayName))),
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.centerRight,
-                          child: ResultMenu(
-                            hangout: hangout,
-                            onEdit: onEdit,
-                            onDelete: onDelete,
-                            onRepeat: onRepeat,
-                          ),
-                        ),
-                      )
+                      ResultMenu(
+                        hangout: hangout,
+                        onEdit: onEdit,
+                        onDelete: onDelete,
+                        onRepeat: onRepeat,
+                      ),
                     ],
                   ),
                 ),
