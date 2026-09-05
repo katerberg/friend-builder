@@ -8,19 +8,25 @@ class Hangout {
   final String id;
   String notes = '';
   DateTime when;
+  bool isAllDay;
 
   Hangout(
       {String? id,
       required this.contacts,
       required this.notes,
-      required DateTime when})
+      required DateTime when,
+      this.isAllDay = false})
       : id = id ?? const Uuid().v4(),
         when = when.isUtc ? when.toLocal() : when;
 
   String dateWithYear() => DateFormat.yMMMMd().format(when);
 
-  String dateTimeWithoutYear() =>
-      DateFormat.MMMMd().add_jm().format(when);
+  String dateTimeWithoutYear() {
+    if (isAllDay) {
+      return DateFormat.MMMMd().format(when);
+    }
+    return DateFormat.MMMMd().add_jm().format(when);
+  }
 
   /// Hidden inspect copy: local and UTC representations of [when].
   String debugLocalAndUtc() {
@@ -42,6 +48,7 @@ class Hangout {
           .toList(),
       notes: parsedJson['notes'] ?? parsedJson['where'] ?? "",
       when: DateTime.parse(parsedJson['when']),
+      isAllDay: parsedJson['isAllDay'] as bool? ?? false,
     );
   }
 
@@ -51,6 +58,7 @@ class Hangout {
       contacts: [],
       notes: parsed['notes'] ?? "",
       when: DateTime.parse(parsed['whenOccurred']),
+      isAllDay: parsed['isAllDay'] == 1,
     );
   }
 
@@ -60,6 +68,7 @@ class Hangout {
       "contacts": contacts,
       "notes": notes,
       "when": when.toIso8601String(),
+      "isAllDay": isAllDay,
     };
   }
 
@@ -68,6 +77,7 @@ class Hangout {
       "id": id,
       "notes": notes,
       "when": when.toIso8601String(),
+      "isAllDay": isAllDay ? 1 : 0,
     };
   }
 }

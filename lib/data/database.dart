@@ -22,7 +22,8 @@ class DBProvider {
     batch.execute('''CREATE TABLE hangouts (
     id TEXT PRIMARY KEY,
     notes TEXT,
-    whenOccurred TEXT
+    whenOccurred TEXT,
+    isAllDay INTEGER NOT NULL DEFAULT 0
 )''');
     batch.execute(
         'CREATE INDEX IF NOT EXISTS idx_hangouts_when ON hangouts(whenOccurred)');
@@ -87,6 +88,12 @@ class DBProvider {
     _createSnoozeRemindersTable(batch);
   }
 
+  void _updateV5ToV6(Batch batch) {
+    batch.execute(
+      'ALTER TABLE hangouts ADD COLUMN isAllDay INTEGER NOT NULL DEFAULT 0',
+    );
+  }
+
   _initDB() async {
     return await openDatabase(
       join(await getDatabasesPath(), 'friend-builder.db'),
@@ -114,10 +121,13 @@ class DBProvider {
         if (oldVersion < 5) {
           _updateV4ToV5(batch);
         }
+        if (oldVersion < 6) {
+          _updateV5ToV6(batch);
+        }
         await batch.commit();
       },
       onDowngrade: onDatabaseDowngradeDelete,
-      version: 5,
+      version: 6,
     );
   }
 
@@ -221,9 +231,14 @@ class DBProvider {
   Future<int> _insertHangout(Hangout hangout) async {
     final db = await database;
     var raw = await db.rawInsert(
-        "INSERT INTO hangouts (id,notes,whenOccurred)"
-        " VALUES (?,?,?)",
-        [hangout.id, hangout.notes, hangout.when.toIso8601String()]);
+        "INSERT INTO hangouts (id,notes,whenOccurred,isAllDay)"
+        " VALUES (?,?,?,?)",
+        [
+          hangout.id,
+          hangout.notes,
+          hangout.when.toIso8601String(),
+          hangout.isAllDay ? 1 : 0,
+        ]);
     var promises = hangout.contacts.map((c) => _insertContact(c, hangout));
     await Future.wait(promises);
     return raw;
@@ -232,8 +247,13 @@ class DBProvider {
   Future _updateHangout(Hangout hangout) async {
     final db = await database;
     var hangoutPromise = db.rawUpdate(
-        'UPDATE hangouts SET notes = ?, whenOccurred = ? WHERE id = ?',
-        [hangout.notes, hangout.when.toIso8601String(), hangout.id]);
+        'UPDATE hangouts SET notes = ?, whenOccurred = ?, isAllDay = ? WHERE id = ?',
+        [
+          hangout.notes,
+          hangout.when.toIso8601String(),
+          hangout.isAllDay ? 1 : 0,
+          hangout.id,
+        ]);
     var previousContacts = await db
         .query('contacts', where: 'hangoutId = ?', whereArgs: [hangout.id]);
     var deletionPromises = previousContacts.map((previousContact) {

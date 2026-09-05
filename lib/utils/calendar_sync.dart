@@ -179,6 +179,7 @@ class CalendarSync {
                 .toList(),
             notes: 'Calendar: ${event.title ?? "Event"}',
             when: hangoutWhenFromCalendarEvent(event),
+            isAllDay: event.allDay == true,
           );
 
           await DBProvider.db.saveHangout(hangout);
