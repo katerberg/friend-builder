@@ -23,12 +23,7 @@ class Hangout {
 
   String dateWithYear() => DateFormat.yMMMMd().format(when);
 
-  String dateTimeWithoutYear() {
-    if (isAllDay) {
-      return DateFormat.MMMMd().format(when);
-    }
-    return DateFormat.MMMMd().add_jm().format(when);
-  }
+  String dateWithoutYear() => DateFormat.MMMMd().format(when);
 
   /// Hidden inspect copy: local and UTC representations of [when].
   String debugLocalAndUtc() {

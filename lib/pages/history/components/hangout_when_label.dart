@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
 
-/// History date/time label. Long-press shows local and UTC instants.
+/// History date label. Long-press shows local and UTC instants.
 class HangoutWhenLabel extends StatelessWidget {
   final Hangout hangout;
   final TextStyle? style;
@@ -33,7 +33,7 @@ class HangoutWhenLabel extends StatelessWidget {
     return GestureDetector(
       onLongPress: () => _showDebugDialog(context),
       child: Text(
-        hangout.dateTimeWithoutYear(),
+        hangout.dateWithoutYear(),
         style: style,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,

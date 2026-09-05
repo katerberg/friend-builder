@@ -116,26 +116,13 @@ void main() {
       expect(restored.isAllDay, isTrue);
     });
 
-    test('dateTimeWithoutYear includes month, day, and time when timed', () {
+    test('dateWithoutYear shows month and day without time', () {
       final evening = DateTime(2024, 8, 22, 18, 45);
       final hangout = Hangout(contacts: [], notes: '', when: evening);
-      final expected = DateFormat.MMMMd().add_jm().format(evening);
+      final expected = DateFormat.MMMMd().format(evening);
 
-      expect(hangout.dateTimeWithoutYear(), expected);
-    });
-
-    test('dateTimeWithoutYear omits time when isAllDay', () {
-      final midnight = DateTime(2024, 8, 22);
-      final hangout = Hangout(
-        contacts: [],
-        notes: '',
-        when: midnight,
-        isAllDay: true,
-      );
-      final expected = DateFormat.MMMMd().format(midnight);
-
-      expect(hangout.dateTimeWithoutYear(), expected);
-      expect(hangout.dateTimeWithoutYear(), isNot(contains(':')));
+      expect(hangout.dateWithoutYear(), expected);
+      expect(hangout.dateWithoutYear(), isNot(contains(':')));
     });
 
     test('debugLocalAndUtc includes local and UTC lines', () {
