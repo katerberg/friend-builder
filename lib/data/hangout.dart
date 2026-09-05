@@ -18,7 +18,6 @@ class Hangout {
         when = when.isUtc ? when.toLocal() : when;
 
   String dateWithYear() => DateFormat.yMMMMd().format(when);
-  String dateWithoutYear() => DateFormat.MMMMd().format(when);
 
   String dateTimeWithoutYear() =>
       DateFormat.MMMMd().add_jm().format(when);

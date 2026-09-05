@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:friend_builder/utils/local_date.dart';
+import 'package:friend_builder/utils/hangout_date_picker.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:friend_builder/utils/scheduling.dart';
 import 'package:friend_builder/contacts_permission.dart';
@@ -52,19 +52,15 @@ class HangoutFormState extends State<HangoutForm> {
   }
 
   Future<void> _selectWhen(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-            context: context,
-            initialDate: selectedDate,
-            firstDate: DateTime(2018, 8),
-            lastDate: DateTime.now()) ??
-        selectedDate;
-    if (!isSameHangoutDate(picked, selectedDate)) {
-      final combined = combineHangoutDateAndTime(picked, selectedDate);
+    final combined = await pickHangoutDate(
+      context: context,
+      selectedDate: selectedDate,
+    );
+    if (combined != null) {
       setState(() {
         selectedDate = combined;
         _data.when = combined;
       });
-
       dateController.text = Scheduling.formatDate(combined);
     }
     _unfocus();
