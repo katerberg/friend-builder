@@ -1,25 +1,40 @@
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/contacts_permission.dart';
-import 'package:friend_builder/utils/local_date.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+
+bool parseIsAllDay(Object? value) => value == true || value == 1;
 
 class Hangout {
   List<EncodableContact> contacts = [];
   final String id;
   String notes = '';
   DateTime when;
+  bool isAllDay;
 
   Hangout(
       {String? id,
       required this.contacts,
       required this.notes,
-      required DateTime when})
+      required DateTime when,
+      this.isAllDay = false})
       : id = id ?? const Uuid().v4(),
-        when = normalizeToHangoutDate(when);
+        when = when.isUtc ? when.toLocal() : when;
 
   String dateWithYear() => DateFormat.yMMMMd().format(when);
-  String dateWithoutYear() => DateFormat.MMMMd().format(when);
+
+  String dateTimeWithoutYear() {
+    if (isAllDay) {
+      return DateFormat.MMMMd().format(when);
+    }
+    return DateFormat.MMMMd().add_jm().format(when);
+  }
+
+  /// Hidden inspect copy: local and UTC representations of [when].
+  String debugLocalAndUtc() {
+    final formatter = DateFormat.yMMMMd().add_jms();
+    return 'Local: ${formatter.format(when)}\nUTC: ${formatter.format(when.toUtc())}';
+  }
 
   bool hasContact(Contact contact) {
     return contacts.any((element) => element.identifier == contact.id);
@@ -33,6 +48,7 @@ class Hangout {
           .toList(),
       notes: parsedJson['notes'] ?? parsedJson['where'] ?? "",
       when: DateTime.parse(parsedJson['when']),
+      isAllDay: parseIsAllDay(parsedJson['isAllDay']),
     );
   }
 
@@ -42,6 +58,7 @@ class Hangout {
       contacts: [],
       notes: parsed['notes'] ?? "",
       when: DateTime.parse(parsed['whenOccurred']),
+      isAllDay: parseIsAllDay(parsed['isAllDay']),
     );
   }
 
@@ -50,7 +67,8 @@ class Hangout {
       "id": id,
       "contacts": contacts,
       "notes": notes,
-      "when": normalizeToHangoutDate(when).toIso8601String(),
+      "when": when.toIso8601String(),
+      "isAllDay": isAllDay,
     };
   }
 
@@ -58,7 +76,8 @@ class Hangout {
     return {
       "id": id,
       "notes": notes,
-      "when": normalizeToHangoutDate(when).toIso8601String(),
+      "when": when.toIso8601String(),
+      "isAllDay": isAllDay ? 1 : 0,
     };
   }
 }

@@ -2,18 +2,6 @@ import 'dart:io';
 
 import 'package:device_calendar/device_calendar.dart';
 
-/// Local noon for the calendar day of [dateTime] (in local time).
-///
-/// Hangout dates are calendar days, not instants. Local noon is a stable
-/// canonical instant for a day that avoids most DST edge cases.
-DateTime normalizeToHangoutDate(DateTime dateTime) {
-  final local = dateTime.isUtc ? dateTime.toLocal() : dateTime;
-  return DateTime(local.year, local.month, local.day, 12);
-}
-
-/// Today as a hangout date (local noon).
-DateTime hangoutDateToday() => normalizeToHangoutDate(DateTime.now());
-
 /// Calendar-day difference from [from] to [to] (local dates).
 ///
 /// Uses UTC midnights built from local Y/M/D so DST transitions do not
@@ -31,26 +19,42 @@ int calendarDaysBetween(DateTime from, DateTime to) {
 bool isSameHangoutDate(DateTime a, DateTime b) =>
     calendarDaysBetween(a, b) == 0;
 
-/// Calendar event start → hangout date.
+/// Calendar day of [date] with the clock time of [timeOfDay].
+DateTime combineHangoutDateAndTime(DateTime date, DateTime timeOfDay) {
+  final localDate = date.isUtc ? date.toLocal() : date;
+  final localTime = timeOfDay.isUtc ? timeOfDay.toLocal() : timeOfDay;
+  return DateTime(
+    localDate.year,
+    localDate.month,
+    localDate.day,
+    localTime.hour,
+    localTime.minute,
+    localTime.second,
+    localTime.millisecond,
+    localTime.microsecond,
+  );
+}
+
+/// Calendar event start → hangout instant (local).
 ///
 /// All-day iOS (EventKit) uses UTC date components; converting to local first
 /// shifts the day. All-day Android uses the date components as provided.
-/// Timed events use local wall-clock date.
+/// Timed events keep the local wall-clock instant.
 ///
 /// [isIos] overrides [Platform.isIOS] for tests.
-DateTime hangoutDateFromCalendarEvent(Event event, {bool? isIos}) {
+DateTime hangoutWhenFromCalendarEvent(Event event, {bool? isIos}) {
   final start = event.start;
   if (start == null) {
-    return hangoutDateToday();
+    return DateTime.now();
   }
 
   if (event.allDay == true) {
     if (isIos ?? Platform.isIOS) {
       final utc = start.toUtc();
-      return DateTime(utc.year, utc.month, utc.day, 12);
+      return DateTime(utc.year, utc.month, utc.day);
     }
-    return DateTime(start.year, start.month, start.day, 12);
+    return DateTime(start.year, start.month, start.day);
   }
 
-  return normalizeToHangoutDate(start.toLocal());
+  return start.toLocal();
 }

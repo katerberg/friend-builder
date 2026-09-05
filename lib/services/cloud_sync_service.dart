@@ -169,6 +169,7 @@ class CloudSyncService {
           'id': hangout.id,
           'notes': hangout.notes,
           'when': Timestamp.fromDate(hangout.when),
+          'isAllDay': hangout.isAllDay,
           'contacts': hangout.contacts
               .map((c) => {
                     'displayName': c.displayName,
@@ -435,6 +436,7 @@ class CloudSyncService {
           notes: data['notes'] as String? ?? '',
           when: (data['when'] as Timestamp).toDate(),
           contacts: contacts,
+          isAllDay: parseIsAllDay(data['isAllDay']),
         );
 
         await DBProvider.db.saveHangout(hangout);

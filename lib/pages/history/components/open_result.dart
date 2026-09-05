@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/friends/components/contact_tile.dart';
+import 'package:friend_builder/pages/history/components/hangout_when_label.dart';
 import 'package:friend_builder/pages/history/components/result_bubbles.dart';
 import 'package:friend_builder/pages/history/components/result_expansion_item.dart';
 import 'package:friend_builder/pages/history/components/result_menu.dart';
@@ -38,25 +39,22 @@ class OpenResult extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     children: [
-                      Text(
-                        hangout.dateWithoutYear(),
-                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      Expanded(
+                        child: HangoutWhenLabel(
+                          hangout: hangout,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
                       ),
                       ResultBubbles(
                           contacts: hangout.contacts
                             ..sort((a, b) =>
                                 a.displayName.compareTo(b.displayName))),
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.centerRight,
-                          child: ResultMenu(
-                            hangout: hangout,
-                            onEdit: onEdit,
-                            onDelete: onDelete,
-                            onRepeat: onRepeat,
-                          ),
-                        ),
-                      )
+                      ResultMenu(
+                        hangout: hangout,
+                        onEdit: onEdit,
+                        onDelete: onDelete,
+                        onRepeat: onRepeat,
+                      ),
                     ],
                   ),
                 ),

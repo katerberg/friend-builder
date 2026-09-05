@@ -5,37 +5,6 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 void main() {
-  group('normalizeToHangoutDate', () {
-    test('normalizes local evening to local noon on the same day', () {
-      final evening = DateTime(2024, 8, 22, 23, 47);
-      final normalized = normalizeToHangoutDate(evening);
-
-      expect(normalized.year, 2024);
-      expect(normalized.month, 8);
-      expect(normalized.day, 22);
-      expect(normalized.hour, 12);
-      expect(normalized.isUtc, isFalse);
-    });
-
-    test('normalizes local midnight to local noon on the same day', () {
-      final midnight = DateTime(2024, 8, 22);
-      final normalized = normalizeToHangoutDate(midnight);
-
-      expect(normalized, DateTime(2024, 8, 22, 12));
-    });
-
-    test('converts UTC midnight to local calendar day before normalizing', () {
-      final utcMidnight = DateTime.utc(2024, 8, 22);
-      final normalized = normalizeToHangoutDate(utcMidnight);
-      final expectedLocalDay = utcMidnight.toLocal();
-
-      expect(normalized.year, expectedLocalDay.year);
-      expect(normalized.month, expectedLocalDay.month);
-      expect(normalized.day, expectedLocalDay.day);
-      expect(normalized.hour, 12);
-    });
-  });
-
   group('calendarDaysBetween', () {
     test('counts one calendar day across a late-evening boundary', () {
       final yesterdayEvening = DateTime(2024, 8, 21, 23, 30);
@@ -53,12 +22,25 @@ void main() {
     });
   });
 
-  group('hangoutDateFromCalendarEvent', () {
+  group('combineHangoutDateAndTime', () {
+    test('keeps the clock time when the calendar day changes', () {
+      final existing = DateTime(2024, 8, 22, 15, 42, 7);
+      final pickedDay = DateTime(2024, 8, 20);
+
+      expect(
+        combineHangoutDateAndTime(pickedDay, existing),
+        DateTime(2024, 8, 20, 15, 42, 7),
+      );
+    });
+  });
+
+  group('hangoutWhenFromCalendarEvent', () {
     setUpAll(() {
       tzdata.initializeTimeZones();
     });
 
-    test('iOS all-day UTC midnight keeps the UTC calendar day', () {
+    test('iOS all-day UTC midnight keeps the UTC calendar day at local midnight',
+        () {
       final utcLocation = tz.getLocation('UTC');
       final event = Event(
         'calendar',
@@ -66,12 +48,13 @@ void main() {
         allDay: true,
       );
 
-      final hangoutDate = hangoutDateFromCalendarEvent(event, isIos: true);
+      final hangoutWhen =
+          hangoutWhenFromCalendarEvent(event, isIos: true);
 
-      expect(hangoutDate, DateTime(2024, 8, 22, 12));
+      expect(hangoutWhen, DateTime(2024, 8, 22));
     });
 
-    test('Android all-day uses provided date components', () {
+    test('Android all-day uses provided date components at local midnight', () {
       final losAngeles = tz.getLocation('America/Los_Angeles');
       final event = Event(
         'calendar',
@@ -79,25 +62,25 @@ void main() {
         allDay: true,
       );
 
-      final hangoutDate = hangoutDateFromCalendarEvent(event, isIos: false);
+      final hangoutWhen =
+          hangoutWhenFromCalendarEvent(event, isIos: false);
 
-      expect(hangoutDate, DateTime(2024, 8, 22, 12));
+      expect(hangoutWhen, DateTime(2024, 8, 22));
     });
 
-    test('timed event uses local wall-clock date', () {
+    test('timed event keeps local wall-clock time', () {
       final utcLocation = tz.getLocation('UTC');
       final event = Event(
         'calendar',
-        start: tz.TZDateTime(utcLocation, 2024, 8, 22, 18),
+        start: tz.TZDateTime(utcLocation, 2024, 8, 22, 18, 30),
         allDay: false,
       );
 
-      final hangoutDate = hangoutDateFromCalendarEvent(event);
-      final expected = normalizeToHangoutDate(
-        tz.TZDateTime(utcLocation, 2024, 8, 22, 18).toLocal(),
-      );
+      final hangoutWhen = hangoutWhenFromCalendarEvent(event);
+      final expected =
+          tz.TZDateTime(utcLocation, 2024, 8, 22, 18, 30).toLocal();
 
-      expect(hangoutDate, expected);
+      expect(hangoutWhen, expected);
     });
   });
 }
