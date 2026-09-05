@@ -32,12 +32,12 @@ class HangoutFormState extends State<HangoutForm> {
   bool _submitting = false;
   Hangout _data = Hangout(
     contacts: [],
-    when: hangoutDateToday(),
+    when: DateTime.now(),
     notes: '',
   );
-  DateTime selectedDate = hangoutDateToday();
+  DateTime selectedDate = DateTime.now();
   TextEditingController dateController =
-      TextEditingController(text: Scheduling.formatDate(hangoutDateToday()));
+      TextEditingController(text: Scheduling.formatDate(DateTime.now()));
 
   @override
   void initState() {
@@ -45,9 +45,8 @@ class HangoutFormState extends State<HangoutForm> {
     if (widget.hangout != null) {
       _data = widget.hangout!;
     }
-    selectedDate = widget.hangout != null
-        ? normalizeToHangoutDate(widget.hangout!.when)
-        : hangoutDateToday();
+    selectedDate =
+        widget.hangout != null ? widget.hangout!.when : DateTime.now();
     dateController =
         TextEditingController(text: Scheduling.formatDate(selectedDate));
   }
@@ -57,16 +56,16 @@ class HangoutFormState extends State<HangoutForm> {
             context: context,
             initialDate: selectedDate,
             firstDate: DateTime(2018, 8),
-            lastDate: hangoutDateToday()) ??
-        hangoutDateToday();
-    final normalizedPicked = normalizeToHangoutDate(picked);
-    if (!isSameHangoutDate(normalizedPicked, selectedDate)) {
+            lastDate: DateTime.now()) ??
+        selectedDate;
+    if (!isSameHangoutDate(picked, selectedDate)) {
+      final combined = combineHangoutDateAndTime(picked, selectedDate);
       setState(() {
-        selectedDate = normalizedPicked;
-        _data.when = normalizedPicked;
+        selectedDate = combined;
+        _data.when = combined;
       });
 
-      dateController.text = Scheduling.formatDate(normalizedPicked);
+      dateController.text = Scheduling.formatDate(combined);
     }
     _unfocus();
   }

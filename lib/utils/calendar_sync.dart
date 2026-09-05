@@ -178,7 +178,7 @@ class CalendarSync {
                 .map((c) => EncodableContact.fromContact(c))
                 .toList(),
             notes: 'Calendar: ${event.title ?? "Event"}',
-            when: hangoutDateFromCalendarEvent(event),
+            when: hangoutWhenFromCalendarEvent(event),
           );
 
           await DBProvider.db.saveHangout(hangout);

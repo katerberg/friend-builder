@@ -1,6 +1,5 @@
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/contacts_permission.dart';
-import 'package:friend_builder/utils/local_date.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,10 +15,21 @@ class Hangout {
       required this.notes,
       required DateTime when})
       : id = id ?? const Uuid().v4(),
-        when = normalizeToHangoutDate(when);
+        when = when.isUtc ? when.toLocal() : when;
 
   String dateWithYear() => DateFormat.yMMMMd().format(when);
   String dateWithoutYear() => DateFormat.MMMMd().format(when);
+
+  String dateTimeWithoutYear() =>
+      DateFormat.MMMMd().add_jm().format(when);
+
+  /// Hidden inspect copy: local and UTC representations of [when].
+  String debugLocalAndUtc() {
+    final local = when.isUtc ? when.toLocal() : when;
+    final utc = when.toUtc();
+    final formatter = DateFormat.yMMMMd().add_jms();
+    return 'Local: ${formatter.format(local)}\nUTC: ${formatter.format(utc)}';
+  }
 
   bool hasContact(Contact contact) {
     return contacts.any((element) => element.identifier == contact.id);
@@ -50,7 +60,7 @@ class Hangout {
       "id": id,
       "contacts": contacts,
       "notes": notes,
-      "when": normalizeToHangoutDate(when).toIso8601String(),
+      "when": when.toIso8601String(),
     };
   }
 
@@ -58,7 +68,7 @@ class Hangout {
     return {
       "id": id,
       "notes": notes,
-      "when": normalizeToHangoutDate(when).toIso8601String(),
+      "when": when.toIso8601String(),
     };
   }
 }

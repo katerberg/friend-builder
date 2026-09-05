@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/pages/history/components/hangout_when_label.dart';
 import 'package:friend_builder/pages/history/components/result_menu.dart';
 import 'package:friend_builder/pages/history/components/result_bubbles.dart';
 
@@ -31,8 +32,8 @@ class ClosedResult extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     children: [
-                      Text(
-                        hangout.dateWithoutYear(),
+                      HangoutWhenLabel(
+                        hangout: hangout,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       ResultBubbles(
