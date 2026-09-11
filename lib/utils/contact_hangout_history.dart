@@ -1,6 +1,6 @@
 import 'package:friend_builder/data/hangout.dart';
 
-/// Matches History pagination's `filterOldHangouts` window in the database layer.
+/// Shared with History pagination's `filterOldHangouts` in the database layer.
 const Duration historyOpenableWindow = Duration(days: 365);
 
 /// Hangouts History can currently deep-link to: [when] on or after [now] minus

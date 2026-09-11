@@ -4,6 +4,7 @@ import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/snooze_reminder.dart';
 import 'package:friend_builder/data/top_friend_row.dart';
 import 'package:friend_builder/utils/calendar_year.dart';
+import 'package:friend_builder/utils/contact_hangout_history.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:path/path.dart';
@@ -434,7 +435,7 @@ class DBProvider {
     final db = await database;
 
     final oneYearAgo =
-        DateTime.now().subtract(const Duration(days: 365)).toIso8601String();
+        DateTime.now().subtract(historyOpenableWindow).toIso8601String();
 
     var dbHangouts = await db.query(
       "hangouts",

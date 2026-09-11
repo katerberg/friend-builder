@@ -42,6 +42,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   };
   bool isContactable = false;
   bool _hasNotificationsPermissions = false;
+  List<Hangout> _contactHangouts = [];
   List<Hangout> _eligibleContactHangouts = [];
   bool _isLoadingHangouts = true;
   final Storage _storage = Storage();
@@ -150,13 +151,12 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     if (allHangouts != null) {
       final contactHangouts = allHangouts
           .where((hangout) => hangout.hasContact(widget.contact!))
-          .toList();
-
-      // Sort by date descending to get most recent first
-      contactHangouts.sort((a, b) => b.when.compareTo(a.when));
+          .toList()
+        ..sort((a, b) => b.when.compareTo(a.when));
 
       if (mounted) {
         setState(() {
+          _contactHangouts = contactHangouts;
           _eligibleContactHangouts =
               hangoutsOpenableInHistory(contactHangouts);
           _isLoadingHangouts = false;
@@ -389,9 +389,11 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                             ],
                           ),
                         )
-                      else if (_eligibleContactHangouts.isNotEmpty)
+                      else if (_contactHangouts.isNotEmpty)
                         GestureDetector(
-                          onTap: _openHangoutHistory,
+                          onTap: _eligibleContactHangouts.isEmpty
+                              ? null
+                              : _openHangoutHistory,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
@@ -401,15 +403,17 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                                     size: 16, color: Colors.grey),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Last hangout: ${_eligibleContactHangouts.first.dateWithYear()}',
+                                  'Last hangout: ${_contactHangouts.first.dateWithYear()}',
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
                                   ),
                                 ),
-                                const Spacer(),
-                                const Icon(Icons.arrow_forward_ios,
-                                    size: 12, color: Colors.grey),
+                                if (_eligibleContactHangouts.isNotEmpty) ...[
+                                  const Spacer(),
+                                  const Icon(Icons.arrow_forward_ios,
+                                      size: 12, color: Colors.grey),
+                                ],
                               ],
                             ),
                           ),

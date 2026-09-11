@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/pages/friends/components/contact_hangout_history_row.dart';
+import 'package:friend_builder/pages/history/components/closed_result.dart';
 
 class ContactHangoutHistoryDialog extends StatelessWidget {
   final String contactName;
@@ -24,7 +24,7 @@ class ContactHangoutHistoryDialog extends StatelessWidget {
           final hangout = hangouts[index];
           return InkWell(
             onTap: () => Navigator.pop(context, hangout),
-            child: ContactHangoutHistoryRow(hangout: hangout),
+            child: ClosedResult(hangout: hangout),
           );
         },
       ),
