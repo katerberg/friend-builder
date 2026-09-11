@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/hangout_when_label.dart';
 import 'package:friend_builder/pages/history/components/result_menu.dart';
@@ -6,55 +7,48 @@ import 'package:friend_builder/pages/history/components/result_bubbles.dart';
 
 class ClosedResult extends StatelessWidget {
   final Hangout hangout;
-  final void Function(Hangout) onDelete;
-  final void Function(Hangout) onEdit;
-  final void Function(Hangout) onRepeat;
+  final void Function(Hangout)? onDelete;
+  final void Function(Hangout)? onEdit;
+  final void Function(Hangout)? onRepeat;
 
   const ClosedResult({
     super.key,
     required this.hangout,
-    required this.onDelete,
-    required this.onEdit,
-    required this.onRepeat,
+    this.onDelete,
+    this.onEdit,
+    this.onRepeat,
   });
+
+  bool get _showActions =>
+      onDelete != null && onEdit != null && onRepeat != null;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: HangoutWhenLabel(
-                          hangout: hangout,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      ResultBubbles(
-                          contacts: hangout.contacts
-                            ..sort((a, b) =>
-                                a.displayName.compareTo(b.displayName))),
-                      ResultMenu(
-                        hangout: hangout,
-                        onEdit: onEdit,
-                        onDelete: onDelete,
-                        onRepeat: onRepeat,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    final sortedContacts = List<EncodableContact>.from(hangout.contacts)
+      ..sort((a, b) => a.displayName.compareTo(b.displayName));
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 40),
+        child: Row(
+          children: [
+            Expanded(
+              child: HangoutWhenLabel(
+                hangout: hangout,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-        ],
+            ResultBubbles(contacts: sortedContacts),
+            if (_showActions)
+              ResultMenu(
+                hangout: hangout,
+                onEdit: onEdit!,
+                onDelete: onDelete!,
+                onRepeat: onRepeat!,
+              ),
+          ],
+        ),
       ),
     );
   }

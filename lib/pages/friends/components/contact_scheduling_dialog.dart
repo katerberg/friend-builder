@@ -6,8 +6,10 @@ import 'package:friend_builder/shared/settings_modal.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/pages/friends/components/contact_hangout_history_dialog.dart';
 import 'package:friend_builder/permissions.dart';
 import 'package:friend_builder/storage.dart';
+import 'package:friend_builder/utils/contact_hangout_history.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -41,6 +43,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   bool isContactable = false;
   bool _hasNotificationsPermissions = false;
   List<Hangout> _contactHangouts = [];
+  List<Hangout> _eligibleContactHangouts = [];
   bool _isLoadingHangouts = true;
   final Storage _storage = Storage();
   int? _customDays;
@@ -148,14 +151,14 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     if (allHangouts != null) {
       final contactHangouts = allHangouts
           .where((hangout) => hangout.hasContact(widget.contact!))
-          .toList();
-
-      // Sort by date descending to get most recent first
-      contactHangouts.sort((a, b) => b.when.compareTo(a.when));
+          .toList()
+        ..sort((a, b) => b.when.compareTo(a.when));
 
       if (mounted) {
         setState(() {
           _contactHangouts = contactHangouts;
+          _eligibleContactHangouts =
+              hangoutsOpenableInHistory(contactHangouts);
           _isLoadingHangouts = false;
         });
       }
@@ -209,12 +212,29 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     FlutterContacts.openExternalEdit(widget.contact!.id);
   }
 
-  void _navigateToHistory() {
+  Future<void> _openHangoutHistory() async {
+    if (_eligibleContactHangouts.isEmpty) {
+      return;
+    }
+
+    final selectedHangout = await Navigator.push<Hangout>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContactHangoutHistoryDialog(
+          contactName: ContactsHelper.getContactName(widget.contact),
+          hangouts: _eligibleContactHangouts,
+        ),
+        fullscreenDialog: true,
+      ),
+    );
+
+    if (selectedHangout == null || !mounted) {
+      return;
+    }
+
     Navigator.pop(context);
 
-    if (widget.onNavigateToHistory != null && _contactHangouts.isNotEmpty) {
-      widget.onNavigateToHistory!(_contactHangouts.first);
-    }
+    widget.onNavigateToHistory?.call(selectedHangout);
   }
 
   ButtonStyleButton _getContactButton() {
@@ -371,7 +391,9 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                         )
                       else if (_contactHangouts.isNotEmpty)
                         GestureDetector(
-                          onTap: _navigateToHistory,
+                          onTap: _eligibleContactHangouts.isEmpty
+                              ? null
+                              : _openHangoutHistory,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
@@ -387,9 +409,11 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
                                     color: Colors.grey,
                                   ),
                                 ),
-                                const Spacer(),
-                                const Icon(Icons.arrow_forward_ios,
-                                    size: 12, color: Colors.grey),
+                                if (_eligibleContactHangouts.isNotEmpty) ...[
+                                  const Spacer(),
+                                  const Icon(Icons.arrow_forward_ios,
+                                      size: 12, color: Colors.grey),
+                                ],
                               ],
                             ),
                           ),
