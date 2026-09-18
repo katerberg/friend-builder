@@ -38,6 +38,19 @@
 	<string>Calendar access is used to automatically log hangouts with friends from your calendar events</string>
 	<key>NSSiriUsageDescription</key>
 	<string>Siri can tell you which friend you are most overdue to see</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.example.friendBuilder</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>friendbuilder</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

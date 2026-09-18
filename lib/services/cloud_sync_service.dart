@@ -10,6 +10,7 @@ import 'package:friend_builder/data/snooze_reminder.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/firebase_options.dart';
+import 'package:friend_builder/services/due_friend_snapshot_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _firebaseUserIdKey = 'firebase_user_id';
@@ -357,6 +358,7 @@ class CloudSyncService {
       await _restoreSettings();
 
       await _updateLastSyncTimestamp();
+      await DueFriendSnapshotService.refresh();
 
       if (kDebugMode) {
         print('Restore from cloud completed successfully');

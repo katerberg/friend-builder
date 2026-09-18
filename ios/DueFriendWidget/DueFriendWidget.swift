@@ -29,7 +29,9 @@ struct DueFriendProvider: TimelineProvider {
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<DueFriendEntry>) -> Void) {
     let entry = DueFriendEntry(date: Date(), snapshot: DueFriendSnapshotStore.load())
-    completion(Timeline(entries: [entry], policy: .atEnd))
+    let nextRefresh =
+      Calendar.current.date(byAdding: .hour, value: 1, to: Date()) ?? Date().addingTimeInterval(3600)
+    completion(Timeline(entries: [entry], policy: .after(nextRefresh)))
   }
 }
 
