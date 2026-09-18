@@ -10,6 +10,7 @@ import 'package:friend_builder/utils/calendar_sync.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
 import 'package:friend_builder/theme_notifier.dart';
 import 'package:friend_builder/services/cloud_sync_service.dart';
+import 'package:friend_builder/services/carplay_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -118,6 +119,12 @@ Future<bool> initBackgroundFetch() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Register before awaits that touch the DB so CarPlay-first launches can
+  // call getTopPerson / logHangout as soon as the engine is ready.
+  CarPlayService.register(
+    notificationsPlugin: flutterLocalNotificationsPlugin,
+  );
 
   CloudSyncService().initialize().then((_) {
     if (CloudSyncService().isInitialized) {

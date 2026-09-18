@@ -36,6 +36,8 @@
 	<string>Calendar access is used to automatically log hangouts with friends from your calendar events</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Calendar access is used to automatically log hangouts with friends from your calendar events</string>
+	<key>NSSiriUsageDescription</key>
+	<string>Siri is used so Friend Builder can send short messages as required for CarPlay communication features</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -44,6 +46,25 @@
 	<string>Notifications are needed to remind you about hanging out</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>CPTemplateApplicationSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>CPTemplateApplicationScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>CarPlay Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).CarPlaySceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>I</string>
 	<key>UIMainStoryboardFile</key>

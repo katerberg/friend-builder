@@ -3,6 +3,7 @@ import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/top_friend_row.dart';
+import 'package:friend_builder/services/carplay_service.dart';
 
 class Storage {
   Future<List<Hangout>?> getHangouts() async {
@@ -23,15 +24,21 @@ class Storage {
   }
 
   Future updateHangout(Hangout hangout) async {
-    return DBProvider.db.saveHangout(hangout);
+    final result = await DBProvider.db.saveHangout(hangout);
+    await CarPlayService.notifyRefresh();
+    return result;
   }
 
   Future createHangout(Hangout hangout) async {
-    return DBProvider.db.saveHangout(hangout);
+    final result = await DBProvider.db.saveHangout(hangout);
+    await CarPlayService.notifyRefresh();
+    return result;
   }
 
   Future deleteHangout(Hangout hangout) async {
-    return DBProvider.db.deleteHangout(hangout);
+    final result = await DBProvider.db.deleteHangout(hangout);
+    await CarPlayService.notifyRefresh();
+    return result;
   }
 
   Future<List<TopFriendRow>> getTopFriendsForCalendarYear({int limit = 5}) {
@@ -62,13 +69,17 @@ class Storage {
   Future deleteFriend(Friend friend) async {
     await DBProvider.db
         .deleteSnoozeRemindersForContact(friend.contactIdentifier);
-    return DBProvider.db.deleteFriend(friend);
+    final result = await DBProvider.db.deleteFriend(friend);
+    await CarPlayService.notifyRefresh();
+    return result;
   }
 
   Future saveFriends(List<Friend> friends) async {
     var futureMap = friends.map((friend) {
       return DBProvider.db.saveFriend(friend);
     });
-    return Future.wait(futureMap);
+    final result = await Future.wait(futureMap);
+    await CarPlayService.notifyRefresh();
+    return result;
   }
 }
