@@ -22,6 +22,13 @@
 		W1B6 /* DueFriendSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1F5 /* DueFriendSnapshotStore.swift */; };
 		W1B7 /* WhoShouldIHangOutWithIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1F7 /* WhoShouldIHangOutWithIntent.swift */; };
 		W1EB1 /* DueFriendWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = W1F4 /* DueFriendWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+
+		C2B10002 /* CarPlaySceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B10001 /* CarPlaySceneDelegate.swift */; };
+		C2B10004 /* CarPlayFlutterBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B10003 /* CarPlayFlutterBridge.swift */; };
+		C2B10007 /* CarPlay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2B10006 /* CarPlay.framework */; };
+		C2B20002 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B20001 /* IntentHandler.swift */; };
+		C2B20012 /* MessagingIntents.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C2B20005 /* MessagingIntents.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C2B20019 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2B20008 /* Intents.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +46,14 @@
 			proxyType = 1;
 			remoteGlobalIDString = W1T1;
 			remoteInfo = DueFriendWidgetExtension;
+		};
+
+		C2B20013 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C2B20007;
+			remoteInfo = MessagingIntents;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -63,6 +78,18 @@
 				W1EB1 /* DueFriendWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		C2B20011 /* Embed Messaging Intents */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C2B20012 /* MessagingIntents.appex in Embed App Extensions */,
+			);
+			name = "Embed Messaging Intents";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -101,6 +128,15 @@
 		W1F4 /* DueFriendWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DueFriendWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		W1F5 /* DueFriendSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueFriendSnapshotStore.swift; sourceTree = "<group>"; };
 		W1F7 /* WhoShouldIHangOutWithIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhoShouldIHangOutWithIntent.swift; sourceTree = "<group>"; };
+
+		C2B10001 /* CarPlaySceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlaySceneDelegate.swift; sourceTree = "<group>"; };
+		C2B10003 /* CarPlayFlutterBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayFlutterBridge.swift; sourceTree = "<group>"; };
+		C2B10006 /* CarPlay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CarPlay.framework; path = System/Library/Frameworks/CarPlay.framework; sourceTree = SDKROOT; };
+		C2B20001 /* IntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentHandler.swift; sourceTree = "<group>"; };
+		C2B20003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C2B20004 /* MessagingIntents.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MessagingIntents.entitlements; sourceTree = "<group>"; };
+		C2B20005 /* MessagingIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MessagingIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2B20008 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +178,8 @@
 		8A0DCE232D4765D8D9B1C4FD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C2B10006 /* CarPlay.framework */,
+				C2B20008 /* Intents.framework */,
 				1DCC12BBFD45264D7C7B37B5 /* Pods_Runner.framework */,
 				88F1204860AC6566DC2D715C /* Pods_RunnerTests.framework */,
 			);
@@ -166,6 +204,7 @@
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				W1G1 /* DueFriendWidget */,
+				C2B20006 /* MessagingIntents */,
 				W1G2 /* Shared */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
@@ -180,6 +219,7 @@
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 				W1F4 /* DueFriendWidgetExtension.appex */,
+				C2B20005 /* MessagingIntents.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -196,6 +236,8 @@
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				C2B10003 /* CarPlayFlutterBridge.swift */,
+				C2B10001 /* CarPlaySceneDelegate.swift */,
 				W1F7 /* WhoShouldIHangOutWithIntent.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
@@ -266,6 +308,7 @@
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				W1E1 /* Embed Foundation Extensions */,
+				C2B20011 /* Embed Messaging Intents */,
 				EF4F3A35495AECDDA84AEB6C /* [CP] Copy Pods Resources */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 			);
@@ -273,6 +316,7 @@
 			);
 			dependencies = (
 				W1D1 /* PBXTargetDependency */,
+				C2B20014 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -297,6 +341,24 @@
 			productReference = W1F4 /* DueFriendWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+
+		C2B20007 /* MessagingIntents */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C2B20018 /* Build configuration list for PBXNativeTarget "MessagingIntents" */;
+			buildPhases = (
+				C2B2000A /* Sources */,
+				C2B20009 /* Frameworks */,
+				C2B20010 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MessagingIntents;
+			productName = MessagingIntents;
+			productReference = C2B20005 /* MessagingIntents.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -318,6 +380,9 @@
 					W1T1 = {
 						CreatedOnToolsVersion = 15.0;
 					};
+					C2B20007 = {
+						CreatedOnToolsVersion = 15.0;
+					};
 				};
 			};
 			buildConfigurationList = 97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */;
@@ -336,6 +401,7 @@
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				W1T1 /* DueFriendWidgetExtension */,
+				C2B20007 /* MessagingIntents */,
 			);
 		};
 /* End PBXProject section */
@@ -360,6 +426,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		W1R1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C2B20010 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -477,9 +550,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				C2B10004 /* CarPlayFlutterBridge.swift in Sources */,
+				C2B10002 /* CarPlaySceneDelegate.swift in Sources */,
 				W1B7 /* WhoShouldIHangOutWithIntent.swift in Sources */,
 				W1B5 /* DueFriendSnapshotStore.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C2B2000A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C2B20002 /* IntentHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -504,6 +587,11 @@
 			isa = PBXTargetDependency;
 			target = W1T1 /* DueFriendWidgetExtension */;
 			targetProxy = W1P1 /* PBXContainerItemProxy */;
+		};
+		C2B20014 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C2B20007 /* MessagingIntents */;
+			targetProxy = C2B20013 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -915,6 +1003,82 @@
 			};
 			name = Profile;
 		};
+
+		C2B20015 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MessagingIntents/MessagingIntents.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7M8N832MA2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MessagingIntents/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.5.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.friendBuilder.MessagingIntents;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C2B20016 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MessagingIntents/MessagingIntents.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7M8N832MA2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MessagingIntents/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.5.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.friendBuilder.MessagingIntents;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C2B20017 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = MessagingIntents/MessagingIntents.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7M8N832MA2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MessagingIntents/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.5.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.friendBuilder.MessagingIntents;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -955,6 +1119,17 @@
 				W1C1 /* Debug */,
 				W1C2 /* Release */,
 				W1C3 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+
+		C2B20018 /* Build configuration list for PBXNativeTarget "MessagingIntents" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C2B20015 /* Debug */,
+				C2B20016 /* Release */,
+				C2B20017 /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

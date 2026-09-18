@@ -8,5 +8,7 @@
 	<array>
 		<string>group.com.example.friendBuilder</string>
 	</array>
+	<key>com.apple.developer.carplay-communication</key>
+	<true/>
 </dict>
 </plist>
