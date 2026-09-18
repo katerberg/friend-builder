@@ -1,77 +1,63 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/utils/carplay_phone.dart';
-import 'package:friend_builder/utils/carplay_urgency.dart';
 import 'package:friend_builder/utils/contact_sorting.dart';
+import 'package:friend_builder/utils/due_friend_urgency.dart';
 
-class CarPlayTopPerson {
+class TopDueFriend {
   final String contactIdentifier;
   final String displayName;
   final String urgency;
-  final Uint8List? photoBytes;
-  final List<Map<String, String>> phones;
-  final bool hasPhone;
 
-  const CarPlayTopPerson({
+  const TopDueFriend({
     required this.contactIdentifier,
     required this.displayName,
     required this.urgency,
-    required this.photoBytes,
-    required this.phones,
-    required this.hasPhone,
   });
 
-  Map<String, dynamic> toChannelPayload() {
+  Map<String, dynamic> toSnapshotPayload() {
     return {
       'found': true,
       'contactIdentifier': contactIdentifier,
       'displayName': displayName,
       'urgency': urgency,
-      'photoBase64': photoBytes == null ? null : base64Encode(photoBytes!),
-      'phones': phones,
-      'hasPhone': hasPhone,
     };
   }
 }
 
-class CarPlayTopPersonResult {
-  final CarPlayTopPerson? person;
+class TopDueFriendResult {
+  final TopDueFriend? friend;
   final bool missingContactsPermission;
 
-  const CarPlayTopPersonResult({
-    this.person,
+  const TopDueFriendResult({
+    this.friend,
     this.missingContactsPermission = false,
   });
 
-  Map<String, dynamic> toChannelPayload() {
+  Map<String, dynamic> toSnapshotPayload() {
     if (missingContactsPermission) {
       return {
         'found': false,
         'reason': 'contacts_permission',
       };
     }
-    if (person == null) {
+    if (friend == null) {
       return {'found': false};
     }
-    return person!.toChannelPayload();
+    return friend!.toSnapshotPayload();
   }
 }
 
 /// Selects the single most overdue/due contactable friend using the same
 /// ordering as Friends ([sortContactsForDisplay]).
-Future<CarPlayTopPersonResult> resolveCarPlayTopPerson({
+TopDueFriendResult resolveTopDueFriend({
   required bool missingContactsPermission,
   required Iterable<Contact> contacts,
   required List<Friend> friends,
   required List<Hangout> hangouts,
-  required Future<Uint8List?> Function(String contactIdentifier) loadPhoto,
-}) async {
+}) {
   if (missingContactsPermission) {
-    return const CarPlayTopPersonResult(missingContactsPermission: true);
+    return const TopDueFriendResult(missingContactsPermission: true);
   }
 
   final friendMap = {
@@ -103,31 +89,26 @@ Future<CarPlayTopPersonResult> resolveCarPlayTopPerson({
 
   final sorted = sortContactsForDisplay(sortableContacts);
   if (sorted.hangoutContactIds.isEmpty) {
-    return const CarPlayTopPersonResult();
+    return const TopDueFriendResult();
   }
 
   final topContactIdentifier = sorted.hangoutContactIds.first;
   final topContact = contactMap[topContactIdentifier];
   if (topContact == null) {
-    return const CarPlayTopPersonResult();
+    return const TopDueFriendResult();
   }
 
   final friend = friendMap[topContactIdentifier];
   final latestHangout = latestHangoutMap[topContactIdentifier];
-  final phones = carPlayPhonesFromContact(topContact);
-  final photoBytes = await loadPhoto(topContactIdentifier);
 
-  return CarPlayTopPersonResult(
-    person: CarPlayTopPerson(
+  return TopDueFriendResult(
+    friend: TopDueFriend(
       contactIdentifier: topContactIdentifier,
       displayName: topContact.displayName,
-      urgency: carPlayUrgencyLabel(
+      urgency: dueFriendUrgencyLabel(
         latestHangoutWhen: latestHangout?.when,
         frequency: friend?.frequency,
       ),
-      photoBytes: photoBytes,
-      phones: phones,
-      hasPhone: phones.isNotEmpty,
     ),
   );
 }

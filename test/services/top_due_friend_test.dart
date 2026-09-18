@@ -1,22 +1,18 @@
-import 'dart:typed_data';
-
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
-import 'package:friend_builder/services/carplay_top_person.dart';
+import 'package:friend_builder/services/top_due_friend.dart';
 
 Contact _contact({
   required String id,
   required String displayName,
-  List<Phone>? phones,
 }) {
   return Contact(
     id: id,
     displayName: displayName,
-    phones: phones ?? [],
   );
 }
 
@@ -52,24 +48,23 @@ Hangout _hangout({
 }
 
 void main() {
-  group('resolveCarPlayTopPerson', () {
-    test('returns contacts_permission when permission is missing', () async {
-      final result = await resolveCarPlayTopPerson(
+  group('resolveTopDueFriend', () {
+    test('returns contacts_permission when permission is missing', () {
+      final result = resolveTopDueFriend(
         missingContactsPermission: true,
         contacts: [],
         friends: [],
         hangouts: [],
-        loadPhoto: (_) async => null,
       );
 
-      expect(result.toChannelPayload(), {
+      expect(result.toSnapshotPayload(), {
         'found': false,
         'reason': 'contacts_permission',
       });
     });
 
-    test('returns found false when no contactable friends exist', () async {
-      final result = await resolveCarPlayTopPerson(
+    test('returns found false when no contactable friends exist', () {
+      final result = resolveTopDueFriend(
         missingContactsPermission: false,
         contacts: [_contact(id: 'a', displayName: 'Alice')],
         friends: [
@@ -81,27 +76,18 @@ void main() {
           ),
         ],
         hangouts: [],
-        loadPhoto: (_) async => null,
       );
 
-      expect(result.toChannelPayload(), {'found': false});
+      expect(result.toSnapshotPayload(), {'found': false});
     });
 
-    test('selects the most overdue contactable friend', () async {
+    test('selects the most overdue contactable friend', () {
       final now = DateTime.now();
-      final result = await resolveCarPlayTopPerson(
+      final result = resolveTopDueFriend(
         missingContactsPermission: false,
         contacts: [
-          _contact(
-            id: 'alice',
-            displayName: 'Alice',
-            phones: [Phone('555-111-1111')],
-          ),
-          _contact(
-            id: 'bob',
-            displayName: 'Bob',
-            phones: [Phone('(555) 222-3333'), Phone('+1 555 444 5555')],
-          ),
+          _contact(id: 'alice', displayName: 'Alice'),
+          _contact(id: 'bob', displayName: 'Bob'),
         ],
         friends: [
           _friend(contactIdentifier: 'alice', frequencyDays: 7),
@@ -117,25 +103,13 @@ void main() {
             when: now.subtract(const Duration(days: 20)),
           ),
         ],
-        loadPhoto: (contactIdentifier) async {
-          if (contactIdentifier == 'bob') {
-            return Uint8List.fromList([1, 2, 3]);
-          }
-          return null;
-        },
       );
 
-      final payload = result.toChannelPayload();
+      final payload = result.toSnapshotPayload();
       expect(payload['found'], true);
       expect(payload['contactIdentifier'], 'bob');
       expect(payload['displayName'], 'Bob');
       expect(payload['urgency'], '13 days late');
-      expect(payload['hasPhone'], true);
-      expect(payload['photoBase64'], isNotNull);
-      expect(payload['phones'], [
-        {'label': 'mobile', 'number': '5552223333'},
-        {'label': 'mobile', 'number': '+15554445555'},
-      ]);
     });
   });
 }

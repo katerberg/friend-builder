@@ -29,6 +29,7 @@ dependencies:
   cloud_firestore: ^5.5.1
   flutter_secure_storage: ^9.2.2
   fl_chart: ^1.2.0
+  home_widget: ^0.8.0
 
 dev_dependencies:
   flutter_test:

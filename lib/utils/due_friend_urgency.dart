@@ -2,7 +2,7 @@ import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/utils/scheduling.dart';
 
 /// Urgency copy matching [ContactTile] Friends UI semantics.
-String carPlayUrgencyLabel({
+String dueFriendUrgencyLabel({
   required DateTime? latestHangoutWhen,
   required Frequency? frequency,
 }) {

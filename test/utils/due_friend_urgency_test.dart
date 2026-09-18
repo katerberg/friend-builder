@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friend_builder/data/frequency.dart';
-import 'package:friend_builder/utils/carplay_urgency.dart';
+import 'package:friend_builder/utils/due_friend_urgency.dart';
 
 void main() {
-  group('carPlayUrgencyLabel', () {
+  group('dueFriendUrgencyLabel', () {
     test('returns Never seen when there is no hangout', () {
       expect(
-        carPlayUrgencyLabel(
+        dueFriendUrgencyLabel(
           latestHangoutWhen: null,
           frequency: Frequency.fromType('Weekly'),
         ),
@@ -18,7 +18,7 @@ void main() {
       final latestHangoutWhen =
           DateTime.now().subtract(const Duration(days: 2));
       expect(
-        carPlayUrgencyLabel(
+        dueFriendUrgencyLabel(
           latestHangoutWhen: latestHangoutWhen,
           frequency: Frequency.fromType('Weekly'),
         ),
@@ -30,7 +30,7 @@ void main() {
       final latestHangoutWhen =
           DateTime.now().subtract(const Duration(days: 10));
       expect(
-        carPlayUrgencyLabel(
+        dueFriendUrgencyLabel(
           latestHangoutWhen: latestHangoutWhen,
           frequency: Frequency.fromType('Weekly'),
         ),

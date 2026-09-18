@@ -3,7 +3,7 @@ import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/top_friend_row.dart';
-import 'package:friend_builder/services/carplay_service.dart';
+import 'package:friend_builder/services/due_friend_snapshot_service.dart';
 
 class Storage {
   Future<List<Hangout>?> getHangouts() async {
@@ -25,19 +25,19 @@ class Storage {
 
   Future updateHangout(Hangout hangout) async {
     final result = await DBProvider.db.saveHangout(hangout);
-    await CarPlayService.notifyRefresh();
+    await DueFriendSnapshotService.refresh();
     return result;
   }
 
   Future createHangout(Hangout hangout) async {
     final result = await DBProvider.db.saveHangout(hangout);
-    await CarPlayService.notifyRefresh();
+    await DueFriendSnapshotService.refresh();
     return result;
   }
 
   Future deleteHangout(Hangout hangout) async {
     final result = await DBProvider.db.deleteHangout(hangout);
-    await CarPlayService.notifyRefresh();
+    await DueFriendSnapshotService.refresh();
     return result;
   }
 
@@ -70,7 +70,7 @@ class Storage {
     await DBProvider.db
         .deleteSnoozeRemindersForContact(friend.contactIdentifier);
     final result = await DBProvider.db.deleteFriend(friend);
-    await CarPlayService.notifyRefresh();
+    await DueFriendSnapshotService.refresh();
     return result;
   }
 
@@ -79,7 +79,7 @@ class Storage {
       return DBProvider.db.saveFriend(friend);
     });
     final result = await Future.wait(futureMap);
-    await CarPlayService.notifyRefresh();
+    await DueFriendSnapshotService.refresh();
     return result;
   }
 }
