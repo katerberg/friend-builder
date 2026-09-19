@@ -1,0 +1,3 @@
+// Shared by DueFriendWidgetExtension so CFBundle version keys resolve
+// from Flutter's Generated.xcconfig (same as the Runner target).
+#include "Generated.xcconfig"
