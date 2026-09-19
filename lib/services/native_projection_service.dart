@@ -14,6 +14,7 @@ class NativeProjectionService {
   static Timer? _debounceTimer;
   static bool _started = false;
   static Future<bool>? _inFlightRefresh;
+  static bool _dirty = false;
 
   /// Test-only hook that replaces the real App Group refresh.
   static Future<bool> Function()? debugRefreshOverride;
@@ -34,21 +35,38 @@ class NativeProjectionService {
     });
   }
 
-  /// Cancel any pending debounce and refresh immediately (e.g. Siri ACK).
+  /// Cancel any pending debounce and refresh immediately (e.g. post-drain).
   static Future<bool> refreshNow() {
     _debounceTimer?.cancel();
     _debounceTimer = null;
     return _runRefresh();
   }
 
+  /// If a refresh is already running, mark dirty and join it so a follow-up
+  /// pass runs after the in-flight work finishes (includes newer mutations).
   static Future<bool> _runRefresh() {
     final existingRefresh = _inFlightRefresh;
     if (existingRefresh != null) {
+      _dirty = true;
       return existingRefresh;
     }
-    final refreshFuture = _performRefresh().whenComplete(() {
-      _inFlightRefresh = null;
-    });
+
+    late final Future<bool> refreshFuture;
+    refreshFuture = () async {
+      var success = true;
+      do {
+        _dirty = false;
+        success = await _performRefresh();
+      } while (_dirty);
+      if (identical(_inFlightRefresh, refreshFuture)) {
+        _inFlightRefresh = null;
+      }
+      if (_dirty) {
+        return _runRefresh();
+      }
+      return success;
+    }();
+
     _inFlightRefresh = refreshFuture;
     return refreshFuture;
   }
@@ -80,6 +98,7 @@ class NativeProjectionService {
     _debounceTimer?.cancel();
     _debounceTimer = null;
     _inFlightRefresh = null;
+    _dirty = false;
     debugRefreshOverride = null;
     if (_started) {
       StorageChangeBus.removeListener(scheduleRefresh);

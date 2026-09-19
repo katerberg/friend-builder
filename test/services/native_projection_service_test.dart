@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:friend_builder/services/native_projection_service.dart';
@@ -64,5 +66,32 @@ void main() {
       async.flushMicrotasks();
       expect(refreshCount, 1);
     });
+  });
+
+  test('refreshNow while in flight re-runs after the stale pass finishes',
+      () async {
+    final firstRefreshStarted = Completer<void>();
+    final releaseFirstRefresh = Completer<void>();
+    var refreshCount = 0;
+
+    NativeProjectionService.debugRefreshOverride = () async {
+      refreshCount += 1;
+      if (refreshCount == 1) {
+        firstRefreshStarted.complete();
+        await releaseFirstRefresh.future;
+      }
+      return true;
+    };
+
+    final first = NativeProjectionService.refreshNow();
+    await firstRefreshStarted.future;
+    expect(refreshCount, 1);
+
+    final second = NativeProjectionService.refreshNow();
+    expect(refreshCount, 1);
+
+    releaseFirstRefresh.complete();
+    await Future.wait([first, second]);
+    expect(refreshCount, 2);
   });
 }
