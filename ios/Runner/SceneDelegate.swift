@@ -11,6 +11,7 @@ class SceneDelegate: FlutterSceneDelegate {
     super.scene(scene, willConnectTo: session, options: connectionOptions)
     if let controller = window?.rootViewController as? FlutterViewController {
       HangoutChannelBridge.register(with: controller.binaryMessenger)
+      PendingHangoutChannel.register(with: controller.binaryMessenger)
     }
   }
 }

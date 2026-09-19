@@ -59,7 +59,7 @@ After a durable hangout commit (channel or pending-queue drain), Dart flushes [N
 
 Channel name: `com.example.friend_builder/hangouts`.
 
-Siri `LogHangoutIntent` is **queue-only**: it verifies an App Group enqueue (`pending_hangouts_json`) and never calls MethodChannel `logHangout`. Dart drain is the sole SQLite writer for Siri hangouts. Drain claims each `pendingId` in SQLite (`processed_pending_hangouts`), creates the hangout, then removes **only that id** by reloading the current queue (so concurrent enqueues are not wiped). `openAppWhenRun` opens the app so drain happens soon; durability is the verified queue write.
+Siri `LogHangoutIntent` is **queue-only**: it verifies an App Group enqueue (one UserDefaults key per `pendingId`, not a shared JSON array) and never calls MethodChannel `logHangout`. Dart drain is the sole SQLite writer for Siri hangouts. Drain lists pending keys via MethodChannel, claims each `pendingId` in SQLite (`processed_pending_hangouts`), creates the hangout, then deletes **only that id's key**. `openAppWhenRun` opens the app so drain happens soon; durability is the verified per-id queue write.
 
 Hangout defaults: `when: now`, one contact, empty notes, not all-day.
 
