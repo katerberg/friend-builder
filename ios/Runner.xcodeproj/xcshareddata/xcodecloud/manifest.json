@@ -1,0 +1,9 @@
+{
+  "id" : "33e685a8-e891-4f44-988f-ec9a632bca14",
+  "targets" : [
+    {
+      "id" : "43F9785F-E2AB-43E4-94AC-C9D07C2488A7",
+      "name" : "friend_builder"
+    }
+  ]
+}
