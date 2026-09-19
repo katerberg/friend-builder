@@ -1,8 +1,8 @@
 import 'dart:math';
 
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/utils/string_utils.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 
 enum ContactMatchTier {
   none(0),
@@ -32,10 +32,10 @@ class ContactSearch {
     }
 
     addPhrase(contact.displayName);
-    addPhrase(contact.name.first);
-    addPhrase(contact.name.last);
-    addPhrase(contact.name.middle);
-    addPhrase(contact.name.nickname);
+    addPhrase(contact.name?.first);
+    addPhrase(contact.name?.last);
+    addPhrase(contact.name?.middle);
+    addPhrase(contact.name?.nickname);
 
     if (contact is EncodableContact) {
       addPhrase(contact.givenName);
@@ -44,8 +44,8 @@ class ContactSearch {
     }
 
     final structuredFirstLast = [
-      contact.name.first.trim(),
-      contact.name.last.trim(),
+      contact.name?.first?.trim() ?? '',
+      contact.name?.last?.trim() ?? '',
     ].where((part) => part.isNotEmpty).join(' ');
     addPhrase(structuredFirstLast);
 
@@ -81,7 +81,7 @@ class ContactSearch {
   }
 
   static double bigramScoreForContact(Contact contact, String pattern) {
-    return StringUtils.getComparison(contact.displayName, pattern);
+    return StringUtils.getComparison(contact.safeDisplayName, pattern);
   }
 
   static ContactMatchTier tierForContact(Contact contact, String pattern) {
@@ -90,7 +90,7 @@ class ContactSearch {
       return ContactMatchTier.strongLiteral;
     }
 
-    final lowerDisplayName = contact.displayName.toLowerCase();
+    final lowerDisplayName = contact.safeDisplayName.toLowerCase();
 
     ContactMatchTier bestTier = ContactMatchTier.none;
 
@@ -126,7 +126,7 @@ class ContactSearch {
       }
     }
 
-    if (_legacyWordPrefixMatch(contact.displayName, pattern)) {
+    if (_legacyWordPrefixMatch(contact.safeDisplayName, pattern)) {
       consider(ContactMatchTier.legacyWordPrefix);
     }
 
@@ -142,7 +142,7 @@ class ContactSearch {
     Contact contact,
     Set<String> recentContactIdentifiers,
   ) {
-    if (recentContactIdentifiers.contains(contact.id)) {
+    if (recentContactIdentifiers.contains(contact.safeId)) {
       return true;
     }
     if (contact is EncodableContact &&
@@ -323,6 +323,6 @@ class _ScoredContact {
     if (bigramComparison != 0) {
       return bigramComparison;
     }
-    return contact.displayName.compareTo(other.contact.displayName);
+    return contact.safeDisplayName.compareTo(other.contact.safeDisplayName);
   }
 }

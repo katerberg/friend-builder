@@ -22,6 +22,10 @@ class DebugData {
         },
       ];
 
+  static bool _isDebugContact(Contact contact) {
+    return contact.name?.nickname == 'DEBUG';
+  }
+
   // Creates fake device contacts and friends for testing if they don't already exist
   static Future<void> populateFakeContactsIfNeeded() async {
     if (!kDebugMode) {
@@ -29,13 +33,15 @@ class DebugData {
     }
 
     try {
-      if (!await FlutterContacts.requestPermission()) {
+      final status = await FlutterContacts.permissions
+          .request(PermissionType.readWrite);
+      if (status != PermissionStatus.granted) {
         debugPrint('⚠️  Contact permission denied, skipping debug contacts');
         return;
       }
 
-      final existingContacts = await FlutterContacts.getContacts(
-        withProperties: true,
+      final existingContacts = await FlutterContacts.getAll(
+        properties: ContactProperties.allProperties,
       );
 
       final existingFriends = await Storage.getFriends();
@@ -51,34 +57,44 @@ class DebugData {
         final lastName = fakeContact['lastName']!;
         final fullName = '$firstName $lastName';
 
-        Contact? existingContact = existingContacts.firstWhere(
-          (c) => c.name.first == firstName && c.name.last == lastName,
-          orElse: () => Contact(),
-        );
+        Contact? existingContact;
+        for (final contact in existingContacts) {
+          if (contact.name?.first == firstName &&
+              contact.name?.last == lastName) {
+            existingContact = contact;
+            break;
+          }
+        }
 
         String contactId;
-        bool isDebugContact = existingContact.displayName.contains('DEBUG');
+        final isDebugContact =
+            existingContact != null && _isDebugContact(existingContact);
 
-        if (existingContact.id.isEmpty) {
-          final newContact = Contact()
-            ..name.first = firstName
-            ..name.last = lastName
-            ..displayName = '$fullName [DEBUG]'
-            ..phones = [
-              Phone('+1555${100 + contactsCreated}${200 + contactsCreated}')
-            ]
-            ..emails = [
+        if (existingContact == null || (existingContact.id ?? '').isEmpty) {
+          final newContact = Contact(
+            name: Name(
+              first: firstName,
+              last: lastName,
+              nickname: 'DEBUG',
+            ),
+            displayName: fullName,
+            phones: [
+              Phone(
+                  number:
+                      '+1555${100 + contactsCreated}${200 + contactsCreated}')
+            ],
+            emails: [
               Email(
-                  '${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com')
-            ];
+                  address:
+                      '${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com')
+            ],
+          );
 
-          final insertedContact =
-              await FlutterContacts.insertContact(newContact);
-          contactId = insertedContact.id;
+          contactId = await FlutterContacts.create(newContact);
           contactsCreated++;
           debugPrint('📱 Created device contact: $fullName [DEBUG]');
         } else {
-          contactId = existingContact.id;
+          contactId = existingContact.id!;
           if (isDebugContact) {
             debugPrint('ℹ️  Device contact already exists: $fullName [DEBUG]');
           } else {
@@ -127,13 +143,16 @@ class DebugData {
         return;
       }
 
-      final contacts = await FlutterContacts.getContacts(
-        withProperties: true,
+      final contacts = await FlutterContacts.getAll(
+        properties: ContactProperties.allProperties,
       );
 
       final contactMap = <String, Contact>{};
       for (final contact in contacts) {
-        contactMap[contact.id] = contact;
+        final contactId = contact.id;
+        if (contactId != null) {
+          contactMap[contactId] = contact;
+        }
       }
 
       final random = Random();
@@ -263,17 +282,21 @@ class DebugData {
     }
 
     try {
-      if (!await FlutterContacts.requestPermission()) {
+      final status = await FlutterContacts.permissions
+          .request(PermissionType.readWrite);
+      if (status != PermissionStatus.granted) {
         debugPrint(
             '⚠️  Contact permission denied, cannot remove debug contacts');
         return 0;
       }
 
-      final contacts = await FlutterContacts.getContacts(withProperties: true);
+      final contacts = await FlutterContacts.getAll(
+        properties: ContactProperties.allProperties,
+      );
       debugPrint('📱 Found ${contacts.length} total contacts on device');
 
       final debugContacts =
-          contacts.where((c) => c.displayName.contains('[DEBUG]')).toList();
+          contacts.where(_isDebugContact).toList();
 
       if (debugContacts.isEmpty) {
         debugPrint('ℹ️  No debug contacts found');
@@ -284,7 +307,10 @@ class DebugData {
 
       final storage = Storage();
       final friends = await Storage.getFriends();
-      final debugContactIds = debugContacts.map((c) => c.id).toSet();
+      final debugContactIds = debugContacts
+          .map((c) => c.id)
+          .whereType<String>()
+          .toSet();
 
       final debugFriends = friends
               ?.where((f) => debugContactIds.contains(f.contactIdentifier))
@@ -296,7 +322,9 @@ class DebugData {
       }
 
       for (final contact in debugContacts) {
-        await contact.delete();
+        if (contact.id != null) {
+          await FlutterContacts.delete(contact.id!);
+        }
       }
 
       debugPrint(

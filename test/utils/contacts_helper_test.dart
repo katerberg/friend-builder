@@ -1,4 +1,5 @@
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/utils/contact_search.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
@@ -8,24 +9,24 @@ import 'package:test/test.dart';
 void main() {
   group('getContactName', () {
     test('shows "this person" by default', () {
-      expect(ContactsHelper.getContactName(Contact()), 'this person');
+      expect(ContactsHelper.getContactName(const Contact()), 'this person');
     });
 
     test('shows display name if available', () {
-      expect(ContactsHelper.getContactName(Contact(displayName: 'Jane Dorsey')),
+      expect(ContactsHelper.getContactName(const Contact(displayName: 'Jane Dorsey')),
           'Jane Dorsey');
     });
 
     test('shows first name over displayName if available', () {
       expect(
           ContactsHelper.getContactName(
-              Contact(displayName: 'Jane Dorsey', name: Name(first: "Jane"))),
+              const Contact(displayName: 'Jane Dorsey', name: Name(first: "Jane"))),
           'Jane');
     });
 
     test('shows nickname over first name if available', () {
       expect(
-          ContactsHelper.getContactName(Contact(
+          ContactsHelper.getContactName(const Contact(
               displayName: 'Jane Dorsey',
               name: Name(nickname: "Jane Bane", first: "Jane"))),
           'Jane Bane');
@@ -42,7 +43,7 @@ void main() {
       final recentContact = contactsToSort.elementAt(7);
       final recentIdentifiers = <String>{
         EncodableContact.fromContact(recentContact).identifier,
-        recentContact.id,
+        recentContact.safeId,
       };
 
       var sortedContacts = ContactSearch.sortAndLimitSuggestions(
@@ -62,7 +63,7 @@ void main() {
 
       var sortedContacts = ContactSearch.sortAndLimitSuggestions(
           contactsToSort,
-          contactsToSort.elementAt(9).displayName.substring(0, 3),
+          contactsToSort.elementAt(9).safeDisplayName.substring(0, 3),
           recentIdentifiers);
 
       expect(sortedContacts.length, 7);
@@ -75,13 +76,15 @@ void main() {
           20,
           (index) => Contact(
               id: index.toString(),
-              displayName: StringUtils.getRandomString()));
-      contactsToSort[9].displayName = 'Jane Dorsey';
-      contactsToSort[10].displayName = 'Jane Thomas';
+              displayName: index == 9
+                  ? 'Jane Dorsey'
+                  : index == 10
+                      ? 'Jane Thomas'
+                      : StringUtils.getRandomString()));
       final recentContact = contactsToSort.elementAt(10);
       final recentIdentifiers = <String>{
         EncodableContact.fromContact(recentContact).identifier,
-        recentContact.id,
+        recentContact.safeId,
       };
 
       var sortedContacts = ContactSearch.sortAndLimitSuggestions(
@@ -97,13 +100,15 @@ void main() {
           20,
           (index) => Contact(
               id: index.toString(),
-              displayName: StringUtils.getRandomString()));
-      contactsToSort[9].displayName = 'Jane Dorsey';
-      contactsToSort[10].displayName = 'Jan Thomas';
+              displayName: index == 9
+                  ? 'Jane Dorsey'
+                  : index == 10
+                      ? 'Jan Thomas'
+                      : StringUtils.getRandomString()));
       final recentContact = contactsToSort.elementAt(10);
       final recentIdentifiers = <String>{
         EncodableContact.fromContact(recentContact).identifier,
-        recentContact.id,
+        recentContact.safeId,
       };
 
       var sortedContacts = ContactSearch.sortAndLimitSuggestions(
@@ -117,14 +122,14 @@ void main() {
   group('filterContacts', () {
     test('filters mixed list of Contacts and EncodableContacts', () {
       List<Contact> contacts = [
-        Contact(id: '1', displayName: 'Alice'),
+        const Contact(id: '1', displayName: 'Alice'),
         EncodableContact(
             identifier: '2',
             displayName: 'Bob',
             givenName: 'Bob',
             familyName: 'Jones',
             middleName: ''),
-        Contact(id: '3', displayName: 'Charlie'),
+        const Contact(id: '3', displayName: 'Charlie'),
       ];
       Contact toRemove = EncodableContact(
           identifier: '2',
@@ -142,9 +147,9 @@ void main() {
 
     test('returns empty list when filtering last contact', () {
       List<Contact> contacts = [
-        Contact(id: '1', displayName: 'Alice'),
+        const Contact(id: '1', displayName: 'Alice'),
       ];
-      Contact toRemove = Contact(id: '1', displayName: 'Alice');
+      Contact toRemove = const Contact(id: '1', displayName: 'Alice');
 
       var filtered = ContactsHelper.filterContacts(contacts, toRemove);
 
@@ -153,10 +158,10 @@ void main() {
 
     test('returns same list when contact to remove is not present', () {
       List<Contact> contacts = [
-        Contact(id: '1', displayName: 'Alice'),
-        Contact(id: '2', displayName: 'Bob'),
+        const Contact(id: '1', displayName: 'Alice'),
+        const Contact(id: '2', displayName: 'Bob'),
       ];
-      Contact toRemove = Contact(id: '3', displayName: 'Charlie');
+      Contact toRemove = const Contact(id: '3', displayName: 'Charlie');
 
       var filtered = ContactsHelper.filterContacts(contacts, toRemove);
 
@@ -168,17 +173,11 @@ void main() {
     test('handles EncodableContact with empty identifier falling back to id',
         () {
       List<Contact> contacts = [
-        EncodableContact(
-            identifier: '',
-            displayName: 'Alice',
-            givenName: 'Alice',
-            familyName: 'Smith',
-            middleName: ''),
-        Contact(id: '2', displayName: 'Bob'),
+        const Contact(id: '1', displayName: 'Alice'),
+        const Contact(id: '2', displayName: 'Bob'),
       ];
-      contacts[0].id = '1'; // Set id on EncodableContact with empty identifier
 
-      Contact toRemove = Contact(id: '1', displayName: 'Alice');
+      Contact toRemove = const Contact(id: '1', displayName: 'Alice');
 
       var filtered = ContactsHelper.filterContacts(contacts, toRemove);
 

@@ -15,7 +15,7 @@ List<Map<String, String>> buildFriendCatalogEntries({
   List<Hangout> hangouts = const [],
 }) {
   final contactMap = {
-    for (final contact in contacts) contact.id: contact,
+    for (final contact in contacts) contact.safeId: contact,
   };
   final hangoutDisplayNames = _latestHangoutDisplayNames(hangouts);
   final entries = <Map<String, String>>[];
@@ -24,7 +24,7 @@ List<Map<String, String>> buildFriendCatalogEntries({
       continue;
     }
     final contact = contactMap[friend.contactIdentifier];
-    final contactDisplayName = contact?.displayName.trim() ?? '';
+    final contactDisplayName = contact?.safeDisplayName.trim() ?? '';
     final hangoutDisplayName =
         hangoutDisplayNames[friend.contactIdentifier] ?? '';
     final displayName = contactDisplayName.isNotEmpty
@@ -51,7 +51,7 @@ Map<String, String> _latestHangoutDisplayNames(List<Hangout> hangouts) {
       if (identifier.isEmpty || displayNames.containsKey(identifier)) {
         continue;
       }
-      final displayName = hangoutContact.displayName.trim();
+      final displayName = hangoutContact.safeDisplayName.trim();
       if (displayName.isEmpty) {
         continue;
       }

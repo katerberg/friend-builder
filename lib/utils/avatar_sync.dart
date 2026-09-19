@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/database.dart';
+import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AvatarSync {
@@ -45,7 +46,7 @@ class AvatarSync {
 
     final Map<String, Contact> contactMap = {};
     for (final contact in contactPermission.contacts) {
-      contactMap[contact.id] = contact;
+      contactMap[contact.safeId] = contact;
     }
 
     final hangouts = await DBProvider.db.getAllHangouts();
@@ -53,15 +54,13 @@ class AvatarSync {
     for (final hangout in hangouts) {
       bool hangoutUpdated = false;
 
-      for (final encodableContact in hangout.contacts) {
+      for (var index = 0; index < hangout.contacts.length; index++) {
+        final encodableContact = hangout.contacts[index];
         final currentContact = contactMap[encodableContact.identifier];
 
         if (currentContact != null) {
-          final currentAvatar = currentContact.photo;
+          final currentAvatar = currentContact.photoBytes;
 
-          // Update avatar if it's different
-          // Note: We compare by checking if one is null and the other isn't,
-          // or if both exist but have different lengths (simple heuristic)
           final bool avatarChanged =
               (encodableContact.avatar == null && currentAvatar != null) ||
                   (encodableContact.avatar != null && currentAvatar == null) ||
@@ -70,7 +69,14 @@ class AvatarSync {
                       encodableContact.avatar!.length != currentAvatar.length);
 
           if (avatarChanged) {
-            encodableContact.avatar = currentAvatar;
+            hangout.contacts[index] = EncodableContact(
+              displayName: encodableContact.safeDisplayName,
+              middleName: encodableContact.middleName,
+              givenName: encodableContact.givenName,
+              identifier: encodableContact.identifier,
+              familyName: encodableContact.familyName,
+              avatar: currentAvatar,
+            );
             hangoutUpdated = true;
           }
         }

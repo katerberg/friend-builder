@@ -97,9 +97,8 @@ class CalendarSync {
         return;
       }
 
-      final contacts = await FlutterContacts.getContacts(
-        withProperties: true,
-        withPhoto: false,
+      final contacts = await FlutterContacts.getAll(
+        properties: ContactProperties.allProperties,
       );
 
       final excludedContactIds = await _getExcludedContacts();
@@ -107,7 +106,7 @@ class CalendarSync {
 
       final contactsByEmail = <String, Contact>{};
       for (var contact in contacts) {
-        if (excludedContactIds.contains(contact.id)) {
+        if (excludedContactIds.contains(contact.id ?? '')) {
           continue;
         }
         for (var email in contact.emails) {

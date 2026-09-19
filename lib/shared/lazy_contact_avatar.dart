@@ -36,18 +36,19 @@ class _LazyContactAvatarState extends State<LazyContactAvatar> {
         _photoFuture = Future.value(encodable.avatar);
         return;
       }
-    } else if (widget.contact.photo != null) {
-      _photoFuture = Future.value(widget.contact.photo);
+    } else if (widget.contact.photoBytes != null) {
+      _photoFuture = Future.value(widget.contact.photoBytes);
       return;
     }
 
-    _photoFuture = ContactPermissionService.getContactPhoto(widget.contact.id);
+    _photoFuture =
+        ContactPermissionService.getContactPhoto(widget.contact.safeId);
   }
 
   @override
   void didUpdateWidget(LazyContactAvatar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.contact.id != widget.contact.id) {
+    if (oldWidget.contact.safeId != widget.contact.safeId) {
       _loadPhoto();
     }
   }

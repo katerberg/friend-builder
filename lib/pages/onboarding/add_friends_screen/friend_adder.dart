@@ -108,7 +108,7 @@ class FriendAdderState extends State<FriendAdder> {
                   itemBuilder: (context, Contact suggestion) {
                     return ListTile(
                       leading: LazyContactAvatar(contact: suggestion),
-                      title: Text(suggestion.displayName),
+                      title: Text(suggestion.safeDisplayName),
                     );
                   },
                   onSelected: _onSelected,

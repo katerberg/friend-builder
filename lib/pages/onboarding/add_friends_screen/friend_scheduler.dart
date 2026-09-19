@@ -47,7 +47,7 @@ class FriendSchedulerState extends State<FriendScheduler>
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     for (var contact in widget.selectedFriends) {
-      selection[contact.id] = 'Never';
+      selection[contact.safeId] = 'Never';
     }
     super.initState();
   }
@@ -63,7 +63,7 @@ class FriendSchedulerState extends State<FriendScheduler>
     List<Friend>? friends = await Storage.getFriends();
     if (selectedValue != 'Never') {
       var newFriend = Friend(
-        contactIdentifier: contact.id,
+        contactIdentifier: contact.safeId,
         frequency: Frequency.fromType(selectedValue),
         notes: '',
         isContactable: true,
@@ -84,7 +84,7 @@ class FriendSchedulerState extends State<FriendScheduler>
 
     scheduleNextNotification(widget.flutterLocalNotificationsPlugin);
     setState(() {
-      selection[contact.id] = selectedValue;
+      selection[contact.safeId] = selectedValue;
     });
   }
 
@@ -97,7 +97,7 @@ class FriendSchedulerState extends State<FriendScheduler>
       choices: const ['Weekly', 'Monthly', 'Quarterly', 'Yearly', 'Never'],
       onSelect: (_, selectedValue) =>
           _handleSelectionTap(contact, selectedValue),
-      selection: selection[contact.id] ?? '',
+      selection: selection[contact.safeId] ?? '',
       label: _getLabel((contact)),
     );
   }

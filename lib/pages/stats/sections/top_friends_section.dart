@@ -42,7 +42,8 @@ class _TopFriendsSectionState extends State<TopFriendsSection> {
     setState(() {
       _topFriends = topFriends;
       _contactByIdentifier = {
-        for (final contact in contactPermission.contacts) contact.id: contact,
+        for (final contact in contactPermission.contacts)
+          contact.safeId: contact,
       };
       _isLoading = false;
     });
@@ -97,7 +98,7 @@ class _TopFriendsSectionState extends State<TopFriendsSection> {
             child: Text(
               row.displayName.isNotEmpty
                   ? row.displayName
-                  : contact.displayName,
+                  : contact.safeDisplayName,
               overflow: TextOverflow.ellipsis,
             ),
           ),

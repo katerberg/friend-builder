@@ -1,49 +1,56 @@
-import 'package:friend_builder/contacts_permission.dart';
-import 'package:flutter/material.dart';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
+
 class EncodableContact extends Contact {
-  @override
-  // ignore: overridden_fields
-  String displayName = "";
-  String middleName = "";
-  String givenName = "";
-  String identifier = "";
-  String familyName = "";
-  Uint8List? avatar;
+  final String middleName;
+  final String givenName;
+  final String identifier;
+  final String familyName;
+  final Uint8List? avatar;
 
   EncodableContact({
-    required this.displayName,
+    required String displayName,
     required this.middleName,
     required this.givenName,
     required this.identifier,
     required this.familyName,
     this.avatar,
-  }) {
-    id = identifier;
-  }
+  }) : super(
+          id: identifier,
+          displayName: displayName,
+          name: Name(
+            first: givenName,
+            middle: middleName,
+            last: familyName,
+          ),
+          photo: avatar != null ? Photo(fullSize: avatar) : null,
+        );
 
-  EncodableContact.fromContact(Contact contact) {
+  factory EncodableContact.fromContact(Contact contact) {
     if (contact is EncodableContact) {
-      displayName = contact.displayName;
-      middleName =
-          contact.middleName == '' ? contact.middleName : contact.name.middle;
-      givenName =
-          contact.givenName == '' ? contact.name.first : contact.givenName;
-      identifier = contact.identifier == '' ? contact.id : contact.identifier;
-      id = contact.id == '' ? contact.identifier : contact.id;
-      familyName =
-          contact.familyName == '' ? contact.name.last : contact.familyName;
-      avatar = contact.photo ?? contact.avatar;
-    } else {
-      displayName = contact.displayName;
-      middleName = contact.name.middle;
-      givenName = contact.name.first;
-      identifier = contact.id;
-      id = contact.id;
-      familyName = contact.name.last;
-      avatar = contact.photo;
+      return EncodableContact(
+        displayName: contact.displayName ?? '',
+        middleName: contact.middleName,
+        givenName: contact.givenName,
+        identifier: contact.identifier.isNotEmpty
+            ? contact.identifier
+            : (contact.id ?? ''),
+        familyName: contact.familyName,
+        avatar: contact.avatar ??
+            contact.photo?.fullSize ??
+            contact.photo?.thumbnail,
+      );
     }
+    return EncodableContact(
+      displayName: contact.displayName ?? '',
+      middleName: contact.name?.middle ?? '',
+      givenName: contact.name?.first ?? '',
+      identifier: contact.id ?? '',
+      familyName: contact.name?.last ?? '',
+      avatar: contact.photo?.fullSize ?? contact.photo?.thumbnail,
+    );
   }
 
   CircleAvatar getAvatar(context, [double? fontSize]) {
@@ -68,7 +75,7 @@ class EncodableContact extends Contact {
   }
 
   factory EncodableContact.fromJson(Map<String, dynamic> parsedJson) {
-    final contact = EncodableContact(
+    return EncodableContact(
       displayName: parsedJson['displayName'] ?? "",
       middleName: parsedJson['middleName'] ?? "",
       givenName: parsedJson['givenName'] ?? "",
@@ -78,12 +85,10 @@ class EncodableContact extends Contact {
           ? null
           : Uint8List.fromList(parsedJson['avatar'].cast<int>()),
     );
-    contact.id = contact.identifier;
-    return contact;
   }
 
   factory EncodableContact.fromMap(Map<String, dynamic> parsedJson) {
-    final contact = EncodableContact(
+    return EncodableContact(
       displayName: parsedJson['displayName'] ?? "",
       middleName: parsedJson['middleName'] ?? "",
       givenName: parsedJson['givenName'] ?? "",
@@ -93,12 +98,10 @@ class EncodableContact extends Contact {
           ? null
           : Uint8List.fromList(parsedJson['avatar'].cast<int>()),
     );
-    contact.id = contact.identifier;
-    return contact;
   }
 
   @override
-  Map<String, dynamic> toJson({withPhoto = true, withThumbnail = true}) {
+  Map<String, dynamic> toJson() {
     return {
       "avatar": avatar,
       "displayName": displayName,

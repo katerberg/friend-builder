@@ -1,0 +1,112 @@
+group = 'co.quis.flutter_contacts'
+version = '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '2.2.20'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath('com.android.tools.build:gradle:8.11.1')
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = 'https://storage.googleapis.com/download.flutter.io'
+        }
+    }
+}
+
+// Resolve Flutter SDK path robustly across normal builds, IDE sync, and FVM setups.
+// Priority: 1) Gradle property  2) rootProject local.properties  3) Walk up from project dir  4) FLUTTER_ROOT env
+String readFlutterSdk(File dir) {
+    if (dir == null) return null
+    def file = new File(dir, 'local.properties')
+    if (!file.exists()) return null
+    def props = new Properties()
+    file.withReader('UTF-8') { props.load(it) }
+    return props.getProperty('flutter.sdk')
+}
+
+def flutterRoot = project.findProperty('flutter-root')?.toString()
+    ?: project.findProperty('flutter.sdk')?.toString()
+
+if (flutterRoot == null) {
+    flutterRoot = readFlutterSdk(rootProject.projectDir)
+}
+
+if (flutterRoot == null) {
+    def dir = project.projectDir
+    while (dir != null && flutterRoot == null) {
+        flutterRoot = readFlutterSdk(dir)
+        dir = dir.parentFile
+    }
+}
+
+if (flutterRoot == null) {
+    flutterRoot = System.getenv('FLUTTER_ROOT')
+}
+
+if (flutterRoot == null) {
+    throw new GradleException(
+        'Flutter SDK not found. Define flutter.sdk in local.properties, pass -Pflutter.sdk=<path>, or set FLUTTER_ROOT.'
+    )
+}
+
+def engineVersion = new File(flutterRoot, 'bin/cache/engine.stamp').text.trim()
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    namespace = 'co.quis.flutter_contacts'
+    compileSdk = 36
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+
+    packaging {
+        resources {
+            excludes += [
+                'META-INF/LICENSE.md',
+                'META-INF/LICENSE-notice.md',
+                'META-INF/LICENSE',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.md',
+            ]
+        }
+    }
+}
+
+dependencies {
+    compileOnly "io.flutter:flutter_embedding_release:1.0.0-${engineVersion}"
+    testImplementation "io.flutter:flutter_embedding_release:1.0.0-${engineVersion}"
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.16'
+    testImplementation 'io.mockk:mockk:1.14.6'
+}

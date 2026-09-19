@@ -161,7 +161,7 @@ class HangoutIntentService {
         await ContactPermissionService().getContacts();
     if (!contactPermission.missingPermission) {
       for (final contact in contactPermission.contacts) {
-        if (contact.id == contactIdentifier) {
+        if (contact.safeId == contactIdentifier) {
           return EncodableContact.fromContact(contact);
         }
       }

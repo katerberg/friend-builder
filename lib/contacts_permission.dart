@@ -5,6 +5,12 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 
 export 'package:flutter_contacts/flutter_contacts.dart' show Contact;
 
+extension ContactFields on Contact {
+  String get safeId => id ?? '';
+  String get safeDisplayName => displayName ?? '';
+  Uint8List? get photoBytes => photo?.fullSize ?? photo?.thumbnail;
+}
+
 class ContactPermission {
   final Iterable<Contact> contacts;
   final bool missingPermission;
@@ -22,8 +28,9 @@ class ContactPermissionService {
   Future<ContactPermission> getContacts() async {
     bool missingPermission =
         await permissionsUtils.isMissingPermission(Permission.contacts);
-    List<Contact> contacts = await FlutterContacts.getContacts(
-        withPhoto: false, withProperties: true);
+    final contacts = await FlutterContacts.getAll(
+      properties: ContactProperties.allProperties,
+    );
     return ContactPermission(missingPermission, contacts);
   }
 
@@ -32,9 +39,15 @@ class ContactPermissionService {
       return _photoCache[contactId];
     }
 
-    final contact =
-        await FlutterContacts.getContact(contactId, withPhoto: true);
-    final photo = contact?.photo;
+    final contact = await FlutterContacts.get(
+      contactId,
+      properties: {
+        ContactProperty.photoFullRes,
+        ContactProperty.photoThumbnail,
+      },
+    );
+    final photo =
+        contact?.photo?.fullSize ?? contact?.photo?.thumbnail;
 
     _photoCache[contactId] = photo;
 

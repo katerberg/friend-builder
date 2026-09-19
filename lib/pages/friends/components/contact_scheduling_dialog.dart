@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/shared/selection_choice_group.dart';
 import 'package:friend_builder/shared/settings_modal.dart';
 import 'package:friend_builder/data/friend.dart';
@@ -92,7 +93,8 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
 
     final excludedContacts = await SettingsModal.getExcludedContacts();
     final isExcluded =
-        widget.contact != null && excludedContacts.contains(widget.contact!.id);
+        widget.contact != null &&
+            excludedContacts.contains(widget.contact!.safeId);
 
     if (mounted) {
       setState(() {
@@ -109,10 +111,10 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
     List<String> newExcludedContacts;
 
     if (exclude) {
-      newExcludedContacts = [...excludedContacts, widget.contact!.id];
+      newExcludedContacts = [...excludedContacts, widget.contact!.safeId];
     } else {
       newExcludedContacts =
-          excludedContacts.where((id) => id != widget.contact!.id).toList();
+          excludedContacts.where((id) => id != widget.contact!.safeId).toList();
     }
 
     await SettingsModal.setExcludedContacts(newExcludedContacts);
@@ -189,7 +191,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
       return widget.friend!;
     }
     return Friend(
-      contactIdentifier: widget.contact!.id,
+      contactIdentifier: widget.contact!.safeId,
       frequency: freq,
       notes: selection[notesLabel] ?? '',
       isContactable: isContactable,
@@ -209,7 +211,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
   }
 
   void _editContactPressed() {
-    FlutterContacts.openExternalEdit(widget.contact!.id);
+    FlutterContacts.native.showEditor(widget.contact!.safeId);
   }
 
   Future<void> _openHangoutHistory() async {
@@ -280,7 +282,7 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
         appBar: AppBar(
           leading:
               IconButton(icon: const Icon(Icons.close), onPressed: _closePage),
-          title: Text(widget.contact?.displayName ?? 'Schedule'),
+          title: Text(widget.contact?.safeDisplayName ?? 'Schedule'),
           actions: widget.contact != null
               ? [
                   IconButton(

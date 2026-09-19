@@ -74,13 +74,13 @@ TopDueFriendResult resolveTopDueFriend({
     }
   }
 
-  final contactMap = {for (final contact in contacts) contact.id: contact};
+  final contactMap = {for (final contact in contacts) contact.safeId: contact};
   final sortableContacts = contacts.map((contact) {
-    final friend = friendMap[contact.id];
-    final hangout = latestHangoutMap[contact.id];
+    final friend = friendMap[contact.safeId];
+    final hangout = latestHangoutMap[contact.safeId];
     return SortableContact(
-      id: contact.id,
-      displayName: contact.displayName,
+      id: contact.safeId,
+      displayName: contact.safeDisplayName,
       frequencyValue: friend?.frequency.value,
       lastHangoutDate: hangout?.when,
       isContactable: friend?.isContactable ?? false,
@@ -104,7 +104,7 @@ TopDueFriendResult resolveTopDueFriend({
   return TopDueFriendResult(
     friend: TopDueFriend(
       contactIdentifier: topContactIdentifier,
-      displayName: topContact.displayName,
+      displayName: topContact.safeDisplayName,
       urgency: dueFriendUrgencyLabel(
         latestHangoutWhen: latestHangout?.when,
         frequency: friend?.frequency,
