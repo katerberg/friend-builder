@@ -47,13 +47,19 @@ Urgency copy must match Friends [`ContactTile`](../lib/pages/friends/components/
 - `daysLeft > 0` → `"N days to go"`
 - else → `"N days late"`
 
-### MethodChannel contract (future)
+### MethodChannel contract (shared with Siri)
 
 **`getTopPerson` →** `{ found: false, reason? }` or `{ found: true, contactIdentifier, displayName, urgency, photoBase64?, phones: [{label, number}], hasPhone }`
 
-**`logHangout` ←** `{ contactIdentifier }` → `{ ok: true }` / error
+**`logHangout` ←** `{ pendingId, contactIdentifier, displayName? }` → `{ ok: true }` / error
 
-Native never writes SQLite; Dart remains source of truth. Phone dial strings: digits + optional leading `+` for `tel:` URLs (helpers can live next to ranking when dial work starts).
+Channel name: `com.example.friend_builder/hangouts`.
+
+Siri `LogHangoutIntent` always enqueues a pending hangout in the App Group (`pending_hangouts_json`), then invokes `logHangout` when the Flutter engine is warm. On success, the pending id is removed. Dart also drains any leftover queue on startup and resume. Native never writes SQLite; Dart remains source of truth.
+
+Hangout defaults: `when: now`, one contact, empty notes, not all-day.
+
+Phone dial strings: digits + optional leading `+` for `tel:` URLs (helpers can live next to ranking when dial work starts).
 
 ---
 
@@ -87,6 +93,7 @@ Already in tree for CarPlay to pick up later:
 - Ranking: `resolveTopDueFriend` (same sort as Friends)
 - Urgency: `dueFriendUrgencyLabel`
 - Snapshot keys / App Group pattern (`group.com.example.friendBuilder`) — CarPlay may prefer MethodChannel live queries instead of App Group, but the ranking API is shared
+- Siri hangout logging: `LogHangoutIntent` + `HangoutIntentService` MethodChannel `logHangout` + pending queue drain
 
 ---
 

@@ -24,5 +24,13 @@ struct FriendBuilderAppShortcuts: AppShortcutsProvider {
         "Who is due in \(.applicationName)",
       ]
     )
+    AppShortcut(
+      intent: LogHangoutIntent(),
+      phrases: [
+        "I hung out with \(\.$friend) in \(.applicationName)",
+        "Log a hangout with \(\.$friend) in \(.applicationName)",
+        "Log a hangout in \(.applicationName)",
+      ]
+    )
   }
 }

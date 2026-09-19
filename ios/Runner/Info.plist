@@ -48,7 +48,7 @@
 	<key>NSContactsUsageDescription</key>
 	<string>Contacts are needed to know who you might be hanging out with</string>
 	<key>NSSiriUsageDescription</key>
-	<string>Siri can tell you which friend you are most overdue to see</string>
+	<string>Siri can tell you which friend you are most overdue to see and log hangouts with friends</string>
 	<key>PermissionGroupNotification</key>
 	<string>Notifications are needed to remind you about hanging out</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

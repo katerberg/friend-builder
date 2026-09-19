@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:friend_builder/contacts_permission.dart';
+import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/services/friend_catalog.dart';
 import 'package:friend_builder/services/top_due_friend.dart';
 import 'package:friend_builder/storage.dart';
 
-/// Publishes the top due friend snapshot to the App Group for WidgetKit + Siri.
+/// Publishes the top due friend snapshot and friend catalog to the App Group
+/// for WidgetKit + Siri.
 class DueFriendSnapshotService {
   static const String appGroupId = 'group.com.example.friendBuilder';
   static const String iosWidgetName = 'DueFriendWidget';
@@ -14,6 +17,8 @@ class DueFriendSnapshotService {
   static const String keyContactIdentifier = 'due_friend_contact_identifier';
   static const String keyDisplayName = 'due_friend_display_name';
   static const String keyUrgency = 'due_friend_urgency';
+  static const String keyFriendCatalogJson = 'friend_catalog_json';
+  static const String keyPendingHangoutsJson = 'pending_hangouts_json';
 
   static final Storage _storage = Storage();
   static bool _appGroupConfigured = false;
@@ -46,6 +51,10 @@ class DueFriendSnapshotService {
         hangouts: hangouts,
       );
       await publishSnapshot(result.toSnapshotPayload());
+      await publishFriendCatalog(
+        friends: friends,
+        contacts: contactPermission.contacts,
+      );
     } catch (error) {
       if (kDebugMode) {
         print('DueFriendSnapshotService refresh failed: $error');
@@ -81,6 +90,27 @@ class DueFriendSnapshotService {
     } catch (error) {
       if (kDebugMode) {
         print('DueFriendSnapshotService publishSnapshot failed: $error');
+      }
+    }
+  }
+
+  static Future<void> publishFriendCatalog({
+    required List<Friend> friends,
+    required Iterable<Contact> contacts,
+  }) async {
+    await configureAppGroup();
+    try {
+      final entries = buildFriendCatalogEntries(
+        friends: friends,
+        contacts: contacts,
+      );
+      await HomeWidget.saveWidgetData<String>(
+        keyFriendCatalogJson,
+        encodeFriendCatalogEntries(entries),
+      );
+    } catch (error) {
+      if (kDebugMode) {
+        print('DueFriendSnapshotService publishFriendCatalog failed: $error');
       }
     }
   }
