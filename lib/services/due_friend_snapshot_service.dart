@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/services/friend_catalog.dart';
 import 'package:friend_builder/services/top_due_friend.dart';
 import 'package:friend_builder/storage.dart';
@@ -56,6 +57,7 @@ class DueFriendSnapshotService {
     await publishFriendCatalog(
       friends: friends,
       contacts: contactPermission.contacts,
+      hangouts: hangouts,
     );
     return payload;
   }
@@ -109,12 +111,14 @@ class DueFriendSnapshotService {
   static Future<void> publishFriendCatalog({
     required List<Friend> friends,
     required Iterable<Contact> contacts,
+    List<Hangout> hangouts = const [],
   }) async {
     await configureAppGroup();
     try {
       final entries = buildFriendCatalogEntries(
         friends: friends,
         contacts: contacts,
+        hangouts: hangouts,
       );
       await HomeWidget.saveWidgetData<String>(
         keyFriendCatalogJson,

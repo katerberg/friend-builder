@@ -1,7 +1,9 @@
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/frequency.dart';
+import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/services/friend_catalog.dart';
 
 Contact _contact({
@@ -26,20 +28,43 @@ Friend _friend({
   );
 }
 
+Hangout _hangout({
+  required String contactIdentifier,
+  required String displayName,
+  required DateTime when,
+}) {
+  return Hangout(
+    contacts: [
+      EncodableContact(
+        displayName: displayName,
+        middleName: '',
+        givenName: '',
+        identifier: contactIdentifier,
+        familyName: '',
+      ),
+    ],
+    notes: '',
+    when: when,
+  );
+}
+
 void main() {
-  test('buildFriendCatalogEntries includes only contactable friends with names',
-      () {
+  test('buildFriendCatalogEntries prefers live contact names', () {
     final entries = buildFriendCatalogEntries(
       friends: [
         _friend(contactIdentifier: 'a', isContactable: true),
         _friend(contactIdentifier: 'b', isContactable: false),
-        _friend(contactIdentifier: 'missing', isContactable: true),
-        _friend(contactIdentifier: 'blank', isContactable: true),
       ],
       contacts: [
         _contact(id: 'a', displayName: 'Alex'),
         _contact(id: 'b', displayName: 'Blake'),
-        _contact(id: 'blank', displayName: '   '),
+      ],
+      hangouts: [
+        _hangout(
+          contactIdentifier: 'a',
+          displayName: 'Old Alex',
+          when: DateTime(2024, 1, 1),
+        ),
       ],
     );
 
@@ -47,6 +72,48 @@ void main() {
       {
         'contactIdentifier': 'a',
         'displayName': 'Alex',
+      },
+    ]);
+  });
+
+  test(
+      'buildFriendCatalogEntries uses hangout names when contacts are unavailable',
+      () {
+    final now = DateTime.now();
+    final entries = buildFriendCatalogEntries(
+      friends: [
+        _friend(contactIdentifier: 'a', isContactable: true),
+        _friend(contactIdentifier: 'b', isContactable: true),
+        _friend(contactIdentifier: 'c', isContactable: true),
+      ],
+      contacts: const [],
+      hangouts: [
+        _hangout(
+          contactIdentifier: 'a',
+          displayName: 'Alex From Hangout',
+          when: now.subtract(const Duration(days: 2)),
+        ),
+        _hangout(
+          contactIdentifier: 'a',
+          displayName: 'Alex Latest',
+          when: now,
+        ),
+        _hangout(
+          contactIdentifier: 'b',
+          displayName: 'Blake',
+          when: now,
+        ),
+      ],
+    );
+
+    expect(entries, [
+      {
+        'contactIdentifier': 'a',
+        'displayName': 'Alex Latest',
+      },
+      {
+        'contactIdentifier': 'b',
+        'displayName': 'Blake',
       },
     ]);
   });

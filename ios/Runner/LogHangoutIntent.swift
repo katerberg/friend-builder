@@ -20,6 +20,14 @@ struct LogHangoutIntent: AppIntent {
   func perform() async throws -> some IntentResult & ProvidesDialog {
     let catalog = FriendCatalogStore.load()
     if catalog.isEmpty {
+      let snapshot = DueFriendSnapshotStore.load()
+      if snapshot.reason == "contacts_permission" {
+        return .result(
+          dialog: IntentDialog(
+            stringLiteral: "Contacts access is required in Friend Builder before I can log hangouts with Siri."
+          )
+        )
+      }
       return .result(
         dialog: IntentDialog(
           stringLiteral: "No friends are available yet. Add friends to contact in Friend Builder first."
