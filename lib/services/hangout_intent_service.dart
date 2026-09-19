@@ -26,13 +26,22 @@ class HangoutIntentService {
   }
 
   static Future<dynamic> _handleMethodCall(MethodCall call) async {
-    if (call.method != 'logHangout') {
-      throw PlatformException(
-        code: 'unsupported_method',
-        message: 'Unsupported method ${call.method}',
-      );
+    switch (call.method) {
+      case 'logHangout':
+        return _handleLogHangout(call.arguments);
+      case 'getTopPerson':
+        return getTopPerson();
+      default:
+        throw PlatformException(
+          code: 'unsupported_method',
+          message: 'Unsupported method ${call.method}',
+        );
     }
-    final arguments = call.arguments;
+  }
+
+  static Future<Map<String, dynamic>> _handleLogHangout(
+    dynamic arguments,
+  ) async {
     if (arguments is! Map) {
       throw PlatformException(
         code: 'invalid_arguments',
@@ -57,6 +66,11 @@ class HangoutIntentService {
     return {'ok': true};
   }
 
+  /// Live ranking for warm Flutter (Siri / CarPlay). Also refreshes App Group.
+  static Future<Map<String, dynamic>> getTopPerson() async {
+    return DueFriendSnapshotService.refreshAndReturnPayload();
+  }
+
   static Future<void> logHangout({
     required String contactIdentifier,
     String displayName = '',
@@ -76,6 +90,13 @@ class HangoutIntentService {
     );
     if (pendingId.isNotEmpty) {
       await removePendingHangout(pendingId);
+    }
+    // Close the ranking/Siri snapshot loop after a durable hangout commit.
+    // createHangout already refreshes; this second pass guarantees the App
+    // Group reflects the hangout even if the first publish raced or failed.
+    final refreshed = await DueFriendSnapshotService.refresh();
+    if (!refreshed && kDebugMode) {
+      print('HangoutIntentService snapshot refresh failed after logHangout');
     }
   }
 
@@ -115,12 +136,14 @@ class HangoutIntentService {
       }
 
       final remainingItems = <PendingHangoutItem>[];
+      var committedAny = false;
       for (final item in pendingItems) {
         try {
           await logHangout(
             contactIdentifier: item.contactIdentifier,
             displayName: item.displayName,
           );
+          committedAny = true;
         } catch (error) {
           remainingItems.add(item);
           if (kDebugMode) {
@@ -133,6 +156,10 @@ class HangoutIntentService {
         DueFriendSnapshotService.keyPendingHangoutsJson,
         encodePendingHangouts(remainingItems),
       );
+
+      if (committedAny) {
+        await DueFriendSnapshotService.refresh();
+      }
     } catch (error) {
       if (kDebugMode) {
         print('HangoutIntentService drainPendingHangouts failed: $error');

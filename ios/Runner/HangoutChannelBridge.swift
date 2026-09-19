@@ -1,7 +1,7 @@
 import Flutter
 import Foundation
 
-/// Invokes Flutter `logHangout` when the engine is warm; otherwise callers rely on the pending queue.
+/// Invokes Flutter hangout MethodChannel methods when the engine is warm.
 enum HangoutChannelBridge {
   static let channelName = "com.example.friend_builder/hangouts"
 
@@ -33,7 +33,7 @@ enum HangoutChannelBridge {
             "displayName": displayName,
           ]
         ) { result in
-          if (result is FlutterError) {
+          if result is FlutterError {
             continuation.resume(returning: false)
             return
           }
@@ -42,6 +42,29 @@ enum HangoutChannelBridge {
             return
           }
           continuation.resume(returning: false)
+        }
+      }
+    }
+  }
+
+  /// Live ranking when Flutter is awake; nil when the engine is unavailable.
+  static func getTopPerson() async -> [String: Any]? {
+    guard let methodChannel else {
+      return nil
+    }
+
+    return await withCheckedContinuation { continuation in
+      DispatchQueue.main.async {
+        methodChannel.invokeMethod("getTopPerson", arguments: nil) { result in
+          if result is FlutterError {
+            continuation.resume(returning: nil)
+            return
+          }
+          if let map = result as? [String: Any] {
+            continuation.resume(returning: map)
+            return
+          }
+          continuation.resume(returning: nil)
         }
       }
     }

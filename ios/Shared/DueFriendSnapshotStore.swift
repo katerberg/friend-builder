@@ -48,6 +48,16 @@ enum DueFriendSnapshotStore {
       }
       return "No one is due right now. Add friends to contact in Friend Builder."
     }
+
+    static func fromPayload(_ payload: [String: Any]) -> Snapshot {
+      Snapshot(
+        found: payload["found"] as? Bool ?? false,
+        reason: payload["reason"] as? String ?? "",
+        contactIdentifier: payload["contactIdentifier"] as? String ?? "",
+        displayName: payload["displayName"] as? String ?? "",
+        urgency: payload["urgency"] as? String ?? ""
+      )
+    }
   }
 
   static func load() -> Snapshot {

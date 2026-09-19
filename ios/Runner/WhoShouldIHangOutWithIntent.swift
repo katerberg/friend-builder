@@ -8,6 +8,11 @@ struct WhoShouldIHangOutWithIntent: AppIntent {
   )
 
   func perform() async throws -> some IntentResult & ProvidesDialog {
+    if let livePayload = await HangoutChannelBridge.getTopPerson() {
+      let snapshot = DueFriendSnapshotStore.Snapshot.fromPayload(livePayload)
+      return .result(dialog: IntentDialog(stringLiteral: snapshot.spokenSummary))
+    }
+
     let snapshot = DueFriendSnapshotStore.load()
     return .result(dialog: IntentDialog(stringLiteral: snapshot.spokenSummary))
   }

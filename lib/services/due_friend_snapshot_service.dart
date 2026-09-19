@@ -37,28 +37,39 @@ class DueFriendSnapshotService {
     }
   }
 
-  static Future<void> refresh() async {
+  /// Recomputes ranking, publishes App Group snapshot + friend catalog.
+  /// Returns the payload (also used by live `getTopPerson`).
+  static Future<Map<String, dynamic>> refreshAndReturnPayload() async {
     await configureAppGroup();
+    final contactPermission =
+        await ContactPermissionService().getContacts();
+    final friends = await Storage.getFriends() ?? [];
+    final hangouts = await _storage.getHangouts() ?? [];
+    final result = resolveTopDueFriend(
+      missingContactsPermission: contactPermission.missingPermission,
+      contacts: contactPermission.contacts,
+      friends: friends,
+      hangouts: hangouts,
+    );
+    final payload = result.toSnapshotPayload();
+    await publishSnapshot(payload);
+    await publishFriendCatalog(
+      friends: friends,
+      contacts: contactPermission.contacts,
+    );
+    return payload;
+  }
+
+  /// Returns true when ranking was recomputed and published successfully.
+  static Future<bool> refresh() async {
     try {
-      final contactPermission =
-          await ContactPermissionService().getContacts();
-      final friends = await Storage.getFriends() ?? [];
-      final hangouts = await _storage.getHangouts() ?? [];
-      final result = resolveTopDueFriend(
-        missingContactsPermission: contactPermission.missingPermission,
-        contacts: contactPermission.contacts,
-        friends: friends,
-        hangouts: hangouts,
-      );
-      await publishSnapshot(result.toSnapshotPayload());
-      await publishFriendCatalog(
-        friends: friends,
-        contacts: contactPermission.contacts,
-      );
+      await refreshAndReturnPayload();
+      return true;
     } catch (error) {
       if (kDebugMode) {
         print('DueFriendSnapshotService refresh failed: $error');
       }
+      return false;
     }
   }
 
@@ -91,6 +102,7 @@ class DueFriendSnapshotService {
       if (kDebugMode) {
         print('DueFriendSnapshotService publishSnapshot failed: $error');
       }
+      rethrow;
     }
   }
 
@@ -112,6 +124,7 @@ class DueFriendSnapshotService {
       if (kDebugMode) {
         print('DueFriendSnapshotService publishFriendCatalog failed: $error');
       }
+      rethrow;
     }
   }
 }

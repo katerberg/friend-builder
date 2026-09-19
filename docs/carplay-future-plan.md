@@ -49,9 +49,13 @@ Urgency copy must match Friends [`ContactTile`](../lib/pages/friends/components/
 
 ### MethodChannel contract (shared with Siri)
 
-**`getTopPerson` →** `{ found: false, reason? }` or `{ found: true, contactIdentifier, displayName, urgency, photoBase64?, phones: [{label, number}], hasPhone }`
+**`getTopPerson` →** `{ found: false, reason? }` or `{ found: true, contactIdentifier, displayName, urgency, … }`
+
+Shipped for warm-path Siri (`WhoShouldIHangOutWithIntent`): recomputes ranking in Dart, publishes the App Group snapshot, and returns the live payload. Cold path / WidgetKit still read the last App Group snapshot.
 
 **`logHangout` ←** `{ pendingId, contactIdentifier, displayName? }` → `{ ok: true }` / error
+
+After a durable hangout commit (channel or pending-queue drain), Dart refreshes the App Group snapshot in the same path so ranking/urgency are not left stale.
 
 Channel name: `com.example.friend_builder/hangouts`.
 
@@ -92,8 +96,9 @@ Already in tree for CarPlay to pick up later:
 
 - Ranking: `resolveTopDueFriend` (same sort as Friends)
 - Urgency: `dueFriendUrgencyLabel`
-- Snapshot keys / App Group pattern (`group.com.example.friendBuilder`) — CarPlay may prefer MethodChannel live queries instead of App Group, but the ranking API is shared
-- Siri hangout logging: `LogHangoutIntent` + `HangoutIntentService` MethodChannel `logHangout` + pending queue drain
+- Snapshot keys / App Group pattern (`group.com.example.friendBuilder`) — WidgetKit + cold Siri fallback; warm Siri uses live `getTopPerson`
+- Siri hangout logging: `LogHangoutIntent` + `HangoutIntentService` MethodChannel `logHangout` + pending queue drain + post-commit snapshot refresh
+- Warm-path `getTopPerson` MethodChannel (extend later with phones / photoBase64 for CarPlay)
 
 ---
 
