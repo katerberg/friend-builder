@@ -2,7 +2,64 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:friend_builder/services/pending_hangout.dart';
 
 void main() {
-  test('parsePendingHangouts reads valid items and skips invalid ones', () {
+  test('pendingHangoutStorageKey is unique per pendingId', () {
+    expect(pendingHangoutStorageKey('p1'), 'pending_hangout.p1');
+    expect(pendingHangoutStorageKey('p2'), 'pending_hangout.p2');
+    expect(
+      pendingHangoutStorageKey('p1'),
+      isNot(pendingHangoutStorageKey('p2')),
+    );
+  });
+
+  test('parsePendingHangoutItem reads a single object', () {
+    final item = parsePendingHangoutItem({
+      'pendingId': 'p1',
+      'contactIdentifier': 'c1',
+      'displayName': 'Alex',
+      'enqueuedAt': '2026-01-01T00:00:00Z',
+    });
+    expect(item?.pendingId, 'p1');
+    expect(item?.displayName, 'Alex');
+  });
+
+  test('parsePendingHangoutItem rejects invalid payloads', () {
+    expect(parsePendingHangoutItem(null), isNull);
+    expect(parsePendingHangoutItem(''), isNull);
+    expect(parsePendingHangoutItem('not-json'), isNull);
+    expect(parsePendingHangoutItem({'pendingId': ''}), isNull);
+    expect(
+      parsePendingHangoutItem({
+        'pendingId': 'p1',
+        'contactIdentifier': '',
+      }),
+      isNull,
+    );
+  });
+
+  test('parsePendingHangoutList reads channel payloads and skips invalid', () {
+    final items = parsePendingHangoutList([
+      {
+        'pendingId': 'p1',
+        'contactIdentifier': 'c1',
+        'displayName': 'Alex',
+        'enqueuedAt': 't1',
+      },
+      {
+        'pendingId': '',
+        'contactIdentifier': 'c2',
+        'displayName': 'Bad',
+      },
+      {
+        'pendingId': 'p3',
+        'contactIdentifier': 'c3',
+        'displayName': 'Casey',
+        'enqueuedAt': 't3',
+      },
+    ]);
+    expect(items.map((item) => item.pendingId), ['p1', 'p3']);
+  });
+
+  test('parsePendingHangouts still reads legacy JSON arrays', () {
     const json = '''
 [
   {
@@ -15,73 +72,13 @@ void main() {
     "pendingId": "",
     "contactIdentifier": "c2",
     "displayName": "Bad"
-  },
-  {
-    "pendingId": "p3",
-    "contactIdentifier": "c3",
-    "displayName": "Casey",
-    "enqueuedAt": "2026-01-02T00:00:00Z"
   }
 ]
 ''';
-
     final items = parsePendingHangouts(json);
-    expect(items.length, 2);
-    expect(items.first.pendingId, 'p1');
-    expect(items.first.displayName, 'Alex');
-    expect(items.last.pendingId, 'p3');
-  });
-
-  test('parsePendingHangouts returns empty for null or malformed JSON', () {
+    expect(items.single.pendingId, 'p1');
     expect(parsePendingHangouts(null), isEmpty);
-    expect(parsePendingHangouts(''), isEmpty);
     expect(parsePendingHangouts('not-json'), isEmpty);
     expect(parsePendingHangouts('{}'), isEmpty);
-  });
-
-  test('removePendingHangoutById is idempotent', () {
-    final items = [
-      const PendingHangoutItem(
-        pendingId: 'p1',
-        contactIdentifier: 'c1',
-        displayName: 'Alex',
-        enqueuedAt: 't1',
-      ),
-      const PendingHangoutItem(
-        pendingId: 'p2',
-        contactIdentifier: 'c2',
-        displayName: 'Blake',
-        enqueuedAt: 't2',
-      ),
-    ];
-
-    final once = removePendingHangoutById(items: items, pendingId: 'p1');
-    expect(once.map((item) => item.pendingId), ['p2']);
-
-    final twice = removePendingHangoutById(items: once, pendingId: 'p1');
-    expect(twice.map((item) => item.pendingId), ['p2']);
-
-    final encoded = encodePendingHangouts(twice);
-    expect(parsePendingHangouts(encoded).single.pendingId, 'p2');
-  });
-
-  test('removePendingHangoutById preserves unrelated concurrent items', () {
-    final items = [
-      const PendingHangoutItem(
-        pendingId: 'p1',
-        contactIdentifier: 'c1',
-        displayName: 'Alex',
-        enqueuedAt: 't1',
-      ),
-      const PendingHangoutItem(
-        pendingId: 'p2',
-        contactIdentifier: 'c2',
-        displayName: 'Blake',
-        enqueuedAt: 't2',
-      ),
-    ];
-
-    final afterP1 = removePendingHangoutById(items: items, pendingId: 'p1');
-    expect(afterP1.map((item) => item.pendingId), ['p2']);
   });
 }

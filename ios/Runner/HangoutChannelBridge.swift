@@ -8,6 +8,9 @@ enum HangoutChannelBridge {
   private static var methodChannel: FlutterMethodChannel?
 
   static func register(with messenger: FlutterBinaryMessenger) {
+    if methodChannel != nil {
+      return
+    }
     methodChannel = FlutterMethodChannel(
       name: channelName,
       binaryMessenger: messenger

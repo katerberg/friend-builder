@@ -16,8 +16,10 @@ class HangoutIntentService {
     'com.example.friend_builder/hangouts',
   );
 
-  /// Matches iOS `PendingHangoutStore.keyPendingJson`.
-  static const String keyPendingHangoutsJson = 'pending_hangouts_json';
+  /// Native list/delete for per-id App Group pending keys (see PendingHangoutChannel).
+  static const MethodChannel pendingHangoutChannel = MethodChannel(
+    'com.example.friend_builder/pending_hangouts',
+  );
 
   static final Storage _storage = Storage();
   static bool _methodChannelRegistered = false;
@@ -107,7 +109,7 @@ class HangoutIntentService {
     }
   }
 
-  /// Claim → create → remove-one from queue (reload+filter, never batch rewrite).
+  /// Claim → create → delete only that pendingId's App Group key.
   /// Returns true when a new hangout was written.
   static Future<bool> _commitPendingHangout({
     required String pendingId,
@@ -178,10 +180,7 @@ class HangoutIntentService {
   static Future<void> drainPendingHangouts() async {
     await DueFriendSnapshotService.configureAppGroup();
     try {
-      final pendingJson = await HomeWidget.getWidgetData<String>(
-        keyPendingHangoutsJson,
-      );
-      final pendingItems = parsePendingHangouts(pendingJson);
+      final pendingItems = await listPendingHangouts();
       if (pendingItems.isEmpty) {
         return;
       }
@@ -214,24 +213,54 @@ class HangoutIntentService {
     }
   }
 
-  /// Reloads the current queue and removes only [pendingId] (merge-safe).
-  static Future<void> removePendingHangout(String pendingId) async {
-    await DueFriendSnapshotService.configureAppGroup();
+  /// Lists pending hangouts via native per-id UserDefaults keys (migrates legacy blob).
+  static Future<List<PendingHangoutItem>> listPendingHangouts() async {
     try {
-      final pendingJson = await HomeWidget.getWidgetData<String>(
-        keyPendingHangoutsJson,
+      final result = await pendingHangoutChannel.invokeMethod<dynamic>(
+        'listPendingHangouts',
       );
-      final remaining = removePendingHangoutById(
-        items: parsePendingHangouts(pendingJson),
-        pendingId: pendingId,
-      );
-      await HomeWidget.saveWidgetData<String>(
-        keyPendingHangoutsJson,
-        encodePendingHangouts(remaining),
+      return parsePendingHangoutList(result);
+    } catch (error) {
+      if (kDebugMode) {
+        print('HangoutIntentService listPendingHangouts failed: $error');
+      }
+      return const [];
+    }
+  }
+
+  /// Deletes only [pendingId]'s App Group key (no shared-array rewrite).
+  static Future<void> removePendingHangout(String pendingId) async {
+    if (pendingId.isEmpty) {
+      return;
+    }
+    try {
+      await pendingHangoutChannel.invokeMethod<dynamic>(
+        'removePendingHangout',
+        {'pendingId': pendingId},
       );
     } catch (error) {
       if (kDebugMode) {
         print('HangoutIntentService removePendingHangout failed: $error');
+      }
+      await _removePendingHangoutViaHomeWidget(pendingId);
+    }
+  }
+
+  /// Fallback when the native handler is unavailable (still per-id, not a blob rewrite).
+  static Future<void> _removePendingHangoutViaHomeWidget(
+    String pendingId,
+  ) async {
+    await DueFriendSnapshotService.configureAppGroup();
+    try {
+      await HomeWidget.saveWidgetData<String>(
+        pendingHangoutStorageKey(pendingId),
+        null,
+      );
+    } catch (error) {
+      if (kDebugMode) {
+        print(
+          'HangoutIntentService HomeWidget pending remove failed: $error',
+        );
       }
     }
   }
