@@ -8,6 +8,11 @@ struct WhoShouldIHangOutWithIntent: AppIntent {
   )
 
   func perform() async throws -> some IntentResult & ProvidesDialog {
+    if let livePayload = await HangoutChannelBridge.getTopPerson() {
+      let snapshot = DueFriendSnapshotStore.Snapshot.fromPayload(livePayload)
+      return .result(dialog: IntentDialog(stringLiteral: snapshot.spokenSummary))
+    }
+
     let snapshot = DueFriendSnapshotStore.load()
     return .result(dialog: IntentDialog(stringLiteral: snapshot.spokenSummary))
   }
@@ -22,6 +27,14 @@ struct FriendBuilderAppShortcuts: AppShortcutsProvider {
         "Who should I hang out with in \(.applicationName)",
         "Who am I overdue to see in \(.applicationName)",
         "Who is due in \(.applicationName)",
+      ]
+    )
+    AppShortcut(
+      intent: LogHangoutIntent(),
+      phrases: [
+        "I hung out with \(\.$friend) in \(.applicationName)",
+        "Log a hangout with \(\.$friend) in \(.applicationName)",
+        "Log a hangout in \(.applicationName)",
       ]
     )
   }

@@ -106,6 +106,17 @@ class DBProvider {
     );
   }
 
+  void _createProcessedPendingHangoutsTable(batch) {
+    batch.execute('''CREATE TABLE IF NOT EXISTS processed_pending_hangouts (
+    pendingId TEXT PRIMARY KEY,
+    processedAt TEXT NOT NULL
+)''');
+  }
+
+  void _updateV6ToV7(Batch batch) {
+    _createProcessedPendingHangoutsTable(batch);
+  }
+
   _initDB() async {
     return await openDatabase(
       join(await getDatabasesPath(), 'friend-builder.db'),
@@ -116,6 +127,7 @@ class DBProvider {
         _createHangoutsTable(batch);
         _createSyncedEventsTable(batch);
         _createSnoozeRemindersTable(batch);
+        _createProcessedPendingHangoutsTable(batch);
         await batch.commit();
       },
       onConfigure: _onConfigure,
@@ -136,10 +148,13 @@ class DBProvider {
         if (oldVersion < 6) {
           _updateV5ToV6(batch);
         }
+        if (oldVersion < 7) {
+          _updateV6ToV7(batch);
+        }
         await batch.commit();
       },
       onDowngrade: onDatabaseDowngradeDelete,
-      version: 6,
+      version: 7,
     );
   }
 
@@ -193,6 +208,36 @@ class DBProvider {
   Future<int> deleteHangout(Hangout hangout) async {
     final db = await database;
     return db.delete('hangouts', where: 'id = ?', whereArgs: [hangout.id]);
+  }
+
+  /// Claims a Siri pending hangout id for idempotent drain.
+  /// Returns true when this caller newly claimed it; false if already processed.
+  Future<bool> claimProcessedPendingHangout(String pendingId) async {
+    if (pendingId.isEmpty) {
+      return false;
+    }
+    final databaseHandle = await database;
+    final insertedRowId = await databaseHandle.insert(
+      'processed_pending_hangouts',
+      {
+        'pendingId': pendingId,
+        'processedAt': DateTime.now().toIso8601String(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+    return insertedRowId != 0;
+  }
+
+  Future<void> releaseProcessedPendingHangout(String pendingId) async {
+    if (pendingId.isEmpty) {
+      return;
+    }
+    final databaseHandle = await database;
+    await databaseHandle.delete(
+      'processed_pending_hangouts',
+      where: 'pendingId = ?',
+      whereArgs: [pendingId],
+    );
   }
 
   Future saveHangout(Hangout hangout) async {

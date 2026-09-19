@@ -5,7 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/hangout.dart';
-import 'package:friend_builder/services/due_friend_snapshot_service.dart';
+import 'package:friend_builder/services/native_projection_service.dart';
 import 'package:friend_builder/utils/local_date.dart';
 import 'package:friend_builder/utils/notification_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -196,7 +196,7 @@ class CalendarSync {
 
       if (createdAnyHangouts) {
         await scheduleNextNotification(flutterLocalNotificationsPlugin);
-        await DueFriendSnapshotService.refresh();
+        await NativeProjectionService.refreshNow();
         if (kDebugMode) {
           print('Rescheduled notifications after calendar sync');
         }

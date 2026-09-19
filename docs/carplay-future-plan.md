@@ -47,13 +47,23 @@ Urgency copy must match Friends [`ContactTile`](../lib/pages/friends/components/
 - `daysLeft > 0` → `"N days to go"`
 - else → `"N days late"`
 
-### MethodChannel contract (future)
+### MethodChannel contract (shared with Siri)
 
-**`getTopPerson` →** `{ found: false, reason? }` or `{ found: true, contactIdentifier, displayName, urgency, photoBase64?, phones: [{label, number}], hasPhone }`
+**`getTopPerson` →** `{ found: false, reason? }` or `{ found: true, contactIdentifier, displayName, urgency, … }`
 
-**`logHangout` ←** `{ contactIdentifier }` → `{ ok: true }` / error
+Shipped for warm-path Siri (`WhoShouldIHangOutWithIntent`): recomputes ranking in Dart, publishes the App Group snapshot, and returns the live payload. Cold path / WidgetKit still read the last App Group snapshot.
 
-Native never writes SQLite; Dart remains source of truth. Phone dial strings: digits + optional leading `+` for `tel:` URLs (helpers can live next to ranking when dial work starts).
+**`logHangout` ←** `{ pendingId, contactIdentifier, displayName? }` → `{ ok: true }` / error
+
+After a durable hangout commit (channel or pending-queue drain), Dart flushes [NativeProjectionService.refreshNow] so ranking/urgency are not left stale. UI/DB mutations notify [StorageChangeBus]; the projection service debounces and republishes snapshot + catalog without Storage importing widget/Siri code.
+
+Channel name: `com.example.friend_builder/hangouts`.
+
+Siri `LogHangoutIntent` is **queue-only**: it verifies an App Group enqueue (`pending_hangouts_json`) and never calls MethodChannel `logHangout`. Dart drain is the sole SQLite writer for Siri hangouts. Drain claims each `pendingId` in SQLite (`processed_pending_hangouts`), creates the hangout, then removes **only that id** by reloading the current queue (so concurrent enqueues are not wiped). `openAppWhenRun` opens the app so drain happens soon; durability is the verified queue write.
+
+Hangout defaults: `when: now`, one contact, empty notes, not all-day.
+
+Phone dial strings: digits + optional leading `+` for `tel:` URLs (helpers can live next to ranking when dial work starts).
 
 ---
 
@@ -86,7 +96,10 @@ Already in tree for CarPlay to pick up later:
 
 - Ranking: `resolveTopDueFriend` (same sort as Friends)
 - Urgency: `dueFriendUrgencyLabel`
-- Snapshot keys / App Group pattern (`group.com.example.friendBuilder`) — CarPlay may prefer MethodChannel live queries instead of App Group, but the ranking API is shared
+- Snapshot keys / App Group pattern (`group.com.example.friendBuilder`) — WidgetKit + cold Siri fallback; warm Siri uses live `getTopPerson`
+- Siri hangout logging: queue-only `LogHangoutIntent` + claim/idempotent `HangoutIntentService` drain (`processed_pending_hangouts`) + `NativeProjectionService` refresh
+- Warm-path `getTopPerson` MethodChannel (extend later with phones / photoBase64 for CarPlay); `logHangout` MethodChannel remains for CarPlay dial-success, not Siri
+- Domain → projection seam: `StorageChangeBus` + debounced `NativeProjectionService` (Storage no longer imports widget/Siri code)
 
 ---
 

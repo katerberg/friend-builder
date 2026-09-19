@@ -1,10 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:friend_builder/contacts_permission.dart';
+import 'package:friend_builder/data/friend.dart';
+import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/services/friend_catalog.dart';
 import 'package:friend_builder/services/top_due_friend.dart';
 import 'package:friend_builder/storage.dart';
 
-/// Publishes the top due friend snapshot to the App Group for WidgetKit + Siri.
+/// Publishes the top due-friend snapshot and friend catalog to the App Group.
+///
+/// Callers should go through [NativeProjectionService] rather than invoking
+/// this from Storage or UI mutation paths.
 class DueFriendSnapshotService {
   static const String appGroupId = 'group.com.example.friendBuilder';
   static const String iosWidgetName = 'DueFriendWidget';
@@ -14,6 +20,7 @@ class DueFriendSnapshotService {
   static const String keyContactIdentifier = 'due_friend_contact_identifier';
   static const String keyDisplayName = 'due_friend_display_name';
   static const String keyUrgency = 'due_friend_urgency';
+  static const String keyFriendCatalogJson = 'friend_catalog_json';
 
   static final Storage _storage = Storage();
   static bool _appGroupConfigured = false;
@@ -32,24 +39,39 @@ class DueFriendSnapshotService {
     }
   }
 
-  static Future<void> refresh() async {
+  /// Recomputes ranking and publishes snapshot + friend catalog.
+  static Future<Map<String, dynamic>> refreshAndReturnPayload() async {
     await configureAppGroup();
+    final contactPermission =
+        await ContactPermissionService().getContacts();
+    final friends = await Storage.getFriends() ?? [];
+    final hangouts = await _storage.getHangouts() ?? [];
+    final result = resolveTopDueFriend(
+      missingContactsPermission: contactPermission.missingPermission,
+      contacts: contactPermission.contacts,
+      friends: friends,
+      hangouts: hangouts,
+    );
+    final payload = result.toSnapshotPayload();
+    await publishSnapshot(payload);
+    await publishFriendCatalog(
+      friends: friends,
+      contacts: contactPermission.contacts,
+      hangouts: hangouts,
+    );
+    return payload;
+  }
+
+  /// Returns true when ranking was recomputed and published successfully.
+  static Future<bool> refresh() async {
     try {
-      final contactPermission =
-          await ContactPermissionService().getContacts();
-      final friends = await Storage.getFriends() ?? [];
-      final hangouts = await _storage.getHangouts() ?? [];
-      final result = resolveTopDueFriend(
-        missingContactsPermission: contactPermission.missingPermission,
-        contacts: contactPermission.contacts,
-        friends: friends,
-        hangouts: hangouts,
-      );
-      await publishSnapshot(result.toSnapshotPayload());
+      await refreshAndReturnPayload();
+      return true;
     } catch (error) {
       if (kDebugMode) {
         print('DueFriendSnapshotService refresh failed: $error');
       }
+      return false;
     }
   }
 
@@ -82,6 +104,31 @@ class DueFriendSnapshotService {
       if (kDebugMode) {
         print('DueFriendSnapshotService publishSnapshot failed: $error');
       }
+      rethrow;
+    }
+  }
+
+  static Future<void> publishFriendCatalog({
+    required List<Friend> friends,
+    required Iterable<Contact> contacts,
+    List<Hangout> hangouts = const [],
+  }) async {
+    await configureAppGroup();
+    try {
+      final entries = buildFriendCatalogEntries(
+        friends: friends,
+        contacts: contacts,
+        hangouts: hangouts,
+      );
+      await HomeWidget.saveWidgetData<String>(
+        keyFriendCatalogJson,
+        encodeFriendCatalogEntries(entries),
+      );
+    } catch (error) {
+      if (kDebugMode) {
+        print('DueFriendSnapshotService publishFriendCatalog failed: $error');
+      }
+      rethrow;
     }
   }
 }

@@ -11,6 +11,8 @@ import 'package:friend_builder/shared/settings_modal.dart';
 import 'package:friend_builder/theme_notifier.dart';
 import 'package:friend_builder/services/cloud_sync_service.dart';
 import 'package:friend_builder/services/due_friend_snapshot_service.dart';
+import 'package:friend_builder/services/hangout_intent_service.dart';
+import 'package:friend_builder/services/native_projection_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -121,6 +123,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await DueFriendSnapshotService.configureAppGroup();
+  NativeProjectionService.start();
+  HangoutIntentService.registerMethodChannel();
+  await HangoutIntentService.drainPendingHangouts();
 
   CloudSyncService().initialize().then((_) {
     if (CloudSyncService().isInitialized) {
@@ -156,7 +161,7 @@ Future<void> main() async {
   // await DebugData.populateFakeContactsIfNeeded();
   // await DebugData.populateFakeHangoutsIfNeeded();
 
-  DueFriendSnapshotService.refresh();
+  NativeProjectionService.refreshNow();
 
   AvatarSync.syncAvatarsIfNeeded();
 
@@ -178,21 +183,30 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   static const String _title = 'Friend Crafter';
   final ThemeNotifier _themeNotifier = ThemeNotifier();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _themeNotifier.addListener(_onThemeChanged);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _themeNotifier.removeListener(_onThemeChanged);
     _themeNotifier.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      HangoutIntentService.drainPendingHangouts();
+    }
   }
 
   void _onThemeChanged() {
