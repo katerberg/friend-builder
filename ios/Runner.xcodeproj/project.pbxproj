@@ -96,6 +96,7 @@
 		W1F3 /* DueFriendWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DueFriendWidget.entitlements; sourceTree = "<group>"; };
 		W1F4 /* DueFriendWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DueFriendWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		W1F5 /* DueFriendSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DueFriendSnapshotStore.swift; sourceTree = "<group>"; };
+		W1F6 /* DueFriendWidget.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = DueFriendWidget.xcconfig; sourceTree = "<group>"; };
 		W1F7 /* WhoShouldIHangOutWithIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhoShouldIHangOutWithIntent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -216,6 +217,7 @@
 				W1F1 /* DueFriendWidget.swift */,
 				W1F2 /* Info.plist */,
 				W1F3 /* DueFriendWidget.entitlements */,
+				W1F6 /* DueFriendWidget.xcconfig */,
 			);
 			path = DueFriendWidget;
 			sourceTree = "<group>";
@@ -838,10 +840,11 @@
 		};
 		W1C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = W1F6 /* DueFriendWidget.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = DueFriendWidget/DueFriendWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 7M8N832MA2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DueFriendWidget/Info.plist;
@@ -851,7 +854,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.friendBuilder.DueFriendWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -863,10 +866,11 @@
 		};
 		W1C2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = W1F6 /* DueFriendWidget.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = DueFriendWidget/DueFriendWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 7M8N832MA2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DueFriendWidget/Info.plist;
@@ -876,7 +880,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.friendBuilder.DueFriendWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -888,10 +892,11 @@
 		};
 		W1C3 /* Profile */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = W1F6 /* DueFriendWidget.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = DueFriendWidget/DueFriendWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 7M8N832MA2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = DueFriendWidget/Info.plist;
@@ -901,7 +906,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.friendBuilder.DueFriendWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
