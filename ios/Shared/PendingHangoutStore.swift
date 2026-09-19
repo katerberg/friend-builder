@@ -54,22 +54,29 @@ enum PendingHangoutStore {
     return array.compactMap(Item.fromDictionary)
   }
 
-  static func save(_ items: [Item]) {
+  /// Persists the queue and verifies the written value round-trips.
+  @discardableResult
+  static func save(_ items: [Item]) -> Bool {
     let dictionaries = items.map { $0.toDictionary() }
     guard
       let data = try? JSONSerialization.data(withJSONObject: dictionaries),
-      let json = String(data: data, encoding: .utf8)
+      let json = String(data: data, encoding: .utf8),
+      let defaults
     else {
-      return
+      return false
     }
-    defaults?.set(json, forKey: keyPendingJson)
+    defaults.set(json, forKey: keyPendingJson)
+    defaults.synchronize()
+    return load() == items
   }
 
+  /// Appends a pending hangout and confirms it is present after write.
+  @discardableResult
   static func enqueue(
     pendingId: String,
     contactIdentifier: String,
     displayName: String
-  ) {
+  ) -> Bool {
     var items = load()
     items.append(
       Item(
@@ -79,11 +86,15 @@ enum PendingHangoutStore {
         enqueuedAt: ISO8601DateFormatter().string(from: Date())
       )
     )
-    save(items)
+    guard save(items) else {
+      return false
+    }
+    return load().contains { $0.pendingId == pendingId }
   }
 
-  static func remove(pendingId: String) {
+  @discardableResult
+  static func remove(pendingId: String) -> Bool {
     let remaining = load().filter { $0.pendingId != pendingId }
-    save(remaining)
+    return save(remaining)
   }
 }

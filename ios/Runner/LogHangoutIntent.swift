@@ -7,6 +7,9 @@ struct LogHangoutIntent: AppIntent {
     "Logs a hangout with a friend in Friend Builder."
   )
 
+  /// Opens the app so Dart can drain a pending hangout when the engine was cold.
+  static var openAppWhenRun: Bool = true
+
   @Parameter(title: "Friend")
   var friend: FriendEntity
 
@@ -27,7 +30,7 @@ struct LogHangoutIntent: AppIntent {
     let displayName = friend.displayName.isEmpty ? "a friend" : friend.displayName
     let pendingId = UUID().uuidString
 
-    PendingHangoutStore.enqueue(
+    let enqueued = PendingHangoutStore.enqueue(
       pendingId: pendingId,
       contactIdentifier: friend.id,
       displayName: friend.displayName
@@ -40,10 +43,23 @@ struct LogHangoutIntent: AppIntent {
     )
     if savedImmediately {
       PendingHangoutStore.remove(pendingId: pendingId)
+      return .result(
+        dialog: IntentDialog(stringLiteral: "Logged a hangout with \(displayName).")
+      )
+    }
+
+    if enqueued {
+      return .result(
+        dialog: IntentDialog(
+          stringLiteral: "I'll save this hangout with \(displayName) when Friend Builder opens."
+        )
+      )
     }
 
     return .result(
-      dialog: IntentDialog(stringLiteral: "Logged a hangout with \(displayName).")
+      dialog: IntentDialog(
+        stringLiteral: "I couldn't log that hangout. Please open Friend Builder and try again."
+      )
     )
   }
 }
