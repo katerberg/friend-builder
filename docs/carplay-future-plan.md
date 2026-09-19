@@ -92,4 +92,4 @@ Already in tree for CarPlay to pick up later:
 
 ## App Group note (current PoC)
 
-WidgetKit + App Intent use App Group `group.com.example.friendBuilder`. That requires a paid Apple Developer account and enabling the group on Runner + `DueFriendWidgetExtension` in the developer portal / Xcode before device builds work.
+WidgetKit + App Intent use App Group `group.com.example.friendBuilder`. That requires a paid Apple Developer account and enabling the group on Runner + `DueFriendWidgetExtension` in the developer portal / Xcode before device or Xcode Cloud exports work. See **Deploying to iOS** in the root `README.md` for the full checklist (App IDs, App Group, Xcode Cloud Xcode version pin).
