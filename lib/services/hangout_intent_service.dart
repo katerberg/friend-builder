@@ -95,8 +95,12 @@ class HangoutIntentService {
     // createHangout already refreshes; this second pass guarantees the App
     // Group reflects the hangout even if the first publish raced or failed.
     final refreshed = await DueFriendSnapshotService.refresh();
-    if (!refreshed && kDebugMode) {
-      print('HangoutIntentService snapshot refresh failed after logHangout');
+    if (!refreshed) {
+      if (kDebugMode) {
+        print(
+          'HangoutIntentService snapshot refresh failed after logHangout',
+        );
+      }
     }
   }
 
