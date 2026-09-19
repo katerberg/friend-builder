@@ -25,6 +25,7 @@
 		W1BA /* FriendEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1FA /* FriendEntity.swift */; };
 		W1BB /* LogHangoutIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1FB /* LogHangoutIntent.swift */; };
 		W1BC /* HangoutChannelBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1FC /* HangoutChannelBridge.swift */; };
+		W1BD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1FD /* SceneDelegate.swift */; };
 		W1EB1 /* DueFriendWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = W1F4 /* DueFriendWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -108,6 +109,7 @@
 		W1FA /* FriendEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendEntity.swift; sourceTree = "<group>"; };
 		W1FB /* LogHangoutIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogHangoutIntent.swift; sourceTree = "<group>"; };
 		W1FC /* HangoutChannelBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HangoutChannelBridge.swift; sourceTree = "<group>"; };
+		W1FD /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +204,7 @@
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				W1FD /* SceneDelegate.swift */,
 				W1F7 /* WhoShouldIHangOutWithIntent.swift */,
 				W1FA /* FriendEntity.swift */,
 				W1FB /* LogHangoutIntent.swift */,
@@ -488,6 +491,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				W1BD /* SceneDelegate.swift in Sources */,
 				W1B7 /* WhoShouldIHangOutWithIntent.swift in Sources */,
 				W1BA /* FriendEntity.swift in Sources */,
 				W1BB /* LogHangoutIntent.swift in Sources */,
