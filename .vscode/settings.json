@@ -4,6 +4,7 @@
         "autocorrect",
         "autofocus",
         "AUTOINCREMENT",
+        "bigram",
         "bigrams",
         "buildscript",
         "Firestore",
