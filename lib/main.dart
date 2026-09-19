@@ -126,6 +126,10 @@ Future<void> main() async {
   NativeProjectionService.start();
   HangoutIntentService.registerMethodChannel();
   await HangoutIntentService.drainPendingHangouts();
+  // SceneDelegate may finish registering the pending-queue channel after main starts.
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    HangoutIntentService.drainPendingHangouts();
+  });
 
   CloudSyncService().initialize().then((_) {
     if (CloudSyncService().isInitialized) {

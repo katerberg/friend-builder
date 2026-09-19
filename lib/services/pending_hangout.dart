@@ -35,39 +35,51 @@ class PendingHangoutItem {
       pendingId.isNotEmpty && contactIdentifier.isNotEmpty;
 }
 
+/// Matches iOS `PendingHangoutStore.keyPrefix` + pendingId.
+String pendingHangoutStorageKey(String pendingId) {
+  return 'pending_hangout.$pendingId';
+}
+
+PendingHangoutItem? parsePendingHangoutItem(Object? raw) {
+  if (raw is Map) {
+    final item = PendingHangoutItem.fromJson(Map<String, dynamic>.from(raw));
+    return item.isValid ? item : null;
+  }
+  if (raw is! String || raw.isEmpty) {
+    return null;
+  }
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is! Map) {
+      return null;
+    }
+    final item = PendingHangoutItem.fromJson(
+      Map<String, dynamic>.from(decoded),
+    );
+    return item.isValid ? item : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+List<PendingHangoutItem> parsePendingHangoutList(Object? raw) {
+  if (raw is! List) {
+    return const [];
+  }
+  return raw
+      .map(parsePendingHangoutItem)
+      .whereType<PendingHangoutItem>()
+      .toList();
+}
+
+/// Legacy single-blob JSON array parser (upgrade migration / tests).
 List<PendingHangoutItem> parsePendingHangouts(String? json) {
   if (json == null || json.isEmpty) {
     return const [];
   }
   try {
-    final decoded = jsonDecode(json);
-    if (decoded is! List) {
-      return const [];
-    }
-    return decoded
-        .whereType<Map>()
-        .map(
-          (item) => PendingHangoutItem.fromJson(
-            Map<String, dynamic>.from(item),
-          ),
-        )
-        .where((item) => item.isValid)
-        .toList();
+    return parsePendingHangoutList(jsonDecode(json));
   } catch (_) {
     return const [];
   }
-}
-
-String encodePendingHangouts(List<PendingHangoutItem> items) {
-  return jsonEncode(items.map((item) => item.toJson()).toList());
-}
-
-List<PendingHangoutItem> removePendingHangoutById({
-  required List<PendingHangoutItem> items,
-  required String pendingId,
-}) {
-  if (pendingId.isEmpty) {
-    return items;
-  }
-  return items.where((item) => item.pendingId != pendingId).toList();
 }

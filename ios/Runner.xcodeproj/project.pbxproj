@@ -26,6 +26,7 @@
 		W1BB /* LogHangoutIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1FB /* LogHangoutIntent.swift */; };
 		W1BC /* HangoutChannelBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1FC /* HangoutChannelBridge.swift */; };
 		W1BD /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1FD /* SceneDelegate.swift */; };
+		W1BE /* PendingHangoutChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = W1FE /* PendingHangoutChannel.swift */; };
 		W1EB1 /* DueFriendWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = W1F4 /* DueFriendWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -110,6 +111,7 @@
 		W1FB /* LogHangoutIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogHangoutIntent.swift; sourceTree = "<group>"; };
 		W1FC /* HangoutChannelBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HangoutChannelBridge.swift; sourceTree = "<group>"; };
 		W1FD /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		W1FE /* PendingHangoutChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingHangoutChannel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +211,7 @@
 				W1FA /* FriendEntity.swift */,
 				W1FB /* LogHangoutIntent.swift */,
 				W1FC /* HangoutChannelBridge.swift */,
+				W1FE /* PendingHangoutChannel.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
@@ -496,6 +499,7 @@
 				W1BA /* FriendEntity.swift in Sources */,
 				W1BB /* LogHangoutIntent.swift in Sources */,
 				W1BC /* HangoutChannelBridge.swift in Sources */,
+				W1BE /* PendingHangoutChannel.swift in Sources */,
 				W1B5 /* DueFriendSnapshotStore.swift in Sources */,
 				W1B8 /* FriendCatalogStore.swift in Sources */,
 				W1B9 /* PendingHangoutStore.swift in Sources */,
