@@ -4,6 +4,7 @@ import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/services/due_friend_snapshot_service.dart';
+import 'package:friend_builder/services/native_projection_service.dart';
 import 'package:friend_builder/services/pending_hangout.dart';
 import 'package:friend_builder/storage.dart';
 import 'package:home_widget/home_widget.dart';
@@ -13,6 +14,9 @@ class HangoutIntentService {
   static const MethodChannel methodChannel = MethodChannel(
     'com.example.friend_builder/hangouts',
   );
+
+  /// Matches iOS `PendingHangoutStore.keyPendingJson`.
+  static const String keyPendingHangoutsJson = 'pending_hangouts_json';
 
   static final Storage _storage = Storage();
   static bool _methodChannelRegistered = false;
@@ -68,13 +72,14 @@ class HangoutIntentService {
 
   /// Live ranking for warm Flutter (Siri / CarPlay). Also refreshes App Group.
   static Future<Map<String, dynamic>> getTopPerson() async {
-    return DueFriendSnapshotService.refreshAndReturnPayload();
+    return NativeProjectionService.refreshAndReturnPayload();
   }
 
   static Future<void> logHangout({
     required String contactIdentifier,
     String displayName = '',
     String pendingId = '',
+    bool refreshProjection = true,
   }) async {
     final contact = await _resolveContact(
       contactIdentifier: contactIdentifier,
@@ -91,15 +96,14 @@ class HangoutIntentService {
     if (pendingId.isNotEmpty) {
       await removePendingHangout(pendingId);
     }
-    // Close the ranking/Siri snapshot loop after a durable hangout commit.
-    // createHangout already refreshes; this second pass guarantees the App
-    // Group reflects the hangout even if the first publish raced or failed.
-    final refreshed = await DueFriendSnapshotService.refresh();
-    if (!refreshed) {
-      if (kDebugMode) {
-        print(
-          'HangoutIntentService snapshot refresh failed after logHangout',
-        );
+    if (refreshProjection) {
+      final refreshed = await NativeProjectionService.refreshNow();
+      if (!refreshed) {
+        if (kDebugMode) {
+          print(
+            'HangoutIntentService snapshot refresh failed after logHangout',
+          );
+        }
       }
     }
   }
@@ -132,7 +136,7 @@ class HangoutIntentService {
     await DueFriendSnapshotService.configureAppGroup();
     try {
       final pendingJson = await HomeWidget.getWidgetData<String>(
-        DueFriendSnapshotService.keyPendingHangoutsJson,
+        keyPendingHangoutsJson,
       );
       final pendingItems = parsePendingHangouts(pendingJson);
       if (pendingItems.isEmpty) {
@@ -146,6 +150,7 @@ class HangoutIntentService {
           await logHangout(
             contactIdentifier: item.contactIdentifier,
             displayName: item.displayName,
+            refreshProjection: false,
           );
           committedAny = true;
         } catch (error) {
@@ -157,12 +162,12 @@ class HangoutIntentService {
       }
 
       await HomeWidget.saveWidgetData<String>(
-        DueFriendSnapshotService.keyPendingHangoutsJson,
+        keyPendingHangoutsJson,
         encodePendingHangouts(remainingItems),
       );
 
       if (committedAny) {
-        await DueFriendSnapshotService.refresh();
+        await NativeProjectionService.refreshNow();
       }
     } catch (error) {
       if (kDebugMode) {
@@ -175,14 +180,14 @@ class HangoutIntentService {
     await DueFriendSnapshotService.configureAppGroup();
     try {
       final pendingJson = await HomeWidget.getWidgetData<String>(
-        DueFriendSnapshotService.keyPendingHangoutsJson,
+        keyPendingHangoutsJson,
       );
       final remaining = removePendingHangoutById(
         items: parsePendingHangouts(pendingJson),
         pendingId: pendingId,
       );
       await HomeWidget.saveWidgetData<String>(
-        DueFriendSnapshotService.keyPendingHangoutsJson,
+        keyPendingHangoutsJson,
         encodePendingHangouts(remaining),
       );
     } catch (error) {

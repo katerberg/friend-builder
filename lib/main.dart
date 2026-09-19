@@ -12,6 +12,7 @@ import 'package:friend_builder/theme_notifier.dart';
 import 'package:friend_builder/services/cloud_sync_service.dart';
 import 'package:friend_builder/services/due_friend_snapshot_service.dart';
 import 'package:friend_builder/services/hangout_intent_service.dart';
+import 'package:friend_builder/services/native_projection_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -122,6 +123,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await DueFriendSnapshotService.configureAppGroup();
+  NativeProjectionService.start();
   HangoutIntentService.registerMethodChannel();
   await HangoutIntentService.drainPendingHangouts();
 
@@ -159,7 +161,7 @@ Future<void> main() async {
   // await DebugData.populateFakeContactsIfNeeded();
   // await DebugData.populateFakeHangoutsIfNeeded();
 
-  DueFriendSnapshotService.refresh();
+  NativeProjectionService.refreshNow();
 
   AvatarSync.syncAvatarsIfNeeded();
 

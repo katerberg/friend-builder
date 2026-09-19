@@ -6,8 +6,10 @@ import 'package:friend_builder/services/friend_catalog.dart';
 import 'package:friend_builder/services/top_due_friend.dart';
 import 'package:friend_builder/storage.dart';
 
-/// Publishes the top due friend snapshot and friend catalog to the App Group
-/// for WidgetKit + Siri.
+/// Publishes the top due-friend snapshot and friend catalog to the App Group.
+///
+/// Callers should go through [NativeProjectionService] rather than invoking
+/// this from Storage or UI mutation paths.
 class DueFriendSnapshotService {
   static const String appGroupId = 'group.com.example.friendBuilder';
   static const String iosWidgetName = 'DueFriendWidget';
@@ -18,7 +20,6 @@ class DueFriendSnapshotService {
   static const String keyDisplayName = 'due_friend_display_name';
   static const String keyUrgency = 'due_friend_urgency';
   static const String keyFriendCatalogJson = 'friend_catalog_json';
-  static const String keyPendingHangoutsJson = 'pending_hangouts_json';
 
   static final Storage _storage = Storage();
   static bool _appGroupConfigured = false;
@@ -37,8 +38,7 @@ class DueFriendSnapshotService {
     }
   }
 
-  /// Recomputes ranking, publishes App Group snapshot + friend catalog.
-  /// Returns the payload (also used by live `getTopPerson`).
+  /// Recomputes ranking and publishes snapshot + friend catalog.
   static Future<Map<String, dynamic>> refreshAndReturnPayload() async {
     await configureAppGroup();
     final contactPermission =

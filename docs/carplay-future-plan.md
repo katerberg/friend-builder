@@ -55,7 +55,7 @@ Shipped for warm-path Siri (`WhoShouldIHangOutWithIntent`): recomputes ranking i
 
 **`logHangout` ←** `{ pendingId, contactIdentifier, displayName? }` → `{ ok: true }` / error
 
-After a durable hangout commit (channel or pending-queue drain), Dart refreshes the App Group snapshot in the same path so ranking/urgency are not left stale.
+After a durable hangout commit (channel or pending-queue drain), Dart flushes [NativeProjectionService.refreshNow] so ranking/urgency are not left stale. UI/DB mutations notify [StorageChangeBus]; the projection service debounces and republishes snapshot + catalog without Storage importing widget/Siri code.
 
 Channel name: `com.example.friend_builder/hangouts`.
 
@@ -97,8 +97,9 @@ Already in tree for CarPlay to pick up later:
 - Ranking: `resolveTopDueFriend` (same sort as Friends)
 - Urgency: `dueFriendUrgencyLabel`
 - Snapshot keys / App Group pattern (`group.com.example.friendBuilder`) — WidgetKit + cold Siri fallback; warm Siri uses live `getTopPerson`
-- Siri hangout logging: `LogHangoutIntent` + `HangoutIntentService` MethodChannel `logHangout` + pending queue drain + post-commit snapshot refresh
+- Siri hangout logging: `LogHangoutIntent` + `HangoutIntentService` MethodChannel `logHangout` + pending queue drain + post-commit snapshot refresh via `NativeProjectionService`
 - Warm-path `getTopPerson` MethodChannel (extend later with phones / photoBase64 for CarPlay)
+- Domain → projection seam: `StorageChangeBus` + debounced `NativeProjectionService` (Storage no longer imports widget/Siri code)
 
 ---
 
