@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:friend_builder/contacts_permission.dart';
+import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/services/due_friend_snapshot_service.dart';
@@ -32,6 +33,7 @@ class HangoutIntentService {
   static Future<dynamic> _handleMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'logHangout':
+        // CarPlay / warm callers only. Siri uses queue-only + drain.
         return _handleLogHangout(call.arguments);
       case 'getTopPerson':
         return getTopPerson();
@@ -81,6 +83,60 @@ class HangoutIntentService {
     String pendingId = '',
     bool refreshProjection = true,
   }) async {
+    if (pendingId.isNotEmpty) {
+      await _commitPendingHangout(
+        pendingId: pendingId,
+        contactIdentifier: contactIdentifier,
+        displayName: displayName,
+      );
+    } else {
+      await _createHangoutForContact(
+        contactIdentifier: contactIdentifier,
+        displayName: displayName,
+      );
+    }
+    if (refreshProjection) {
+      final refreshed = await NativeProjectionService.refreshNow();
+      if (!refreshed) {
+        if (kDebugMode) {
+          print(
+            'HangoutIntentService snapshot refresh failed after logHangout',
+          );
+        }
+      }
+    }
+  }
+
+  /// Claim → create → remove-one from queue (reload+filter, never batch rewrite).
+  /// Returns true when a new hangout was written.
+  static Future<bool> _commitPendingHangout({
+    required String pendingId,
+    required String contactIdentifier,
+    required String displayName,
+  }) async {
+    final claimed =
+        await DBProvider.db.claimProcessedPendingHangout(pendingId);
+    if (!claimed) {
+      await removePendingHangout(pendingId);
+      return false;
+    }
+    try {
+      await _createHangoutForContact(
+        contactIdentifier: contactIdentifier,
+        displayName: displayName,
+      );
+    } catch (error) {
+      await DBProvider.db.releaseProcessedPendingHangout(pendingId);
+      rethrow;
+    }
+    await removePendingHangout(pendingId);
+    return true;
+  }
+
+  static Future<void> _createHangoutForContact({
+    required String contactIdentifier,
+    required String displayName,
+  }) async {
     final contact = await _resolveContact(
       contactIdentifier: contactIdentifier,
       displayName: displayName,
@@ -93,19 +149,6 @@ class HangoutIntentService {
         isAllDay: false,
       ),
     );
-    if (pendingId.isNotEmpty) {
-      await removePendingHangout(pendingId);
-    }
-    if (refreshProjection) {
-      final refreshed = await NativeProjectionService.refreshNow();
-      if (!refreshed) {
-        if (kDebugMode) {
-          print(
-            'HangoutIntentService snapshot refresh failed after logHangout',
-          );
-        }
-      }
-    }
   }
 
   static Future<EncodableContact> _resolveContact({
@@ -143,28 +186,23 @@ class HangoutIntentService {
         return;
       }
 
-      final remainingItems = <PendingHangoutItem>[];
       var committedAny = false;
       for (final item in pendingItems) {
         try {
-          await logHangout(
+          final didCommit = await _commitPendingHangout(
+            pendingId: item.pendingId,
             contactIdentifier: item.contactIdentifier,
             displayName: item.displayName,
-            refreshProjection: false,
           );
-          committedAny = true;
+          if (didCommit) {
+            committedAny = true;
+          }
         } catch (error) {
-          remainingItems.add(item);
           if (kDebugMode) {
             print('HangoutIntentService drain item failed: $error');
           }
         }
       }
-
-      await HomeWidget.saveWidgetData<String>(
-        keyPendingHangoutsJson,
-        encodePendingHangouts(remainingItems),
-      );
 
       if (committedAny) {
         await NativeProjectionService.refreshNow();
@@ -176,6 +214,7 @@ class HangoutIntentService {
     }
   }
 
+  /// Reloads the current queue and removes only [pendingId] (merge-safe).
   static Future<void> removePendingHangout(String pendingId) async {
     await DueFriendSnapshotService.configureAppGroup();
     try {

@@ -7,7 +7,7 @@ struct LogHangoutIntent: AppIntent {
     "Logs a hangout with a friend in Friend Builder."
   )
 
-  /// Opens the app so Dart can drain a pending hangout when the engine was cold.
+  /// Opens the app so Dart can drain the verified App Group queue soon.
   static var openAppWhenRun: Bool = true
 
   @Parameter(title: "Friend")
@@ -38,23 +38,12 @@ struct LogHangoutIntent: AppIntent {
     let displayName = friend.displayName.isEmpty ? "a friend" : friend.displayName
     let pendingId = UUID().uuidString
 
+    // Queue-only: Dart drain is the sole SQLite writer for Siri hangouts.
     let enqueued = PendingHangoutStore.enqueue(
       pendingId: pendingId,
       contactIdentifier: friend.id,
       displayName: friend.displayName
     )
-
-    let savedImmediately = await HangoutChannelBridge.logHangout(
-      pendingId: pendingId,
-      contactIdentifier: friend.id,
-      displayName: friend.displayName
-    )
-    if savedImmediately {
-      PendingHangoutStore.remove(pendingId: pendingId)
-      return .result(
-        dialog: IntentDialog(stringLiteral: "Logged a hangout with \(displayName).")
-      )
-    }
 
     if enqueued {
       return .result(

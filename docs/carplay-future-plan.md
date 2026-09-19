@@ -59,7 +59,7 @@ After a durable hangout commit (channel or pending-queue drain), Dart flushes [N
 
 Channel name: `com.example.friend_builder/hangouts`.
 
-Siri `LogHangoutIntent` always enqueues a pending hangout in the App Group (`pending_hangouts_json`), then invokes `logHangout` when the Flutter engine is warm. On success, the pending id is removed. Dart also drains any leftover queue on startup and resume. Native never writes SQLite; Dart remains source of truth.
+Siri `LogHangoutIntent` is **queue-only**: it verifies an App Group enqueue (`pending_hangouts_json`) and never calls MethodChannel `logHangout`. Dart drain is the sole SQLite writer for Siri hangouts. Drain claims each `pendingId` in SQLite (`processed_pending_hangouts`), creates the hangout, then removes **only that id** by reloading the current queue (so concurrent enqueues are not wiped). `openAppWhenRun` opens the app so drain happens soon; durability is the verified queue write.
 
 Hangout defaults: `when: now`, one contact, empty notes, not all-day.
 
@@ -97,8 +97,8 @@ Already in tree for CarPlay to pick up later:
 - Ranking: `resolveTopDueFriend` (same sort as Friends)
 - Urgency: `dueFriendUrgencyLabel`
 - Snapshot keys / App Group pattern (`group.com.example.friendBuilder`) — WidgetKit + cold Siri fallback; warm Siri uses live `getTopPerson`
-- Siri hangout logging: `LogHangoutIntent` + `HangoutIntentService` MethodChannel `logHangout` + pending queue drain + post-commit snapshot refresh via `NativeProjectionService`
-- Warm-path `getTopPerson` MethodChannel (extend later with phones / photoBase64 for CarPlay)
+- Siri hangout logging: queue-only `LogHangoutIntent` + claim/idempotent `HangoutIntentService` drain (`processed_pending_hangouts`) + `NativeProjectionService` refresh
+- Warm-path `getTopPerson` MethodChannel (extend later with phones / photoBase64 for CarPlay); `logHangout` MethodChannel remains for CarPlay dial-success, not Siri
 - Domain → projection seam: `StorageChangeBus` + debounced `NativeProjectionService` (Storage no longer imports widget/Siri code)
 
 ---

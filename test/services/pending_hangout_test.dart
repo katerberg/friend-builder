@@ -64,4 +64,24 @@ void main() {
     final encoded = encodePendingHangouts(twice);
     expect(parsePendingHangouts(encoded).single.pendingId, 'p2');
   });
+
+  test('removePendingHangoutById preserves unrelated concurrent items', () {
+    final items = [
+      const PendingHangoutItem(
+        pendingId: 'p1',
+        contactIdentifier: 'c1',
+        displayName: 'Alex',
+        enqueuedAt: 't1',
+      ),
+      const PendingHangoutItem(
+        pendingId: 'p2',
+        contactIdentifier: 'c2',
+        displayName: 'Blake',
+        enqueuedAt: 't2',
+      ),
+    ];
+
+    final afterP1 = removePendingHangoutById(items: items, pendingId: 'p1');
+    expect(afterP1.map((item) => item.pendingId), ['p2']);
+  });
 }
