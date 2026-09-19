@@ -34,25 +34,25 @@ class DebugNotificationMenu extends StatelessWidget {
 
     if (isSnoozeReminder) {
       final snoozeReminder = SnoozeReminder(
-        contactIdentifier: testContact.id,
+        contactIdentifier: testContact.safeId,
         snoozeUntil: notificationTime,
       );
       await DBProvider.db.saveSnoozeReminder(snoozeReminder);
 
       await scheduleTestNotification(
         flutterLocalNotificationsPlugin,
-        'Reminder: Chat with ${testContact.displayName}?',
+        'Reminder: Chat with ${testContact.safeDisplayName}?',
         "You snoozed this reminder!",
         notificationTime,
-        testContact.id,
+        testContact.safeId,
       );
     } else {
       await scheduleTestNotification(
         flutterLocalNotificationsPlugin,
-        'Want to chat with ${testContact.displayName}?',
+        'Want to chat with ${testContact.safeDisplayName}?',
         "It's been a minute!",
         notificationTime,
-        testContact.id,
+        testContact.safeId,
       );
     }
 
@@ -60,7 +60,7 @@ class DebugNotificationMenu extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              '${isSnoozeReminder ? 'Snooze reminder' : 'Reminder'} scheduled in 5 seconds for ${testContact.displayName}'),
+              '${isSnoozeReminder ? 'Snooze reminder' : 'Reminder'} scheduled in 5 seconds for ${testContact.safeDisplayName}'),
         ),
       );
     }

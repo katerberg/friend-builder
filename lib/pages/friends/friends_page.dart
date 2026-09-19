@@ -47,9 +47,9 @@ class FriendsPageContact {
     required Map<String, Hangout?> latestHangoutMap,
     required Map<String, Friend?> friendMap,
   }) {
-    Friend? friend = friendMap[contact.id];
+    Friend? friend = friendMap[contact.safeId];
     frequency = friend?.isContactable == true ? friend?.frequency : null;
-    latestHangout = latestHangoutMap[contact.id];
+    latestHangout = latestHangoutMap[contact.safeId];
   }
 }
 
@@ -125,7 +125,7 @@ class FriendsPageState extends State<FriendsPage> {
 
   FriendsPageContact _getOrCreateContactData(Contact contact) {
     return _contactCache.putIfAbsent(
-      contact.id,
+      contact.safeId,
       () => FriendsPageContact(
         contact: contact,
         latestHangoutMap: _latestHangoutMap,
@@ -197,11 +197,11 @@ class FriendsPageState extends State<FriendsPage> {
 
   Future<void> _sortContacts() async {
     final sortableContacts = _visibleContacts.map((c) {
-      final friend = _friendMap[c.id];
-      final hangout = _latestHangoutMap[c.id];
+      final friend = _friendMap[c.safeId];
+      final hangout = _latestHangoutMap[c.safeId];
       return SortableContact(
-        id: c.id,
-        displayName: c.displayName,
+        id: c.safeId,
+        displayName: c.safeDisplayName,
         frequencyValue: friend?.frequency.value,
         lastHangoutDate: hangout?.when,
         isContactable: friend?.isContactable ?? false,
@@ -212,7 +212,7 @@ class FriendsPageState extends State<FriendsPage> {
 
     if (!mounted) return;
 
-    final contactMap = {for (var c in _visibleContacts) c.id: c};
+    final contactMap = {for (var c in _visibleContacts) c.safeId: c};
 
     setState(() {
       _hangoutContacts = result.hangoutContactIds
@@ -235,7 +235,7 @@ class FriendsPageState extends State<FriendsPage> {
   Future<void> _handleContactPress(Contact? contact) async {
     List<Friend>? friends = await Storage.getFriends();
     Friend? friend = friends?.firstWhereOrNull(
-      (element) => element.contactIdentifier == contact?.id,
+      (element) => element.contactIdentifier == contact?.safeId,
     );
     if (contact == null) {
       return;
@@ -279,13 +279,13 @@ class FriendsPageState extends State<FriendsPage> {
   void _handleContactChange(String pattern) {
     pattern = pattern.trim();
     var exactMatches = _contacts.where((element) =>
-        (element.displayName).toLowerCase().contains(pattern.toLowerCase()));
+        element.safeDisplayName.toLowerCase().contains(pattern.toLowerCase()));
     if (exactMatches.isNotEmpty) {
       return _handleContactsFilter(exactMatches.toList()
-        ..sort((a, b) => (a.displayName).compareTo(b.displayName)));
+        ..sort((a, b) => a.safeDisplayName.compareTo(b.safeDisplayName)));
     }
     var matchingLevel = _contacts.where((element) =>
-        StringUtils.getComparison(element.displayName, pattern) > 0.3);
+        StringUtils.getComparison(element.safeDisplayName, pattern) > 0.3);
     _handleContactsFilter(matchingLevel.isNotEmpty ? matchingLevel : _contacts);
   }
 

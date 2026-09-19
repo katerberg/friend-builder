@@ -5,9 +5,9 @@ import 'package:friend_builder/data/hangout.dart';
 
 class ContactsHelper {
   static String getContactName(Contact? contact) {
-    var fullName = contact?.displayName.trim();
-    var nickName = contact?.name.nickname.trim();
-    var firstName = contact?.name.first.trim();
+    var fullName = contact?.safeDisplayName.trim();
+    var nickName = contact?.name?.nickname?.trim();
+    var firstName = contact?.name?.first?.trim();
     if (nickName != null && nickName != '') {
       return nickName;
     }
@@ -27,13 +27,13 @@ class ContactsHelper {
     String removeId = friendToRemove is EncodableContact &&
             friendToRemove.identifier.isNotEmpty
         ? friendToRemove.identifier
-        : friendToRemove.id;
+        : friendToRemove.safeId;
 
     return contacts.where((element) {
       String elementId =
           element is EncodableContact && element.identifier.isNotEmpty
               ? element.identifier
-              : element.id;
+              : element.safeId;
       return elementId != removeId;
     }).toList();
   }
@@ -89,7 +89,8 @@ class ContactsHelper {
   ) {
     return contactsFromWhichToSuggest
         .where((element) =>
-            !excludedContacts.any((selected) => selected.id == element.id) &&
+            !excludedContacts
+                .any((selected) => selected.safeId == element.safeId) &&
             ContactSearch.passesSuggestionFilter(
               element,
               pattern,
@@ -114,8 +115,8 @@ class ContactsHelper {
         if (contact.identifier.isNotEmpty) {
           recentContactIdentifiers.add(contact.identifier);
         }
-        if (contact.id.isNotEmpty) {
-          recentContactIdentifiers.add(contact.id);
+        if (contact.safeId.isNotEmpty) {
+          recentContactIdentifiers.add(contact.safeId);
         }
       }
     });

@@ -1,4 +1,5 @@
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/utils/contact_search.dart';
 import 'package:test/test.dart';
 
@@ -33,7 +34,7 @@ void main() {
       final sorted = ContactSearch.sortAndLimitSuggestions(
         [bigramOnly, alexandra],
         'Alex M',
-        {bigramOnly.id},
+        {bigramOnly.safeId},
       );
       expect(sorted.first.id, 'alexandra');
     });

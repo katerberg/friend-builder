@@ -306,7 +306,7 @@ Future<void> scheduleNextNotification(
         if (earliestTime == null ||
             nextNotificationTime.isBefore(earliestTime)) {
           earliestTime = nextNotificationTime;
-          earliestFriendName = contact.displayName;
+          earliestFriendName = contact.safeDisplayName;
           earliestContactIdentifier = friend.contactIdentifier;
         }
       }
@@ -375,7 +375,7 @@ Future<void> scheduleSnoozeNotifications(
       await _scheduleNotificationWithActions(
         flutterLocalNotificationsPlugin,
         notificationId,
-        'Reminder: Chat with ${contact.displayName}?',
+        'Reminder: Chat with ${contact.safeDisplayName}?',
         "You snoozed this reminder!",
         reminder.snoozeUntil,
         reminder.contactIdentifier,

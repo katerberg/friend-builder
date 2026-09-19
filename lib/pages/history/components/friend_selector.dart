@@ -49,7 +49,7 @@ class FriendSelector extends StatelessWidget {
       itemBuilder: (context, Contact suggestion) {
         return ListTile(
           leading: LazyContactAvatar(contact: suggestion),
-          title: Text(suggestion.displayName),
+          title: Text(suggestion.safeDisplayName),
         );
       },
       emptyBuilder: (context) => const NoItemsFound(),

@@ -10,7 +10,8 @@ dependencies:
   collection: ^1.18.0
   flutter:
     sdk: flutter
-  flutter_contacts: ^1.1.7+1
+  # 2.2+ requires Flutter 3.44; 2.0.2+ adopts UIScene-safe iOS registration.
+  flutter_contacts: ">=2.0.2 <2.2.0"
   flutter_local_notifications: ^17.1.2
   flutter_keyboard_visibility: ^6.0.0
   flutter_typeahead: ^5.2.0

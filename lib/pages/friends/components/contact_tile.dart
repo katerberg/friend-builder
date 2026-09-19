@@ -46,7 +46,7 @@ class ContactTile extends StatelessWidget {
       leading: LazyContactAvatar(contact: contact),
       onTap: () => onPressed?.call(contact),
       title: Text(
-        contact.displayName,
+        contact.safeDisplayName,
         style: TextStyle(
             fontWeight:
                 frequency == null ? FontWeight.normal : FontWeight.bold),

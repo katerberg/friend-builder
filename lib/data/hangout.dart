@@ -32,7 +32,7 @@ class Hangout {
   }
 
   bool hasContact(Contact contact) {
-    return contacts.any((element) => element.identifier == contact.id);
+    return contacts.any((element) => element.identifier == contact.safeId);
   }
 
   factory Hangout.fromJson(Map<String, dynamic> parsedJson) {

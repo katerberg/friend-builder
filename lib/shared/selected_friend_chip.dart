@@ -24,7 +24,7 @@ class SelectedFriendChip extends StatelessWidget {
       onDeleted: handleDelete,
       onPressed: handleDelete,
       deleteIconColor: Colors.black54,
-      label: Text(selectedFriend.displayName),
+      label: Text(selectedFriend.safeDisplayName),
     );
   }
 }

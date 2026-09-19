@@ -48,7 +48,7 @@ class OpenResult extends StatelessWidget {
                       ResultBubbles(
                           contacts: hangout.contacts
                             ..sort((a, b) =>
-                                a.displayName.compareTo(b.displayName))),
+                                a.safeDisplayName.compareTo(b.safeDisplayName))),
                       ResultMenu(
                         hangout: hangout,
                         onEdit: onEdit,

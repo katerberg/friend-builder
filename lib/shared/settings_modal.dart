@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:friend_builder/utils/calendar_sync.dart';
@@ -85,10 +86,12 @@ class _SettingsModalState extends State<SettingsModal> {
 
     if (excludedIds.isNotEmpty) {
       try {
-        final contacts = await FlutterContacts.getContacts();
+        final contacts = await FlutterContacts.getAll(
+          properties: ContactProperties.none,
+        );
         for (var contact in contacts) {
-          if (excludedIds.contains(contact.id)) {
-            contactNames[contact.id] = contact.displayName;
+          if (excludedIds.contains(contact.safeId)) {
+            contactNames[contact.safeId] = contact.safeDisplayName;
           }
         }
       } catch (e) {
@@ -197,12 +200,15 @@ class _SettingsModalState extends State<SettingsModal> {
   }
 
   Future<void> _addExcludedContact() async {
-    final contacts = await FlutterContacts.getContacts();
+    final contacts = await FlutterContacts.getAll(
+      properties: ContactProperties.none,
+    );
     final availableContacts = contacts
         .where((c) =>
-            !_excludedContactIds.contains(c.id) && c.displayName.isNotEmpty)
+            !_excludedContactIds.contains(c.safeId) &&
+            c.safeDisplayName.isNotEmpty)
         .toList()
-      ..sort((a, b) => a.displayName.compareTo(b.displayName));
+      ..sort((a, b) => a.safeDisplayName.compareTo(b.safeDisplayName));
 
     if (!mounted) return;
 
@@ -212,11 +218,11 @@ class _SettingsModalState extends State<SettingsModal> {
     );
 
     if (selected != null) {
-      final newExcludedIds = [..._excludedContactIds, selected.id];
+      final newExcludedIds = [..._excludedContactIds, selected.safeId];
       await SettingsModal.setExcludedContacts(newExcludedIds);
       setState(() {
         _excludedContactIds = newExcludedIds;
-        _excludedContactNames[selected.id] = selected.displayName;
+        _excludedContactNames[selected.safeId] = selected.safeDisplayName;
       });
     }
   }
@@ -591,7 +597,7 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
       } else {
         _filteredContacts = widget.contacts
             .where((c) =>
-                c.displayName.toLowerCase().contains(query.toLowerCase()))
+                c.safeDisplayName.toLowerCase().contains(query.toLowerCase()))
             .toList();
       }
     });
@@ -621,7 +627,7 @@ class _ContactPickerDialogState extends State<_ContactPickerDialog> {
                 itemBuilder: (context, index) {
                   final contact = _filteredContacts[index];
                   return ListTile(
-                    title: Text(contact.displayName),
+                    title: Text(contact.safeDisplayName),
                     onTap: () => Navigator.of(context).pop(contact),
                   );
                 },

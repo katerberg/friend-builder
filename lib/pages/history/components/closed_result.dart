@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/pages/history/components/hangout_when_label.dart';
@@ -25,7 +26,7 @@ class ClosedResult extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sortedContacts = List<EncodableContact>.from(hangout.contacts)
-      ..sort((a, b) => a.displayName.compareTo(b.displayName));
+      ..sort((a, b) => a.safeDisplayName.compareTo(b.safeDisplayName));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
