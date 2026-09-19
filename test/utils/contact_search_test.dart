@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   group('tierForContact', () {
     test('Alex M matches Alexandra Martellaro via ordered tokens', () {
-      final contact =
+      const contact =
           Contact(id: '1', displayName: 'Alexandra Martellaro');
       expect(
         ContactSearch.tierForContact(contact, 'Alex M'),
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('typo in first name uses ordered fuzzy tier', () {
-      final contact =
+      const contact =
           Contact(id: '1', displayName: 'Alekzandra Martellaro');
       expect(
         ContactSearch.tierForContact(contact, 'Alex M'),
@@ -27,9 +27,9 @@ void main() {
   group('sortAndLimitSuggestions', () {
     test('Alex M ranks strict ordered match above recent bigram-only match',
         () {
-      final alexandra =
+      const alexandra =
           Contact(id: 'alexandra', displayName: 'Alexandra Martellaro');
-      final bigramOnly =
+      const bigramOnly =
           Contact(id: 'alpha', displayName: 'Alpha Lexicus Moreton');
       final sorted = ContactSearch.sortAndLimitSuggestions(
         [bigramOnly, alexandra],
@@ -42,7 +42,7 @@ void main() {
 
   group('normalizedSearchStringsForContact', () {
     test('includes nickname for informal name phrases', () {
-      final contact = Contact(
+      const contact = Contact(
         displayName: 'Robert Formal',
         name: Name(nickname: 'Alex Buddy'),
       );
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('includes given name when display name is formal', () {
-      final contact = Contact(
+      const contact = Contact(
         displayName: 'Robert Formal',
         name: Name(first: 'Alex'),
       );
@@ -65,7 +65,7 @@ void main() {
 
   group('passesSuggestionFilter', () {
     test('excludes weak matches when query length reaches threshold', () {
-      final noMatch = Contact(id: '1', displayName: 'Brimelow Mixtures');
+      const noMatch = Contact(id: '1', displayName: 'Brimelow Mixtures');
       expect(
         ContactSearch.passesSuggestionFilter(
           noMatch,

@@ -9,24 +9,24 @@ import 'package:test/test.dart';
 void main() {
   group('getContactName', () {
     test('shows "this person" by default', () {
-      expect(ContactsHelper.getContactName(Contact()), 'this person');
+      expect(ContactsHelper.getContactName(const Contact()), 'this person');
     });
 
     test('shows display name if available', () {
-      expect(ContactsHelper.getContactName(Contact(displayName: 'Jane Dorsey')),
+      expect(ContactsHelper.getContactName(const Contact(displayName: 'Jane Dorsey')),
           'Jane Dorsey');
     });
 
     test('shows first name over displayName if available', () {
       expect(
           ContactsHelper.getContactName(
-              Contact(displayName: 'Jane Dorsey', name: Name(first: "Jane"))),
+              const Contact(displayName: 'Jane Dorsey', name: Name(first: "Jane"))),
           'Jane');
     });
 
     test('shows nickname over first name if available', () {
       expect(
-          ContactsHelper.getContactName(Contact(
+          ContactsHelper.getContactName(const Contact(
               displayName: 'Jane Dorsey',
               name: Name(nickname: "Jane Bane", first: "Jane"))),
           'Jane Bane');
@@ -122,14 +122,14 @@ void main() {
   group('filterContacts', () {
     test('filters mixed list of Contacts and EncodableContacts', () {
       List<Contact> contacts = [
-        Contact(id: '1', displayName: 'Alice'),
+        const Contact(id: '1', displayName: 'Alice'),
         EncodableContact(
             identifier: '2',
             displayName: 'Bob',
             givenName: 'Bob',
             familyName: 'Jones',
             middleName: ''),
-        Contact(id: '3', displayName: 'Charlie'),
+        const Contact(id: '3', displayName: 'Charlie'),
       ];
       Contact toRemove = EncodableContact(
           identifier: '2',
@@ -147,9 +147,9 @@ void main() {
 
     test('returns empty list when filtering last contact', () {
       List<Contact> contacts = [
-        Contact(id: '1', displayName: 'Alice'),
+        const Contact(id: '1', displayName: 'Alice'),
       ];
-      Contact toRemove = Contact(id: '1', displayName: 'Alice');
+      Contact toRemove = const Contact(id: '1', displayName: 'Alice');
 
       var filtered = ContactsHelper.filterContacts(contacts, toRemove);
 
@@ -158,10 +158,10 @@ void main() {
 
     test('returns same list when contact to remove is not present', () {
       List<Contact> contacts = [
-        Contact(id: '1', displayName: 'Alice'),
-        Contact(id: '2', displayName: 'Bob'),
+        const Contact(id: '1', displayName: 'Alice'),
+        const Contact(id: '2', displayName: 'Bob'),
       ];
-      Contact toRemove = Contact(id: '3', displayName: 'Charlie');
+      Contact toRemove = const Contact(id: '3', displayName: 'Charlie');
 
       var filtered = ContactsHelper.filterContacts(contacts, toRemove);
 
@@ -173,11 +173,11 @@ void main() {
     test('handles EncodableContact with empty identifier falling back to id',
         () {
       List<Contact> contacts = [
-        Contact(id: '1', displayName: 'Alice'),
-        Contact(id: '2', displayName: 'Bob'),
+        const Contact(id: '1', displayName: 'Alice'),
+        const Contact(id: '2', displayName: 'Bob'),
       ];
 
-      Contact toRemove = Contact(id: '1', displayName: 'Alice');
+      Contact toRemove = const Contact(id: '1', displayName: 'Alice');
 
       var filtered = ContactsHelper.filterContacts(contacts, toRemove);
 
