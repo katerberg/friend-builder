@@ -8,6 +8,8 @@ import 'package:friend_builder/utils/calendar_sync.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:friend_builder/theme_notifier.dart';
 import 'package:friend_builder/services/cloud_sync_service.dart';
+import 'package:friend_builder/shared/siri_shortcuts_tip.dart';
+import 'package:friend_builder/services/app_shortcuts_service.dart';
 
 const String calendarSyncEnabledKey = 'calendar_sync_enabled';
 const String excludedContactsKey = 'excluded_calendar_contacts';
@@ -402,6 +404,43 @@ class _SettingsModalState extends State<SettingsModal> {
     return luminance > 0.5 ? Colors.black87 : Colors.white;
   }
 
+  Widget _buildSiriShortcutsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          'Siri & Shortcuts',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Log hangouts and ask who you are overdue to see with Siri. '
+          'Enable Siri for Friend Builder in the Shortcuts app first.',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey[600],
+              ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            TextButton(
+              onPressed: () => SiriShortcutsTip.show(context),
+              child: const Text('How to enable'),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton.icon(
+              onPressed: () => AppShortcutsService.openShortcuts(),
+              icon: const Icon(Icons.mic),
+              label: const Text('Open Shortcuts'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
   Widget _buildCloudSyncSection() {
     final isConfigured = CloudSyncService().isInitialized;
 
@@ -542,6 +581,10 @@ class _SettingsModalState extends State<SettingsModal> {
                         const Divider(),
                         _buildCloudSyncSection(),
                         const Divider(),
+                        if (defaultTargetPlatform == TargetPlatform.iOS) ...[
+                          _buildSiriShortcutsSection(),
+                          const Divider(),
+                        ],
                         SwitchListTile(
                           title: const Text('Calendar Sync'),
                           subtitle: const Text(

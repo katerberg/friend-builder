@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:friend_builder/main.dart' show backgroundFetchFailed;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:friend_builder/theme_notifier.dart';
+import 'package:friend_builder/shared/siri_shortcuts_tip.dart';
 
 class FriendRouter extends StatefulWidget {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -55,6 +56,7 @@ class _FriendRouterState extends State<FriendRouter> {
             firstTime = false;
           });
           _checkBackgroundFetchStatus();
+          _maybeShowSiriShortcutsTip();
         }
       },
     );
@@ -64,6 +66,13 @@ class _FriendRouterState extends State<FriendRouter> {
   void initState() {
     _handleFirstLoad();
     super.initState();
+  }
+
+  void _maybeShowSiriShortcutsTip() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      SiriShortcutsTip.maybeShowAfterOnboarding(context);
+    });
   }
 
   void _checkBackgroundFetchStatus() {
@@ -138,6 +147,7 @@ class _FriendRouterState extends State<FriendRouter> {
                         firstTime = false;
                       });
                       _changeTab(1);
+                      _maybeShowSiriShortcutsTip();
                     }
                   },
                 ),
@@ -166,6 +176,7 @@ class _FriendRouterState extends State<FriendRouter> {
                     firstTime = false;
                   });
                   _changeTab(1);
+                  _maybeShowSiriShortcutsTip();
 
                   // Show the reminders set snackbar after transitioning to main app
                   WidgetsBinding.instance.addPostFrameCallback((_) {

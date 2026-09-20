@@ -12,6 +12,8 @@ class SceneDelegate: FlutterSceneDelegate {
     if let controller = window?.rootViewController as? FlutterViewController {
       HangoutChannelBridge.register(with: controller.binaryMessenger)
       PendingHangoutChannel.register(with: controller.binaryMessenger)
+      AppShortcutsChannel.register(with: controller.binaryMessenger)
     }
+    AppShortcutsChannel.updateParametersIfAvailable()
   }
 }

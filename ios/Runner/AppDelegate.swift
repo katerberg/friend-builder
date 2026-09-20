@@ -11,6 +11,10 @@ import Flutter
     if let registrar = self.registrar(forPlugin: "PendingHangoutChannel") {
       PendingHangoutChannel.register(with: registrar)
     }
+    if let registrar = self.registrar(forPlugin: "AppShortcutsChannel") {
+      AppShortcutsChannel.register(with: registrar)
+    }
+    AppShortcutsChannel.updateParametersIfAvailable()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

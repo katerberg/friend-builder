@@ -98,8 +98,11 @@ Already in tree for CarPlay to pick up later:
 - Urgency: `dueFriendUrgencyLabel`
 - Snapshot keys / App Group pattern (`group.com.example.friendBuilder`) — WidgetKit + cold Siri fallback; warm Siri uses live `getTopPerson`
 - Siri hangout logging: queue-only `LogHangoutIntent` + claim/idempotent `HangoutIntentService` drain (`processed_pending_hangouts`) + `NativeProjectionService` refresh
+- App Shortcuts discoverability: `FriendBuilderAppShortcuts.updateAppShortcutParameters()` after friend-catalog publish (and on launch); capped `suggestedEntities` (80); one-time iOS tip + Settings → Siri & Shortcuts
 - Warm-path `getTopPerson` MethodChannel (extend later with phones / photoBase64 for CarPlay); `logHangout` MethodChannel remains for CarPlay dial-success, not Siri
 - Domain → projection seam: `StorageChangeBus` + debounced `NativeProjectionService` (Storage no longer imports widget/Siri code)
+
+**Device QA (Siri / Shortcuts — not runnable in Linux CI):** After install, confirm Shortcuts → Friend Builder lists “Who's due” and “Log hangout”, turn **Siri** on, speak near-paraphrases of registered phrases on iOS 17+, and verify parameterized friend names resolve after a catalog refresh.
 
 ---
 

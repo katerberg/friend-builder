@@ -3,6 +3,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/hangout.dart';
+import 'package:friend_builder/services/app_shortcuts_service.dart';
 import 'package:friend_builder/services/friend_catalog.dart';
 import 'package:friend_builder/services/top_due_friend.dart';
 import 'package:friend_builder/storage.dart';
@@ -124,6 +125,7 @@ class DueFriendSnapshotService {
         keyFriendCatalogJson,
         encodeFriendCatalogEntries(entries),
       );
+      await AppShortcutsService.updateParameters();
     } catch (error) {
       if (kDebugMode) {
         print('DueFriendSnapshotService publishFriendCatalog failed: $error');
