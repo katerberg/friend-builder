@@ -25,17 +25,25 @@ struct FriendBuilderAppShortcuts: AppShortcutsProvider {
       intent: WhoShouldIHangOutWithIntent(),
       phrases: [
         "Who should I hang out with in \(.applicationName)",
+        "Who should I see in \(.applicationName)",
         "Who am I overdue to see in \(.applicationName)",
+        "Who am I overdue for in \(.applicationName)",
         "Who is due in \(.applicationName)",
-      ]
+      ],
+      shortTitle: "Who's due",
+      systemImageName: "person.crop.circle.badge.clock"
     )
     AppShortcut(
       intent: LogHangoutIntent(),
       phrases: [
         "I hung out with \(\.$friend) in \(.applicationName)",
         "Log a hangout with \(\.$friend) in \(.applicationName)",
+        "I saw \(\.$friend) in \(.applicationName)",
+        "Just hung out with \(\.$friend) in \(.applicationName)",
         "Log a hangout in \(.applicationName)",
-      ]
+      ],
+      shortTitle: "Log hangout",
+      systemImageName: "person.2.fill"
     )
   }
 }
