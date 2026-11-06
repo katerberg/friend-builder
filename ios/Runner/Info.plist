@@ -46,7 +46,7 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Calendar access is used to automatically log hangouts with friends from your calendar events</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Contacts are needed to know who you might be hanging out with</string>
+	<string>Contacts let you pick who you hang out with. Names, phone numbers and other contact details stay on this device; backups store only an anonymous contact ID.</string>
 	<key>NSSiriUsageDescription</key>
 	<string>Siri can tell you which friend you are most overdue to see and log hangouts with friends</string>
 	<key>PermissionGroupNotification</key>

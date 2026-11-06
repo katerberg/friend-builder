@@ -7,14 +7,16 @@ import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/snooze_reminder.dart';
-import 'package:friend_builder/data/encodable_contact.dart';
+import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/frequency.dart';
 import 'package:friend_builder/firebase_options.dart';
+import 'package:friend_builder/services/cloud_contact_codec.dart';
 import 'package:friend_builder/services/native_projection_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _firebaseUserIdKey = 'firebase_user_id';
 const String _lastSyncTimestampKey = 'last_sync_timestamp';
+const String _legacyNamesScrubbedKey = 'cloud_hangout_names_scrubbed_v1';
 
 class CloudSyncService {
   static final CloudSyncService _instance = CloudSyncService._internal();
@@ -171,15 +173,7 @@ class CloudSyncService {
           'notes': hangout.notes,
           'when': Timestamp.fromDate(hangout.when),
           'isAllDay': hangout.isAllDay,
-          'contacts': hangout.contacts
-              .map((c) => {
-                    'displayName': c.displayName,
-                    'middleName': c.middleName,
-                    'givenName': c.givenName,
-                    'identifier': c.identifier,
-                    'familyName': c.familyName,
-                  })
-              .toList(),
+          'contacts': CloudContactCodec.encode(hangout.contacts),
           'updatedAt': FieldValue.serverTimestamp(),
         });
       }
@@ -312,6 +306,7 @@ class CloudSyncService {
           .where((h) => h.when.isAfter(twoYearsAgo))
           .toList();
       await syncHangouts(recentHangouts);
+      await _scrubLegacyContactNames();
 
       final snoozeReminders = await DBProvider.db.getActiveSnoozeReminders();
       await syncSnoozeReminders(snoozeReminders);
@@ -420,15 +415,14 @@ class CloudSyncService {
         return;
       }
 
+      final deviceContacts = await _deviceContactsById();
+
       for (var doc in snapshot.docs) {
         final data = doc.data();
         final contacts = (data['contacts'] as List<dynamic>?)
-                ?.map((c) => EncodableContact(
-                      displayName: c['displayName'] as String? ?? '',
-                      middleName: c['middleName'] as String? ?? '',
-                      givenName: c['givenName'] as String? ?? '',
-                      identifier: c['identifier'] as String? ?? '',
-                      familyName: c['familyName'] as String? ?? '',
+                ?.map((c) => CloudContactCodec.decode(
+                      Map<String, dynamic>.from(c as Map),
+                      deviceContacts,
                     ))
                 .toList() ??
             [];
@@ -450,6 +444,71 @@ class CloudSyncService {
     } catch (e) {
       if (kDebugMode) {
         print('Failed to restore hangouts: $e');
+      }
+    }
+  }
+
+  /// Device contacts keyed by identifier, or empty if contacts permission
+  /// hasn't been granted yet. Missing names are backfilled later by
+  /// AvatarSync once permission is available.
+  Future<Map<String, Contact>> _deviceContactsById() async {
+    try {
+      final result = await ContactPermissionService().getContacts();
+      if (result.missingPermission) return {};
+      return {for (final contact in result.contacts) contact.safeId: contact};
+    } catch (e) {
+      if (kDebugMode) {
+        print('Could not read device contacts for restore: $e');
+      }
+      return {};
+    }
+  }
+
+  /// One-time cleanup: earlier app versions uploaded contact names with each
+  /// hangout. Rewrite every cloud hangout (including ones no longer synced) so
+  /// that only contact identifiers remain.
+  Future<void> _scrubLegacyContactNames() async {
+    if (!_isInitialized || _userId == null) return;
+
+    final preferences = await SharedPreferences.getInstance();
+    if (preferences.getBool(_legacyNamesScrubbedKey) == true) return;
+
+    try {
+      final snapshot =
+          await _firestore.collection('users/$_userId/hangouts').get();
+
+      var batch = _firestore.batch();
+      var pendingWrites = 0;
+      var scrubbed = 0;
+      for (final doc in snapshot.docs) {
+        final contacts = doc.data()['contacts'];
+        if (contacts is! List ||
+            !CloudContactCodec.containsPersonalFields(contacts)) {
+          continue;
+        }
+        batch.update(doc.reference, {
+          'contacts': CloudContactCodec.stripPersonalFields(contacts),
+        });
+        pendingWrites++;
+        scrubbed++;
+        // Firestore batches are capped at 500 writes.
+        if (pendingWrites >= 400) {
+          await batch.commit();
+          batch = _firestore.batch();
+          pendingWrites = 0;
+        }
+      }
+      if (pendingWrites > 0) {
+        await batch.commit();
+      }
+
+      await preferences.setBool(_legacyNamesScrubbedKey, true);
+      if (kDebugMode) {
+        print('Removed contact names from $scrubbed cloud hangouts');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to scrub legacy contact names: $e');
       }
     }
   }
