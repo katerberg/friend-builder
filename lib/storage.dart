@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:friend_builder/data/calendar_year_stats.dart';
 import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/hangout.dart';
 import 'package:friend_builder/data/friend.dart';
 import 'package:friend_builder/data/top_friend_row.dart';
+import 'package:friend_builder/services/cloud_sync_service.dart';
 import 'package:friend_builder/storage_change_bus.dart';
 
 class Storage {
@@ -37,6 +40,7 @@ class Storage {
 
   Future deleteHangout(Hangout hangout) async {
     final result = await DBProvider.db.deleteHangout(hangout);
+    unawaited(CloudSyncService().deleteHangoutFromCloud(hangout.id));
     StorageChangeBus.notifyChanged();
     return result;
   }
@@ -70,6 +74,8 @@ class Storage {
     await DBProvider.db
         .deleteSnoozeRemindersForContact(friend.contactIdentifier);
     final result = await DBProvider.db.deleteFriend(friend);
+    unawaited(
+        CloudSyncService().deleteFriendFromCloud(friend.contactIdentifier));
     StorageChangeBus.notifyChanged();
     return result;
   }

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/data/database.dart';
 import 'package:friend_builder/data/encodable_contact.dart';
+import 'package:friend_builder/services/cloud_contact_codec.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AvatarSync {
@@ -58,7 +59,13 @@ class AvatarSync {
         final encodableContact = hangout.contacts[index];
         final currentContact = contactMap[encodableContact.identifier];
 
-        if (currentContact != null) {
+        if (currentContact != null &&
+            CloudContactCodec.needsNameBackfill(encodableContact)) {
+          // Restored from cloud (which stores IDs only); fill in the name.
+          hangout.contacts[index] =
+              EncodableContact.fromContact(currentContact);
+          hangoutUpdated = true;
+        } else if (currentContact != null) {
           final currentAvatar = currentContact.photoBytes;
 
           final bool avatarChanged =
