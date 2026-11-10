@@ -126,26 +126,19 @@ class LogPageState extends State<LogPage> {
       ]));
     }
 
-    return GestureDetector(
-      child: Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        body: SafeArea(
-          bottom: false,
-          child: Container(
-            padding: const EdgeInsets.only(top: 24, left: 24, right: 24),
-            child: ListView(
-              shrinkWrap: false,
-              scrollDirection: Axis.vertical,
-              children: itemsToShow,
-            ),
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
+      body: SafeArea(
+        bottom: false,
+        child: Container(
+          padding: const EdgeInsets.only(top: 24, left: 24, right: 24),
+          child: ListView(
+            shrinkWrap: false,
+            scrollDirection: Axis.vertical,
+            children: itemsToShow,
           ),
         ),
       ),
-      onTap: () {
-        if (mounted) {
-          FocusScope.of(context).requestFocus(FocusNode());
-        }
-      },
     );
   }
 }

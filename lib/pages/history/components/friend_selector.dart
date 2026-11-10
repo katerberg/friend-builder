@@ -35,6 +35,7 @@ class FriendSelector extends StatelessWidget {
         return TextField(
           controller: controller,
           focusNode: focusNode,
+          onTapOutside: (_) => focusNode.unfocus(),
           cursorColor: TextSelectionTheme.of(context).cursorColor,
           style: const TextStyle(fontSize: 24),
           autofocus: false,
