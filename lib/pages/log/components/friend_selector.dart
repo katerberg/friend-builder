@@ -5,7 +5,6 @@ import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/shared/lazy_contact_avatar.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:friend_builder/shared/typeahead_offset.dart';
 import 'package:friend_builder/data/hangout.dart';
 
 class FriendSelector extends StatefulWidget {
@@ -66,7 +65,6 @@ class FriendSelectorState extends State<FriendSelector> {
     const inputBorder = UnderlineInputBorder(
         borderSide: BorderSide(width: 1, color: Colors.white));
     return TypeAheadField(
-        offset: typeaheadSuggestionsOffset(context),
       controller: widget.typeaheadController,
       builder: (context, controller, focusNode) {
         return TextField(

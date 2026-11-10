@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:friend_builder/shared/typeahead_offset.dart';
 import 'package:friend_builder/contacts_permission.dart';
 import 'package:friend_builder/missing_permission.dart';
 import 'package:friend_builder/shared/lazy_contact_avatar.dart';
@@ -86,7 +85,6 @@ class FriendAdderState extends State<FriendAdder> {
           _selectedFriends.length > 2
               ? const Divider()
               : TypeAheadField(
-                  offset: typeaheadSuggestionsOffset(context),
                   controller: typeaheadController,
                   suggestionsController: _suggestionsController,
                   builder: (context, controller, focusNode) {
