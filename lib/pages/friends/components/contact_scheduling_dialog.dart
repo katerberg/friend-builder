@@ -277,175 +277,183 @@ class ContactSchedulingDialogState extends State<ContactSchedulingDialog>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Scaffold(
-        appBar: AppBar(
-          leading:
-              IconButton(icon: const Icon(Icons.close), onPressed: _closePage),
-          title: Text(widget.contact?.safeDisplayName ?? 'Schedule'),
-          actions: widget.contact != null
-              ? [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: _editContactPressed,
-                    tooltip: 'Edit Contact',
-                  ),
-                ]
-              : null,
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      SelectionChoiceGroup(
-                        choices: const [
-                          'Weekly',
-                          'Monthly',
-                          'Quarterly',
-                          'Yearly',
-                          'Custom',
-                        ],
-                        onSelect: _handleSelectionTap,
-                        selection: selection[oftenLabel] ?? '',
-                        label:
-                            'How often do you want to contact ${ContactsHelper.getContactName(widget.contact)}?',
-                      ),
-                      if (selection[oftenLabel] == 'Custom')
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Every',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              const SizedBox(width: 12),
-                              SizedBox(
-                                width: 100,
-                                child: TextField(
-                                  controller: customDaysController,
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  decoration: const InputDecoration(
-                                    hintText: '14',
-                                    border: OutlineInputBorder(),
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 12),
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _customDays = int.tryParse(value);
-                                    });
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                'days',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
+    // Route system back (Android back button/gesture, side-rail back chevrons)
+    // through _closePage so it saves exactly like tapping the close icon.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _closePage();
+      },
+      child: GestureDetector(
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+                icon: const Icon(Icons.close), onPressed: _closePage),
+            title: Text(widget.contact?.safeDisplayName ?? 'Schedule'),
+            actions: widget.contact != null
+                ? [
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: _editContactPressed,
+                      tooltip: 'Edit Contact',
+                    ),
+                  ]
+                : null,
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SelectionChoiceGroup(
+                          choices: const [
+                            'Weekly',
+                            'Monthly',
+                            'Quarterly',
+                            'Yearly',
+                            'Custom',
+                          ],
+                          onSelect: _handleSelectionTap,
+                          selection: selection[oftenLabel] ?? '',
+                          label:
+                              'How often do you want to contact ${ContactsHelper.getContactName(widget.contact)}?',
                         ),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        child: TextField(
-                          controller: notesController,
-                          onChanged: (newVal) =>
-                              _handleSelectionTap(notesLabel, newVal),
-                          autocorrect: true,
-                          enableSuggestions: false,
-                          decoration:
-                              const InputDecoration(labelText: notesLabel),
-                          keyboardType: TextInputType.multiline,
-                          minLines: 1,
-                          maxLines: 8,
-                          textCapitalization: TextCapitalization.sentences,
-                        ),
-                      ),
-                      if (_isLoadingHangouts)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: const Row(
-                            children: [
-                              SizedBox(
-                                width: 16,
-                                height: 16,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Loading hangout history…',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      else if (_contactHangouts.isNotEmpty)
-                        GestureDetector(
-                          onTap: _eligibleContactHangouts.isEmpty
-                              ? null
-                              : _openHangoutHistory,
-                          child: Container(
+                        if (selection[oftenLabel] == 'Custom')
+                          Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.event,
-                                    size: 16, color: Colors.grey),
-                                const SizedBox(width: 8),
+                                const Text(
+                                  'Every',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(width: 12),
+                                SizedBox(
+                                  width: 100,
+                                  child: TextField(
+                                    controller: customDaysController,
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    decoration: const InputDecoration(
+                                      hintText: '14',
+                                      border: OutlineInputBorder(),
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 12),
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _customDays = int.tryParse(value);
+                                      });
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'days',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          child: TextField(
+                            controller: notesController,
+                            onChanged: (newVal) =>
+                                _handleSelectionTap(notesLabel, newVal),
+                            autocorrect: true,
+                            enableSuggestions: false,
+                            decoration:
+                                const InputDecoration(labelText: notesLabel),
+                            keyboardType: TextInputType.multiline,
+                            minLines: 1,
+                            maxLines: 8,
+                            textCapitalization: TextCapitalization.sentences,
+                          ),
+                        ),
+                        if (_isLoadingHangouts)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: const Row(
+                              children: [
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                                SizedBox(width: 8),
                                 Text(
-                                  'Last hangout: ${_contactHangouts.first.dateWithYear()}',
-                                  style: const TextStyle(
+                                  'Loading hangout history…',
+                                  style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
                                   ),
                                 ),
-                                if (_eligibleContactHangouts.isNotEmpty) ...[
-                                  const Spacer(),
-                                  const Icon(Icons.arrow_forward_ios,
-                                      size: 12, color: Colors.grey),
-                                ],
                               ],
                             ),
+                          )
+                        else if (_contactHangouts.isNotEmpty)
+                          GestureDetector(
+                            onTap: _eligibleContactHangouts.isEmpty
+                                ? null
+                                : _openHangoutHistory,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.event,
+                                      size: 16, color: Colors.grey),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Last hangout: ${_contactHangouts.first.dateWithYear()}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  if (_eligibleContactHangouts.isNotEmpty) ...[
+                                    const Spacer(),
+                                    const Icon(Icons.arrow_forward_ios,
+                                        size: 12, color: Colors.grey),
+                                  ],
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      if (_calendarSyncEnabled)
-                        SwitchListTile(
-                          title: const Text('Exclude from Calendar Sync'),
-                          subtitle: const Text(
-                            'Prevent automatic hangouts from calendar events',
+                        if (_calendarSyncEnabled)
+                          SwitchListTile(
+                            title: const Text('Exclude from Calendar Sync'),
+                            subtitle: const Text(
+                              'Prevent automatic hangouts from calendar events',
+                            ),
+                            value: _isExcludedFromCalendarSync,
+                            onChanged: _toggleCalendarSyncExclusion,
                           ),
-                          value: _isExcludedFromCalendarSync,
-                          onChanged: _toggleCalendarSyncExclusion,
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: _getContactButton(),
-              ),
-            ],
+                Container(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: _getContactButton(),
+                ),
+              ],
+            ),
           ),
         ),
+        onTap: () {
+          if (mounted) {
+            FocusScope.of(context).requestFocus(FocusNode());
+          }
+        },
       ),
-      onTap: () {
-        if (mounted) {
-          FocusScope.of(context).requestFocus(FocusNode());
-        }
-      },
     );
   }
 }
