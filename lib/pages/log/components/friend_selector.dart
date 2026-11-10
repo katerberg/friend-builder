@@ -71,6 +71,7 @@ class FriendSelectorState extends State<FriendSelector> {
           textCapitalization: TextCapitalization.sentences,
           controller: controller,
           focusNode: focusNode,
+          onTapOutside: (_) => focusNode.unfocus(),
           cursorColor: Colors.white,
           style: const TextStyle(color: Colors.white, fontSize: 24),
           autofocus: false,

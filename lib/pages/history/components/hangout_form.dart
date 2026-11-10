@@ -147,6 +147,7 @@ class HangoutFormState extends State<HangoutForm> {
               ),
               maxLines: 3,
               initialValue: _data.notes,
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
               onChanged: _handleNotesChange,
               onSaved: _handleNullableNotesChange,
             ),
