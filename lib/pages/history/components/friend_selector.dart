@@ -4,6 +4,7 @@ import 'package:friend_builder/shared/no_items_found.dart';
 import 'package:friend_builder/shared/lazy_contact_avatar.dart';
 import 'package:friend_builder/utils/contacts_helper.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:friend_builder/shared/typeahead_offset.dart';
 
 class FriendSelector extends StatelessWidget {
   final List<Contact> selectedFriends;
@@ -30,6 +31,7 @@ class FriendSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TypeAheadField(
+        offset: typeaheadSuggestionsOffset(context),
       controller: typeaheadController,
       builder: (context, controller, focusNode) {
         return TextField(
