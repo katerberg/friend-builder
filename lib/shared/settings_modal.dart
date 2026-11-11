@@ -318,16 +318,6 @@ class _SettingsModalState extends State<SettingsModal> {
 
   Widget _buildThemeColorPicker() {
     final currentColor = widget.themeNotifier.themeColor;
-    final colorNames = [
-      'Soft Sky Blue',
-      'Mint Green',
-      'Blush Pink',
-      'Peach',
-      'Lavender',
-      'Golden Yellow',
-      'Black',
-      'Coral',
-    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,9 +331,9 @@ class _SettingsModalState extends State<SettingsModal> {
         Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: List.generate(ThemeNotifier.pastelColors.length, (index) {
-            final color = ThemeNotifier.pastelColors[index];
-            final colorName = colorNames[index];
+          children: ThemeNotifier.colorOptions.map((option) {
+            final color = option.color;
+            final colorName = option.name;
             final isSelected = currentColor.toARGB32() == color.toARGB32();
 
             return Semantics(
@@ -390,7 +380,7 @@ class _SettingsModalState extends State<SettingsModal> {
                 ),
               ),
             );
-          }),
+          }).toList(),
         ),
         const SizedBox(height: 8),
       ],
