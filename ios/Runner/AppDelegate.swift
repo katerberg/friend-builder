@@ -11,6 +11,9 @@ import Flutter
     if let registrar = self.registrar(forPlugin: "PendingHangoutChannel") {
       PendingHangoutChannel.register(with: registrar)
     }
+    if let registrar = self.registrar(forPlugin: "AppIconChannel") {
+      AppIconChannel.register(with: registrar)
+    }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
